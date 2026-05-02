@@ -353,141 +353,7 @@ function ServiceSection() {
   );
 }
 
-function OwlMascot({ size = 130 }: { size?: number }) {
-  const eye = size * 0.2;
-  return (
-    <Box
-      aria-hidden
-      sx={{
-        width: size,
-        height: size * 1.05,
-        position: "relative",
-        mx: "auto",
-        filter: "drop-shadow(0 30px 50px rgba(8, 24, 42, 0.4))",
-        animation: "float 6s infinite ease-in-out",
-      }}
-    >
-      <Box
-        sx={{
-          position: "absolute",
-          inset: `${size * 0.06}px ${size * 0.1}px 0`,
-          borderRadius: "45% 45% 36% 36%",
-          background: "linear-gradient(135deg, #c8f4f3 0%, #8ee9e7 100%)",
-          boxShadow: "inset -12px -14px 0 rgba(76, 174, 179, 0.16)",
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: size * 0.01,
-          left: size * 0.18,
-          width: size * 0.22,
-          height: size * 0.28,
-          bgcolor: "#c8f4f3",
-          borderRadius: "70% 15% 60% 30%",
-          transform: "rotate(18deg)",
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: size * 0.01,
-          right: size * 0.18,
-          width: size * 0.22,
-          height: size * 0.28,
-          bgcolor: "#c8f4f3",
-          borderRadius: "15% 70% 30% 60%",
-          transform: "rotate(-18deg)",
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: size * 0.35,
-          left: size * 0.27,
-          width: eye,
-          height: eye,
-          borderRadius: "50%",
-          bgcolor: "#fff",
-          border: "4px solid #4f7e89",
-        }}
-      >
-        <Box
-          sx={{
-            width: eye * 0.45,
-            height: eye * 0.45,
-            borderRadius: "50%",
-            bgcolor: "#14243a",
-            mx: "auto",
-            mt: eye * 0.2,
-            animation: "blink 4s infinite",
-          }}
-        />
-      </Box>
-      <Box
-        sx={{
-          position: "absolute",
-          top: size * 0.35,
-          right: size * 0.27,
-          width: eye,
-          height: eye,
-          borderRadius: "50%",
-          bgcolor: "#fff",
-          border: "4px solid #4f7e89",
-        }}
-      >
-        <Box
-          sx={{
-            width: eye * 0.45,
-            height: eye * 0.45,
-            borderRadius: "50%",
-            bgcolor: "#14243a",
-            mx: "auto",
-            mt: eye * 0.2,
-            animation: "blink 4s infinite",
-          }}
-        />
-      </Box>
-      <Box
-        sx={{
-          position: "absolute",
-          top: size * 0.55,
-          left: "50%",
-          width: 0,
-          height: 0,
-          borderLeft: `${size * 0.07}px solid transparent`,
-          borderRight: `${size * 0.07}px solid transparent`,
-          borderTop: `${size * 0.12}px solid #ffc444`,
-          transform: "translateX(-50%)",
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: size * 0.08,
-          left: size * 0.35,
-          width: size * 0.12,
-          height: size * 0.18,
-          borderRadius: 99,
-          bgcolor: "#ffc444",
-          boxShadow: "0 4px 10px rgba(255, 196, 68, 0.4)",
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: size * 0.08,
-          right: size * 0.35,
-          width: size * 0.12,
-          height: size * 0.18,
-          borderRadius: 99,
-          bgcolor: "#ffc444",
-          boxShadow: "0 4px 10px rgba(255, 196, 68, 0.4)",
-        }}
-      />
-    </Box>
-  );
-}
+
 
 function Hero() {
   return (
@@ -604,8 +470,18 @@ function Hero() {
                 zIndex: -1,
               }}
             />
-            <Box sx={{ position: "relative", width: { xs: 320, md: 480 } }}>
-              <OwlMascot size={450} />
+            <Box sx={{ position: "relative", width: { xs: 320, md: 550 } }}>
+              <Box
+                component="img"
+                src="/images/logo-cat.png"
+                alt="Mutelu Cat Mascot"
+                sx={{
+                  width: "100%",
+                  height: "auto",
+                  filter: "drop-shadow(0 30px 60px rgba(0, 0, 0, 0.5))",
+                  animation: "float 6s infinite ease-in-out",
+                }}
+              />
             </Box>
           </Box>
         </Box>
@@ -783,7 +659,7 @@ export default function Home() {
 
       <Container maxWidth="lg">
         <ZodiacGrid />
-        
+
         <Box sx={{ my: 15, position: "relative" }}>
           <Card
             sx={{
@@ -814,11 +690,11 @@ export default function Home() {
                     เป็นโอกาสดีที่จะเริ่มต้นโครงการใหม่ๆ หรือเสนอไอเดียให้กับหัวหน้า...
                   </Typography>
                   <Stack direction="row" spacing={2.5}>
-                    <Button 
-                      variant="contained" 
-                      sx={{ 
-                        bgcolor: "#ffd43b", 
-                        color: "#14243a", 
+                    <Button
+                      variant="contained"
+                      sx={{
+                        bgcolor: "#ffd43b",
+                        color: "#14243a",
                         borderRadius: "16px",
                         px: 4,
                         py: 1.5,
@@ -829,9 +705,9 @@ export default function Home() {
                     >
                       อ่านต่อฉบับเต็ม
                     </Button>
-                    <Button 
-                      variant="text" 
-                      sx={{ color: "#fff", fontWeight: 700 }} 
+                    <Button
+                      variant="text"
+                      sx={{ color: "#fff", fontWeight: 700 }}
                       startIcon={<Heart variant="Bold" color="#f64f8b" />}
                     >
                       บันทึกดวงวันนี้
@@ -861,7 +737,7 @@ export default function Home() {
                 </Box>
               </Box>
             </CardContent>
-            
+
             <Box
               sx={{
                 position: "absolute",
@@ -878,9 +754,9 @@ export default function Home() {
         </Box>
 
         <ServiceSection />
-        
+
         <Box sx={{ py: 12, textAlign: "center" }}>
-           <Typography variant="h4" sx={{ fontWeight: 900, mb: 8, color: "#fff" }}>
+          <Typography variant="h4" sx={{ fontWeight: 900, mb: 8, color: "#fff" }}>
             ปรึกษานักพยากรณ์ผู้เชี่ยวชาญ 👩‍🏫
           </Typography>
           <Box
@@ -929,12 +805,12 @@ export default function Home() {
                       <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>{reader.name}</Typography>
                       <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem" }}>{reader.expert}</Typography>
                     </Box>
-                    <Button 
-                      fullWidth 
-                      variant="outlined" 
-                      sx={{ 
-                        borderRadius: "14px", 
-                        borderColor: "rgba(255,255,255,0.2)", 
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      sx={{
+                        borderRadius: "14px",
+                        borderColor: "rgba(255,255,255,0.2)",
                         color: "#fff",
                         "&:hover": { borderColor: reader.color, bgcolor: `${reader.color}10` }
                       }}
