@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
-import { Prompt, Inter } from "next/font/google";
+import { Prompt, Playfair_Display } from "next/font/google";
+import { Box } from "@mui/material";
 import "./globals.css";
 import { Providers } from "./providers";
 
 const prompt = Prompt({
   variable: "--font-prompt",
   subsets: ["thai", "latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const playfair = Playfair_Display({
+  variable: "--font-serif",
   subsets: ["latin"],
+  weight: ["400", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -28,9 +30,10 @@ export default function RootLayout({
   return (
     <html
       lang="th"
-      className={`${prompt.variable} ${inter.variable} h-full antialiased`}
+      className={`${prompt.variable} ${playfair.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full cosmic-body flex flex-col">
+      <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum HoroscopeScope {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum HoroscopeStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  displayName  String?
+  birthDate    DateTime?
+  zodiacSignId Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  zodiacSign ZodiacSign? @relation(fields: [zodiacSignId], references: [id])
+
+  @@index([zodiacSignId])
+}
+
+model ZodiacSign {
+  id          Int      @id
+  slug        String   @unique
+  name        String   @unique
+  startMonth  Int
+  startDay    Int
+  endMonth    Int
+  endDay      Int
+  element     String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users      User[]
+  horoscopes Horoscope[]
+  weeklySnapshots WeeklyHoroscopeSnapshot[]
+}
+
+model Horoscope {
+  id           String          @id @default(cuid())
+  zodiacSignId Int
+  scope        HoroscopeScope
+  title        String
+  summary      String?
+  content      String
+  highlight    String?
+  caution      String?
+  luckyColor   String?
+  luckyNumber  Int?
+  publishDate  DateTime
+  weekStart    DateTime?
+  weekEnd      DateTime?
+  status       HoroscopeStatus @default(DRAFT)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  zodiacSign ZodiacSign @relation(fields: [zodiacSignId], references: [id], onDelete: Cascade)
+
+  @@unique([zodiacSignId, scope, publishDate])
+  @@index([scope, publishDate, status])
+  @@index([scope, status, weekStart, weekEnd])
+  @@index([status])
+}
+
+model WeeklyHoroscopeSnapshot {
+  id            String   @id @default(cuid())
+  zodiacSignId  Int
+  weekStart     DateTime
+  weekEnd       DateTime
+  weekLabel     String
+  title         String
+  summary       String   @db.Text
+  loveText      String   @db.Text
+  careerText    String   @db.Text
+  financeText   String   @db.Text
+  obstacleText  String   @db.Text
+  healthText    String   @db.Text
+  loveScore     Int
+  careerScore   Int
+  financeScore  Int
+  obstacleScore Int
+  healthScore   Int
+  overallScore  Int
+  dominantPlanet String
+  luckyColor    String
+  methodology   String
+  logicVersion  String
+  computedData  Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  zodiacSign ZodiacSign @relation(fields: [zodiacSignId], references: [id], onDelete: Cascade)
+
+  @@unique([zodiacSignId, weekStart])
+  @@index([weekStart, weekEnd])
+}

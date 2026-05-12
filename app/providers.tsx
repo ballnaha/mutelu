@@ -1,44 +1,41 @@
 "use client";
 
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 
 const theme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
     primary: {
-      main: "#f64f8b",
-      light: "#ff7aaa",
-      dark: "#cf386d",
-    },
-    secondary: {
-      main: "#28c4c0",
+      main: "#7c3aed",
+      light: "#a78bfa",
+      dark: "#4c1d95",
     },
     background: {
-      default: "#14243a",
-      paper: "#f7f4eb",
+      default: "#ffffff",
+      paper: "#f9f7ff",
     },
     text: {
-      primary: "#f7f4eb",
-      secondary: "rgba(247, 244, 235, 0.72)",
+      primary: "#1a0a2e",
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 12,
   },
   typography: {
     fontFamily: "var(--font-prompt)",
     h1: {
       fontFamily: "var(--font-prompt)",
-      fontWeight: 900,
-      letterSpacing: "-0.02em",
+      fontWeight: 700,
+      letterSpacing: "-0.01em",
     },
     h2: {
       fontFamily: "var(--font-prompt)",
-      fontWeight: 800,
+      fontWeight: 700,
     },
     h3: {
       fontFamily: "var(--font-prompt)",
-      fontWeight: 800,
+      fontWeight: 700,
     },
     h4: {
       fontFamily: "var(--font-prompt)",
@@ -54,25 +51,26 @@ const theme = createTheme({
     },
     button: {
       textTransform: "none",
-      fontWeight: 700,
+      fontWeight: 600,
     },
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: "#14243a",
+          backgroundColor: "#fdfcff",
+          color: "#1e1b4b",
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 999,
-          paddingInline: 20,
-          paddingBlock: 12,
+          borderRadius: 12,
+          paddingInline: 24,
+          paddingBlock: 10,
           boxShadow: "none",
-          fontWeight: 900,
+          fontWeight: 600,
         },
       },
     },
@@ -80,38 +78,33 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: "none",
-          border: "0",
-          boxShadow: "0 18px 42px rgba(6, 14, 32, 0.16)",
+          border: "1px solid rgba(0,0,0,0.05)",
+          boxShadow: "0 4px 30px rgba(0, 0, 0, 0.03)",
+          borderRadius: 24,
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 999,
-          border: "1px solid rgba(20, 36, 58, 0.16)",
-          fontWeight: 900,
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          "& .MuiOutlinedInput-root": {
-            borderRadius: 8,
-            backgroundColor: "#fffdf6",
-          },
+          borderRadius: 12,
+          border: "1px solid rgba(124, 58, 237, 0.08)",
+          fontWeight: 600,
         },
       },
     },
   },
 });
 
+import { SessionProvider } from "next-auth/react";
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      {children}
-    </ThemeProvider>
+    <AppRouterCacheProvider options={{ key: "mui" }}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <SessionProvider>{children}</SessionProvider>
+      </ThemeProvider>
+    </AppRouterCacheProvider>
   );
 }
