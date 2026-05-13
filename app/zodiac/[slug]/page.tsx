@@ -1,10 +1,37 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Button, Container, Typography, Chip, Divider, Stack } from "@mui/material";
 import { getAllZodiacSigns, getWeeklyHoroscopeBySlug, getZodiacCardBySlug } from "@/lib/horoscopes";
+import { 
+  Heart, 
+  Briefcase, 
+  WalletMoney, 
+  Flash, 
+  Activity, 
+  ArrowLeft,
+  Magicpen,
+  Star1,
+  Information,
+  Shop,
+  Colorfilter
+} from "iconsax-react";
 
-const sectionOrder = ["love", "career", "finance", "obstacles", "health"] as const;
+import { Footer } from "@/app/components/footer";
+import { Header } from "@/app/components/header";
+
+const sectionIcons: Record<string, any> = {
+  love: Heart,
+  career: Briefcase,
+  finance: WalletMoney,
+  obstacles: Flash,
+  health: Activity,
+};
+
+type PageProps = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
 export async function generateStaticParams() {
   return getAllZodiacSigns().map((sign) => ({
@@ -13,7 +40,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(
-  props: PageProps<"/zodiac/[slug]">,
+  props: PageProps,
 ): Promise<Metadata> {
   const { slug } = await props.params;
   const sign = getZodiacCardBySlug(slug);
@@ -30,7 +57,7 @@ export async function generateMetadata(
   };
 }
 
-export default async function ZodiacPage(props: PageProps<"/zodiac/[slug]">) {
+export default async function ZodiacPage(props: PageProps) {
   const { slug } = await props.params;
   const sign = getZodiacCardBySlug(slug);
   const { horoscope, weekLabel } = await getWeeklyHoroscopeBySlug(slug);
@@ -39,67 +66,169 @@ export default async function ZodiacPage(props: PageProps<"/zodiac/[slug]">) {
     notFound();
   }
 
-  return (
-    <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 8, pt: 10 }}>
-      <Container maxWidth="md">
-        <Box sx={{ mb: 6, textAlign: "center" }} className="animate-fade">
-          <Typography sx={{ color: "var(--primary)", fontWeight: 500, letterSpacing: "0.2em", mb: 1, fontSize: "0.75rem", textTransform: "uppercase" }}>
-            Zodiac Insight • {weekLabel}
-          </Typography>
-          <Typography variant="h1" sx={{ fontSize: { xs: "2.5rem", md: "3.5rem" }, fontWeight: 600, mb: 1, color: "var(--foreground)", fontFamily: "var(--font-prompt)" }}>
-            ราศี{sign.name}
-          </Typography>
-          <Box sx={{ width: "40px", height: "1px", bgcolor: "var(--primary)", mx: "auto", my: 2 }} />
-          <Typography sx={{ fontSize: "1rem", fontWeight: 400, opacity: 0.5 }}>{sign.dateRange}</Typography>
-        </Box>
+  const sectionOrder = ["love", "career", "finance", "obstacles", "health"] as const;
 
-        <Box className="pro-card" sx={{ p: { xs: 3, md: 5 }, mb: 6, borderRadius: "12px" }}>
-           <Typography variant="h3" sx={{ fontSize: "1.5rem", mb: 2, fontWeight: 600, color: "var(--foreground)", fontFamily: "var(--font-prompt)", textAlign: "center" }}>
-            {horoscope.title}
-           </Typography>
-           <Typography sx={{ fontSize: "1rem", lineHeight: 1.8, fontWeight: 400, opacity: 0.8, textAlign: "center", mb: 4 }}>
-            {horoscope.summary}
-          </Typography>
-          
-          <Box className="elegant-divider" sx={{ my: 4 }} />
-          
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" }, gap: 4 }}>
-            {sectionOrder.map((sectionKey) => {
-              const section = horoscope.sections[sectionKey];
-              return (
-                <Box key={section.label}>
-                  <Typography sx={{ fontWeight: 600, fontSize: "0.85rem", color: "var(--primary)", mb: 1, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                    {section.label}
-                  </Typography>
-                  <Typography sx={{ fontSize: "0.95rem", lineHeight: 1.6, fontWeight: 400, opacity: 0.8 }}>
-                    {section.text}
-                  </Typography>
+  return (
+    <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", position: "relative", overflow: "hidden", pt: { xs: 8, md: 11 } }}>
+      <Header />
+      
+      {/* Large Background Symbol for character */}
+      <Typography 
+        sx={{ 
+          position: "absolute", top: "10%", right: "-5%", fontSize: { xs: "15rem", md: "25rem" }, 
+          opacity: 0.03, zIndex: 0, pointerEvents: "none", userSelect: "none",
+          transform: "rotate(-15deg)"
+        }}
+      >
+        {sign.symbol}
+      </Typography>
+
+      <Container maxWidth="md" sx={{ position: "relative", zIndex: 1, pb: 8 }}>
+        {/* Condensed Header Section */}
+        <Box sx={{ mb: 2 }} className="animate-fade">
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "2fr 1fr" }, gap: 2, alignItems: "center" }}>
+            <Box>
+              <Stack sx={{ flexDirection: "row", gap: 2, alignItems: "center", mb: { xs: 2, sm: 0 } }}>
+                <Box sx={{ 
+                  width: { xs: 48, md: 56 }, height: { xs: 48, md: 56 }, borderRadius: "16px", bgcolor: "var(--primary-glow)", 
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: { xs: "1.5rem", md: "1.75rem" },
+                  border: "1px solid var(--primary-light)", flexShrink: 0
+                }}>
+                  {sign.symbol}
                 </Box>
-              );
-            })}
+                <Box>
+                  <Typography variant="h1" sx={{ fontSize: { xs: "1.75rem", md: "2.75rem" }, fontWeight: 800, color: "var(--foreground)", fontFamily: "var(--font-prompt)", lineHeight: 1 }}>
+                    ราศี{sign.name}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.875rem", fontWeight: 500, opacity: 0.5 }}>{sign.dateRange}</Typography>
+                </Box>
+              </Stack>
+            </Box>
+            <Box sx={{ textAlign: { xs: "left", sm: "right" } }}>
+              <Typography sx={{ color: "var(--primary)", fontWeight: 700, fontSize: "0.75rem", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                {weekLabel}
+              </Typography>
+            </Box>
           </Box>
         </Box>
 
-        {/* Affiliate Section */}
-        <Box className="pro-card" sx={{ p: { xs: 3, md: 5 }, textAlign: "center", bgcolor: "var(--secondary)", border: "none", borderRadius: "12px" }}>
-          <Typography sx={{ color: "var(--primary)", fontWeight: 600, letterSpacing: "0.2em", mb: 1, fontSize: "0.75rem", textTransform: "uppercase" }}>Recommended</Typography>
-          <Typography variant="h3" sx={{ fontWeight: 600, mb: 2, fontSize: "1.8rem", fontFamily: "var(--font-prompt)", color: "var(--foreground)" }}>Curated Adornments</Typography>
-          <Typography sx={{ fontSize: "0.95rem", fontWeight: 400, opacity: 0.7, mb: 4, maxWidth: 600, mx: "auto", lineHeight: 1.6 }}>
-            เพื่อเปิดรับพลังงานที่ดีที่สุดในสัปดาห์นี้ ขอแนะนำให้สวมใส่เครื่องประดับสี <span style={{ color: "var(--primary)", fontWeight: 600 }}>{horoscope.luckyColor}</span> เพื่อดึงดูดพลังแห่ง {horoscope.energy}
-          </Typography>
-          <Button variant="contained" size="small" sx={{ bgcolor: "var(--foreground)", color: "#fff", px: 4, py: 1, borderRadius: "4px", fontWeight: 500, letterSpacing: "0.05em", "&:hover": { bgcolor: "var(--accent)" } }}>
-            Shop the Collection
-          </Button>
+        {/* Sleek Highlight Bar - Grid Style for better mobile layout */}
+        <Box 
+          sx={{ 
+            mb: 4, borderRadius: "16px", bgcolor: "var(--foreground)", color: "#fff",
+            boxShadow: "0 10px 30px var(--primary-glow)", overflow: "hidden"
+          }}
+        >
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)" }}>
+            <Box>
+              <Box sx={{ p: { xs: 1.5, sm: 2 }, textAlign: "center", borderRight: "1px solid rgba(255,255,255,0.1)" }}>
+                <Box sx={{ color: "var(--primary-light)", mb: 0.5, display: "flex", justifyContent: "center" }}>
+                  <Star1 size="20" variant="Bold" color="currentColor" />
+                </Box>
+                <Typography sx={{ fontSize: { xs: "0.55rem", sm: "0.65rem" }, fontWeight: 600, opacity: 0.6, textTransform: "uppercase", lineHeight: 1 }}>Luck</Typography>
+                <Typography sx={{ fontSize: { xs: "0.875rem", sm: "1rem" }, fontWeight: 700 }}>{horoscope.score}%</Typography>
+              </Box>
+            </Box>
+            <Box>
+              <Box sx={{ p: { xs: 1.5, sm: 2 }, textAlign: "center", borderRight: "1px solid rgba(255,255,255,0.1)" }}>
+                <Box sx={{ color: "var(--primary-light)", mb: 0.5, display: "flex", justifyContent: "center" }}>
+                  <Magicpen size="20" variant="Bold" color="currentColor" />
+                </Box>
+                <Typography sx={{ fontSize: { xs: "0.55rem", sm: "0.65rem" }, fontWeight: 600, opacity: 0.6, textTransform: "uppercase", lineHeight: 1 }}>Energy</Typography>
+                <Typography sx={{ fontSize: { xs: "0.875rem", sm: "1rem" }, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {horoscope.energy?.split("และ")[0] || horoscope.energy}
+                </Typography>
+              </Box>
+            </Box>
+            <Box>
+              <Box sx={{ p: { xs: 1.5, sm: 2 }, textAlign: "center" }}>
+                <Box sx={{ color: "var(--primary-light)", mb: 0.5, display: "flex", justifyContent: "center" }}>
+                  <Colorfilter size="20" variant="Bold" color="currentColor" />
+                </Box>
+                <Typography sx={{ fontSize: { xs: "0.55rem", sm: "0.65rem" }, fontWeight: 600, opacity: 0.6, textTransform: "uppercase", lineHeight: 1 }}>Color</Typography>
+                <Typography sx={{ fontSize: { xs: "0.875rem", sm: "1rem" }, fontWeight: 700 }}>{horoscope.luckyColor}</Typography>
+              </Box>
+            </Box>
+          </Box>
         </Box>
 
-        <Box sx={{ textAlign: "center", mt: 6 }}>
-          <Link href="/" style={{ textDecoration: "none" }}>
-            <Button variant="text" size="small" sx={{ color: "var(--foreground)", opacity: 0.6, letterSpacing: "0.05em", fontWeight: 500 }}>
-              Return to Home
-            </Button>
-          </Link>
+        {/* Main Content Area */}
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: { xs: 3, md: 4 } }}>
+          {/* Summary Section */}
+          <Box sx={{ gridColumn: "1 / -1" }}>
+            <Box sx={{ mb: 2 }}>
+               <Typography variant="h3" sx={{ fontSize: { xs: "1.25rem", md: "1.5rem" }, mb: 1.5, fontWeight: 700, color: "var(--foreground)", fontFamily: "var(--font-prompt)" }}>
+                {horoscope.title}
+              </Typography>
+              <Typography sx={{ fontSize: { xs: "1rem", md: "1.05rem" }, lineHeight: 1.7, fontWeight: 400, color: "var(--foreground)", opacity: 0.85 }}>
+                {horoscope.summary}
+              </Typography>
+            </Box>
+            <Divider sx={{ my: { xs: 3, md: 4 }, opacity: 0.5 }} />
+          </Box>
+
+          {/* Details Grid - More Compact */}
+          {sectionOrder.map((sectionKey) => {
+            const section = horoscope.sections[sectionKey];
+            const Icon = sectionIcons[sectionKey];
+            return (
+              <Box key={sectionKey}>
+                <Box sx={{ display: "flex", gap: 2, mb: { xs: 1, sm: 0 } }}>
+                  <Box sx={{ mt: 0.5, color: "var(--primary)", flexShrink: 0 }}>
+                    <Icon size="20" variant="Bulk" color="currentColor" />
+                  </Box>
+                  <Box>
+                    <Typography sx={{ fontWeight: 800, fontSize: "0.9rem", color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "0.02em", mb: 0.5 }}>
+                      {section.label}
+                    </Typography>
+                    <Typography sx={{ fontSize: "0.925rem", lineHeight: 1.6, color: "var(--foreground)", opacity: 0.75 }}>
+                      {section.text}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            );
+          })}
+
+          {/* Compact Shop Section */}
+          <Box sx={{ gridColumn: "1 / -1" }}>
+            <Box 
+              sx={{ 
+                mt: 4, p: { xs: 2.5, md: 3 }, borderRadius: "20px", 
+                bgcolor: "var(--secondary)", 
+                border: "1px solid var(--border-light)",
+                display: "flex", flexDirection: { xs: "column", sm: "row" },
+                alignItems: "center", gap: { xs: 2, md: 3 }
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", width: { xs: 64, md: 80 }, height: { xs: 64, md: 80 }, borderRadius: "16px", bgcolor: "var(--background)", flexShrink: 0, color: "var(--primary)" }}>
+                <Shop size="40" variant="Bulk" color="currentColor" />
+              </Box>
+              <Box sx={{ flexGrow: 1, textAlign: { xs: "center", sm: "left" } }}>
+                <Typography sx={{ fontWeight: 700, fontSize: { xs: "1rem", md: "1.125rem" }, mb: 0.5 }}>Recommended Adornments</Typography>
+                <Typography sx={{ fontSize: "0.875rem", opacity: 0.7, mb: 0 }}>
+                  สวมใส่เครื่องประดับสี <Box component="span" sx={{ color: "var(--primary)", fontWeight: 700 }}>{horoscope.luckyColor}</Box> เพื่อเสริมพลังงานด้าน {horoscope.energy}
+                </Typography>
+              </Box>
+              <Button 
+                variant="contained" 
+                fullWidth={false}
+                sx={{ 
+                  bgcolor: "var(--foreground)", color: "#fff", px: 3, py: 1, borderRadius: "10px", 
+                  fontWeight: 600, fontSize: "0.875rem", textTransform: "none", flexShrink: 0,
+                  width: { xs: "100%", sm: "auto" },
+                  "&:hover": { bgcolor: "var(--primary)" }
+                }}
+              >
+                Explore Collection
+              </Button>
+            </Box>
+          </Box>
         </Box>
       </Container>
+      
+      <Footer />
     </Box>
   );
 }
+

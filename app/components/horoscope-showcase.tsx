@@ -26,7 +26,7 @@ export function HoroscopeShowcase({ signs, weekLabel }: HoroscopeShowcaseProps) 
               variant="h2"
               sx={{
                 fontSize: { xs: "2rem", md: "3rem" },
-                fontWeight: 900, 
+                fontWeight: 900,
                 letterSpacing: "-0.02em",
                 textTransform: "uppercase",
                 lineHeight: 1,
@@ -40,7 +40,7 @@ export function HoroscopeShowcase({ signs, weekLabel }: HoroscopeShowcaseProps) 
             </Typography>
           </Box>
           <Typography sx={{ color: "#000", opacity: 0.6, fontSize: "1rem", maxWidth: 450, fontWeight: 600, lineHeight: 1.5, textAlign: { xs: "center", md: "right" } }}>
-            ดูดวงประจำเดือน {new Date().toLocaleDateString('th-TH', { month: 'long' })} พ.ศ. {new Date().getFullYear() + 543} พร้อมอัปเดตคำทำนายแม่นยำรายสัปดาห์ เจาะลึกการงาน การเงิน ความรัก และไอเทมเสริมพลังงาน
+            ดูดวงประจำเดือน {new Date().toLocaleDateString('th-TH', { month: 'long' })} {new Date().getFullYear() + 543} พร้อมอัปเดตคำทำนายแม่นยำรายสัปดาห์ เจาะลึกการงาน การเงิน ความรัก และไอเทมเสริมพลังงาน
           </Typography>
         </Box>
 
@@ -86,12 +86,12 @@ export function HoroscopeShowcase({ signs, weekLabel }: HoroscopeShowcaseProps) 
                 <Box
                   className="sign-emoji"
                   sx={{
-                    width: 50, 
-                    height: 50, 
+                    width: 50,
+                    height: 50,
                     borderRadius: "16px",
                     bgcolor: "#fff",
-                    display: "flex", 
-                    alignItems: "center", 
+                    display: "flex",
+                    alignItems: "center",
                     justifyContent: "center",
                     fontSize: "1.8rem",
                     transition: "transform 0.3s ease",
@@ -105,9 +105,9 @@ export function HoroscopeShowcase({ signs, weekLabel }: HoroscopeShowcaseProps) 
 
                 <Typography
                   sx={{
-                    color: "#000", 
+                    color: "#000",
                     fontSize: "1.1rem",
-                    fontWeight: 900, 
+                    fontWeight: 900,
                     lineHeight: 1.2,
                     zIndex: 1,
                     textTransform: "uppercase"
@@ -116,12 +116,12 @@ export function HoroscopeShowcase({ signs, weekLabel }: HoroscopeShowcaseProps) 
                   {sign.name}
                 </Typography>
                 <Typography
-                  sx={{ 
-                    color: "var(--primary)", 
-                    opacity: 0.8, 
-                    fontSize: "0.65rem", 
-                    fontWeight: 800, 
-                    textTransform: "uppercase", 
+                  sx={{
+                    color: "var(--primary)",
+                    opacity: 0.8,
+                    fontSize: "0.65rem",
+                    fontWeight: 800,
+                    textTransform: "uppercase",
                     letterSpacing: "0.05em",
                     zIndex: 1,
                     whiteSpace: "nowrap"

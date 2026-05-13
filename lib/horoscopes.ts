@@ -243,7 +243,7 @@ function formatThaiDayMonth(date: Date) {
 
 function formatWeekLabel(weekStart: Date, weekEnd: Date) {
   const yearBE = weekStart.getFullYear() + 543;
-  return `สัปดาห์ ${formatThaiDayMonth(weekStart)} - ${formatThaiDayMonth(weekEnd)} พ.ศ. ${yearBE}`;
+  return `สัปดาห์ ${formatThaiDayMonth(weekStart)} - ${formatThaiDayMonth(weekEnd)} ${yearBE}`;
 }
 
 function toDateRange(sign: SignDefinition) {
@@ -811,6 +811,7 @@ export function getAllZodiacSigns() {
     name: sign.thaiName,
     dateRange: toDateRange(sign),
     aura: sign.aura,
+    symbol: sign.symbol,
   }));
 }
 

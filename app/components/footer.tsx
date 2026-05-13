@@ -11,7 +11,7 @@ import React from "react";
 
 export function Footer() {
   return (
-    <Box sx={{ py: 6, bgcolor: "#fff", borderTop: "1px solid rgba(0,0,0,0.05)" }}>
+    <Box sx={{ py: 3, bgcolor: "#fff", borderTop: "1px solid rgba(0,0,0,0.05)" }}>
       <Container maxWidth="lg">
         <Box 
           sx={{ 
@@ -19,7 +19,7 @@ export function Footer() {
             flexDirection: { xs: "column", md: "row" }, 
             justifyContent: "space-between", 
             alignItems: "center", 
-            gap: 4 
+            gap: 2 
           }}
         >
           {/* Logo Side */}
