@@ -39,7 +39,7 @@ function ShufflingPile() {
       {[1, 2, 3, 4].map((i) => (
         <Box
           key={i}
-          className="animate-shuffle-pile"
+          
           sx={{
             position: 'absolute',
             width: { xs: '90px', md: '140px' },
@@ -49,7 +49,7 @@ function ShufflingPile() {
             border: '1px solid rgba(212,175,55,0.3)',
             boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
             overflow: 'hidden',
-            animationDelay: `${i * 0.1}s`,
+            animation: `shufflePile 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite ${i * 0.1}s`,
             transformOrigin: 'center center',
             zIndex: i
           }}
@@ -111,7 +111,8 @@ function TarotImage({
       <Box
         className={`card-container ${!faceDown ? "is-flipped" : ""}`}
         sx={{
-          transform: !faceDown ? "rotateY(180deg)" : "none",
+          transformStyle: "preserve-3d",
+          transform: !faceDown ? "rotateY(180deg)" : "rotateY(0deg)",
           boxShadow: isSelected
             ? "0 0 0 2px var(--jewel-gold), 0 20px 40px rgba(0,0,0,0.3)"
             : "0 10px 30px rgba(0,0,0,0.1)",
@@ -225,7 +226,16 @@ export function TarotDailyClient() {
   };
 
   return (
-    <Box sx={{ pb: { xs: 15, lg: 10 }, pt: { xs: 9, md: 16 }, bgcolor: "#0a0a0c", minHeight: "100vh", color: '#fff', overflowX: 'hidden' }}>
+    <Box
+      sx={{
+        pb: { xs: 15, lg: 10 },
+        pt: { xs: 9, md: 14 },
+        bgcolor: "transparent",
+        minHeight: "100vh",
+        color: "#fff",
+        overflowX: "hidden",
+      }}
+    >
       <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, lg: 4 } }}>
         {/* Hero Section */}
         <Box sx={{ textAlign: "center", mb: { xs: 3, md: 5 } }}>
@@ -235,7 +245,7 @@ export function TarotDailyClient() {
               fontSize: { xs: "2rem", md: "3.2rem" },
               fontWeight: 900,
               mb: 0.5,
-              background: "linear-gradient(135deg, #B8860B 0%, #FFD700 50%, #B8860B 100%)",
+              background: "linear-gradient(135deg, #102544 0%, var(--primary) 58%, var(--jewel-ruby) 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               textTransform: "uppercase",
@@ -245,7 +255,7 @@ export function TarotDailyClient() {
             Elite Tarot
           </Typography>
           {!hasShuffled && !isShuffling && (
-            <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.4)", mb: 4, fontWeight: 400, fontSize: { xs: '0.8rem', md: '1.1rem' } }}>
+            <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.6)", mb: 4, fontWeight: 400, fontSize: { xs: '0.8rem', md: '1.1rem' } }}>
               ความลับแห่งดวงชะตา กำลังรอให้คุณค้นพบ
             </Typography>
           )}
@@ -255,44 +265,177 @@ export function TarotDailyClient() {
         {isShuffling && <ShufflingPile />}
 
         {!hasShuffled && !isShuffling && (
-          <Box sx={{ textAlign: "center", mt: { xs: 2, md: 4 } }}>
+          <Box sx={{ mt: { xs: 2, md: 4 }, maxWidth: "980px", mx: "auto" }}>
             <Box
               sx={{
-                p: { xs: 3, md: 6 },
-                bgcolor: "rgba(255,255,255,0.02)",
-                borderRadius: { xs: "24px", md: "40px" },
-                border: "1px solid rgba(212,175,55,0.1)",
-                display: "inline-flex",
-                flexDirection: "column",
+                position: "relative",
+                overflow: "hidden",
+                p: { xs: 2.5, sm: 3, md: 4 },
+                background: "rgba(255,255,255,0.03)",
+                borderRadius: "16px",
+                border: "1px solid rgba(255,255,255,0.08)",
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1.08fr) 320px" },
                 alignItems: "center",
-                gap: { xs: 2, md: 3 },
-                boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+                gap: { xs: 3, md: 5 },
+                boxShadow: "0 22px 60px rgba(0,0,0,0.4)",
+                backdropFilter: "blur(12px)",
                 animation: "smoothFadeIn 0.8s ease",
-                width: '100%',
-                maxWidth: '550px'
+                "&:before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(135deg, rgba(124,58,237,0.055), transparent 34%), linear-gradient(315deg, rgba(212,175,55,0.12), transparent 30%)",
+                  pointerEvents: "none",
+                },
               }}
             >
-              <Cards size={60} variant="Bulk" color="var(--jewel-gold)" />
-              <Typography sx={{ color: 'rgba(255,255,255,0.5)', maxWidth: '400px', fontSize: { xs: '0.8rem', md: '0.95rem' } }}>
-                โปรดตั้งสมาธิให้แน่วแน่ นึกถึงเรื่องราวที่ท่านต้องการคำตอบในวันนี้ แล้วกดปุ่มเพื่อเริ่มสลับไพ่
-              </Typography>
-              <Button
-                variant="contained"
-                size="large"
-                onClick={shuffleDeck}
+              <Box sx={{ position: "relative", zIndex: 1 }}>
+                <Stack direction="row" spacing={1.25} sx={{ alignItems: "center", mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: "8px",
+                      display: "grid",
+                      placeItems: "center",
+                      bgcolor: "rgba(124,58,237,0.065)",
+                      border: "1px solid rgba(124,58,237,0.12)",
+                    }}
+                  >
+                    <Cards size={22} variant="Bulk" color="var(--primary)" />
+                  </Box>
+                  <Typography sx={{ color: "var(--primary)", fontWeight: 900, fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                    Daily Tarot Reading
+                  </Typography>
+                </Stack>
+
+                <Typography
+                  component="h2"
+                  sx={{
+                    color: "#fff",
+                    fontSize: { xs: "1.6rem", md: "2.45rem" },
+                    lineHeight: 1.16,
+                    fontWeight: 900,
+                    mb: 1.5,
+                  }}
+                >
+                  ตั้งคำถามในใจ แล้วเริ่มสลับไพ่
+                </Typography>
+                <Typography
+                  sx={{
+                    color: "rgba(255,255,255,0.6)",
+                    maxWidth: "560px",
+                    fontSize: { xs: "0.92rem", md: "1rem" },
+                    lineHeight: 1.85,
+                    mb: 3,
+                  }}
+                >
+                  โปรดตั้งสมาธิให้แน่วแน่ นึกถึงเรื่องราวที่ท่านต้องการคำตอบในวันนี้ จากนั้นกดปุ่มเพื่อเปิดสำรับและเลือกไพ่ 3 ใบ
+                </Typography>
+
+                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" }, gap: 1, mb: 3 }}>
+                  {[
+                    { label: "ตั้งจิต", color: "var(--jewel-gold)", bg: "rgba(212,175,55,0.14)" },
+                    { label: "สลับสำรับ", color: "var(--jewel-sapphire-light)", bg: "rgba(74,144,226,0.14)" },
+                    { label: "เลือก 3 ใบ", color: "var(--jewel-jade-light)", bg: "rgba(80,200,120,0.14)" },
+                  ].map((step, index) => (
+                    <Box
+                      key={step.label}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        px: 1.25,
+                        py: 1,
+                        borderRadius: "8px",
+                        bgcolor: "rgba(255,255,255,0.05)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: "50%",
+                          display: "grid",
+                          placeItems: "center",
+                          bgcolor: step.bg,
+                          color: step.color,
+                          fontSize: "0.76rem",
+                          fontWeight: 900,
+                        }}
+                      >
+                        {index + 1}
+                      </Box>
+                      <Typography sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.86rem", fontWeight: 700 }}>
+                        {step.label}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={shuffleDeck}
+                  startIcon={<Cards size={20} variant="Bold" color="currentColor" />}
+                  sx={{
+                    bgcolor: "var(--primary)",
+                    color: "#fff",
+                    px: { xs: 3, md: 4.5 },
+                    py: { xs: 1.25, md: 1.45 },
+                    borderRadius: "8px",
+                    fontSize: { xs: "0.95rem", md: "1rem" },
+                    fontWeight: 900,
+                    boxShadow: "0 12px 30px rgba(59, 130, 246, 0.25)",
+                    "&:hover": {
+                      bgcolor: "var(--primary-light)",
+                      boxShadow: "0 16px 36px rgba(59, 130, 246, 0.35)",
+                      transform: "translateY(-1px)",
+                    },
+                  }}
+                >
+                  เริ่มสลับไพ่
+                </Button>
+              </Box>
+
+              <Box
                 sx={{
-                  bgcolor: "var(--jewel-gold)",
-                  color: "#000",
-                  px: { xs: 5, md: 8 },
-                  py: { xs: 1.2, md: 1.5 },
-                  borderRadius: "100px",
-                  fontSize: { xs: "0.95rem", md: "1rem" },
-                  fontWeight: 900,
-                  "&:hover": { bgcolor: "#FFD700", transform: "scale(1.03)" }
+                  position: "relative",
+                  zIndex: 1,
+                  height: { xs: 220, sm: 250, md: 300 },
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  perspective: "1000px",
                 }}
               >
-                เริ่มสลับไพ่
-              </Button>
+                {[0, 1, 2].map((cardIndex) => (
+                  <Box
+                    key={cardIndex}
+                    sx={{
+                      position: "absolute",
+                      width: { xs: 112, sm: 128, md: 146 },
+                      aspectRatio: "2/3",
+                      borderRadius: "8px",
+                      overflow: "hidden",
+                      border: "1px solid rgba(212,175,55,0.35)",
+                      boxShadow: "0 18px 42px rgba(0,0,0,0.38)",
+                      transform: [
+                        "translateX(-44px) rotate(-10deg)",
+                        "translateY(-10px) rotate(0deg)",
+                        "translateX(44px) rotate(10deg)",
+                      ][cardIndex],
+                      zIndex: cardIndex + 1,
+                    }}
+                  >
+                    <Box component="img" src="/images/tarot/tarot-back.webp" sx={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <Box sx={{ position: "absolute", inset: 8, border: "1px solid rgba(212,175,55,0.22)", borderRadius: "6px" }} />
+                  </Box>
+                ))}
+              </Box>
             </Box>
           </Box>
         )}
@@ -316,28 +459,29 @@ export function TarotDailyClient() {
                 position: { xs: 'relative', lg: 'sticky' },
                 top: { lg: '128px' },
                 zIndex: 50,
-                bgcolor: 'rgba(255,255,255,0.025)',
+                bgcolor: 'rgba(255,255,255,0.03)',
+                backdropFilter: 'blur(12px)',
                 p: { xs: 2, sm: 2.5, lg: 3 },
                 borderRadius: { xs: '20px', lg: '24px' },
-                border: '1px solid rgba(212,175,55,0.1)',
-                boxShadow: '0 18px 45px rgba(0,0,0,0.22)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                boxShadow: '0 14px 36px rgba(0,0,0,0.2)',
                 animation: 'smoothFadeIn 0.5s ease',
                 mb: { xs: 1, lg: 0 }
               }}
             >
               <Box sx={{ mb: { xs: 1.75, lg: 2.5 } }}>
                 <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", gap: 2, mb: 1 }}>
-                  <Typography variant="h6" sx={{ color: "var(--jewel-gold)", fontWeight: 900, letterSpacing: '0.08em', fontSize: { xs: '0.85rem', md: '0.98rem' } }}>
+                  <Typography variant="h6" sx={{ color: "var(--primary)", fontWeight: 900, letterSpacing: '0.08em', fontSize: { xs: '0.85rem', md: '0.98rem' } }}>
                     ไพ่ที่คุณเลือก
                   </Typography>
-                  <Typography sx={{ color: "#0a0a0c", bgcolor: "var(--jewel-gold)", borderRadius: "999px", px: 1.25, py: 0.35, fontSize: "0.72rem", fontWeight: 900, lineHeight: 1 }}>
+                  <Typography sx={{ color: "#fff", bgcolor: "#102544", borderRadius: "999px", px: 1.25, py: 0.35, fontSize: "0.72rem", fontWeight: 900, lineHeight: 1 }}>
                     {selectedIds.length}/3
                   </Typography>
                 </Stack>
-                <Box sx={{ height: 4, borderRadius: "999px", bgcolor: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
-                  <Box sx={{ width: `${(selectedIds.length / 3) * 100}%`, height: "100%", bgcolor: "var(--jewel-gold)", transition: "width 0.25s ease" }} />
+                <Box sx={{ height: 4, borderRadius: "999px", bgcolor: "rgba(16,16,20,0.08)", overflow: "hidden" }}>
+                  <Box sx={{ width: `${(selectedIds.length / 3) * 100}%`, height: "100%", bgcolor: "var(--primary)", transition: "width 0.25s ease" }} />
                 </Box>
-                <Typography sx={{ display: { xs: 'none', lg: 'block' }, color: 'rgba(255,255,255,0.48)', fontSize: '0.82rem', lineHeight: 1.6, mt: 1.5 }}>
+                <Typography sx={{ display: { xs: 'none', lg: 'block' }, color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem', lineHeight: 1.6, mt: 1.5 }}>
                   เลือกไพ่ 3 ใบจากสำรับด้านขวา แล้วกดเปิดคำทำนาย
                 </Typography>
               </Box>
@@ -360,8 +504,8 @@ export function TarotDailyClient() {
                         minHeight: { lg: 104 },
                         aspectRatio: { xs: '2/3', lg: 'auto' },
                         borderRadius: { xs: '10px', md: '16px', lg: '18px' },
-                        border: selectedCard ? '1px solid rgba(212,175,55,0.55)' : '1px dashed rgba(212,175,55,0.22)',
-                        bgcolor: selectedCard ? 'rgba(212,175,55,0.06)' : 'rgba(255,255,255,0.018)',
+                        border: selectedCard ? '1px solid rgba(124,58,237,0.5)' : '1px dashed rgba(255,255,255,0.2)',
+                        bgcolor: selectedCard ? 'rgba(124,58,237,0.1)' : 'rgba(255,255,255,0.03)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: { xs: 'center', lg: 'flex-start' },
@@ -373,8 +517,8 @@ export function TarotDailyClient() {
                         transition: 'border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease',
                         '&:hover': selectedCard
                           ? {
-                              borderColor: 'var(--jewel-gold)',
-                              bgcolor: 'rgba(212,175,55,0.1)',
+                              borderColor: 'var(--primary)',
+                              bgcolor: 'rgba(124,58,237,0.08)',
                               transform: { lg: 'translateX(2px)' },
                             }
                           : undefined,
@@ -382,11 +526,11 @@ export function TarotDailyClient() {
                     >
                       {!selectedCard && (
                         <>
-                          <Typography sx={{ display: { xs: 'block', lg: 'none' }, color: 'rgba(212,175,55,0.15)', fontWeight: 900, fontSize: { xs: '1.2rem', md: '2.5rem' } }}>
+                          <Typography sx={{ display: { xs: 'block', lg: 'none' }, color: 'rgba(255,255,255,0.1)', fontWeight: 900, fontSize: { xs: '1.2rem', md: '2.5rem' } }}>
                             {slotIndex + 1}
                           </Typography>
-                          <Box sx={{ display: { xs: 'none', lg: 'flex' }, width: 58, aspectRatio: '2/3', borderRadius: '12px', border: '1px solid rgba(212,175,55,0.16)', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <Typography sx={{ color: 'rgba(212,175,55,0.18)', fontWeight: 900, fontSize: '1.4rem' }}>{slotIndex + 1}</Typography>
+                          <Box sx={{ display: { xs: 'none', lg: 'flex' }, width: 58, aspectRatio: '2/3', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Typography sx={{ color: 'rgba(255,255,255,0.1)', fontWeight: 900, fontSize: '1.4rem' }}>{slotIndex + 1}</Typography>
                           </Box>
                         </>
                       )}
@@ -396,10 +540,10 @@ export function TarotDailyClient() {
                         </Box>
                       )}
                       <Box sx={{ display: { xs: 'none', lg: 'block' }, minWidth: 0 }}>
-                        <Typography sx={{ color: selectedCard ? '#fff' : 'rgba(255,255,255,0.45)', fontSize: '0.86rem', fontWeight: 800, lineHeight: 1.3 }}>
+                        <Typography sx={{ color: selectedCard ? '#fff' : 'rgba(255,255,255,0.5)', fontSize: '0.86rem', fontWeight: 800, lineHeight: 1.3 }}>
                           {positions[slotIndex]}
                         </Typography>
-                        <Typography sx={{ color: selectedCard ? 'rgba(212,175,55,0.82)' : 'rgba(255,255,255,0.24)', fontSize: '0.72rem', fontWeight: 600, mt: 0.5, lineHeight: 1.35 }}>
+                        <Typography sx={{ color: selectedCard ? 'var(--primary)' : 'rgba(255,255,255,0.3)', fontSize: '0.72rem', fontWeight: 600, mt: 0.5, lineHeight: 1.35 }}>
                           {selectedCard ? `ไพ่ใบนี้แทน${positions[slotIndex]}` : 'รอเลือกไพ่'}
                         </Typography>
                       </Box>
@@ -416,20 +560,20 @@ export function TarotDailyClient() {
                     onClick={predict}
                     disabled={isPredicting}
                     sx={{
-                      bgcolor: "var(--jewel-gold)",
-                      color: "#000",
+                      bgcolor: "var(--primary)",
+                      color: "#fff",
                       py: 2,
                       borderRadius: "100px",
                       fontSize: "1rem",
                       fontWeight: 900,
-                      boxShadow: "0 10px 30px rgba(212,175,55,0.3)",
-                      "&:hover": { bgcolor: "#FFD700" }
+                      boxShadow: "0 10px 30px rgba(59, 130, 246, 0.2)",
+                      "&:hover": { bgcolor: "var(--primary-light)" }
                     }}
                   >
                     {isPredicting ? "กำลังเปิดคำทำนาย..." : "เปิดคำทำนาย"}
                   </Button>
                 ) : (
-                  <Button onClick={shuffleDeck} variant="text" size="small" sx={{ color: 'var(--jewel-gold)', fontWeight: 700 }}>สลับใหม่</Button>
+                  <Button onClick={shuffleDeck} variant="text" size="small" sx={{ color: 'var(--primary)', fontWeight: 700 }}>สลับใหม่</Button>
                 )}
               </Box>
             </Box>
@@ -498,8 +642,10 @@ export function TarotDailyClient() {
               left: 0,
               right: 0,
               p: 2,
-              bgcolor: '#0a0a0c',
-              borderTop: '1px solid rgba(212,175,55,0.1)',
+              bgcolor: 'rgba(36,43,50,0.95)',
+              backdropFilter: 'blur(12px)',
+              borderTop: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 -12px 34px rgba(0,0,0,0.2)',
               zIndex: 1000,
               gap: 1.5
             }}
@@ -507,7 +653,7 @@ export function TarotDailyClient() {
             <Button
               onClick={shuffleDeck}
               variant="outlined"
-              sx={{ color: 'var(--jewel-gold)', borderColor: 'rgba(212,175,55,0.3)', borderRadius: '100px', flex: 0.4 }}
+              sx={{ color: 'var(--primary)', borderColor: 'rgba(124,58,237,0.25)', borderRadius: '100px', flex: 0.4 }}
             >
               สลับใหม่
             </Button>
@@ -516,8 +662,8 @@ export function TarotDailyClient() {
               disabled={selectedIds.length !== 3 || isPredicting}
               onClick={predict}
               sx={{
-                bgcolor: selectedIds.length === 3 ? "var(--jewel-gold)" : "rgba(255,255,255,0.1)",
-                color: "#000",
+                bgcolor: selectedIds.length === 3 ? "var(--primary)" : "rgba(255,255,255,0.1)",
+                color: selectedIds.length === 3 ? "#fff" : "rgba(255,255,255,0.4)",
                 flex: 1,
                 py: 1.5,
                 borderRadius: "100px",
@@ -538,7 +684,7 @@ export function TarotDailyClient() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              bgcolor: "rgba(10,10,12,0.72)",
+              bgcolor: "rgba(36,43,50,0.78)",
               backdropFilter: "blur(8px)",
               px: 2,
             }}
@@ -549,22 +695,23 @@ export function TarotDailyClient() {
                 alignItems: "center",
                 textAlign: "center",
                 p: { xs: 3, md: 4 },
-                borderRadius: "24px",
-                border: "1px solid rgba(212,175,55,0.22)",
-                bgcolor: "rgba(255,255,255,0.04)",
-                boxShadow: "0 24px 80px rgba(0,0,0,0.35)",
+                borderRadius: "16px",
+                border: "1px solid rgba(255,255,255,0.08)",
+                bgcolor: "rgba(36,43,50,0.9)",
+                backdropFilter: "blur(12px)",
+                boxShadow: "0 24px 80px rgba(0,0,0,0.3)",
                 minWidth: { xs: 260, sm: 320 },
               }}
             >
               <Box sx={{ position: "relative", width: 68, height: 68, display: "grid", placeItems: "center" }}>
-                <CircularProgress size={68} thickness={2.8} sx={{ color: "var(--jewel-gold)" }} />
-                <Cards size={28} variant="Bulk" color="var(--jewel-gold)" style={{ position: "absolute" }} />
+                <CircularProgress size={68} thickness={2.8} sx={{ color: "var(--primary)" }} />
+                <Cards size={28} variant="Bulk" color="var(--primary)" style={{ position: "absolute" }} />
               </Box>
               <Box>
                 <Typography sx={{ color: "#fff", fontSize: { xs: "1rem", md: "1.15rem" }, fontWeight: 900, mb: 0.5 }}>
                   กำลังเปิดคำทำนาย
                 </Typography>
-                <Typography sx={{ color: "rgba(255,255,255,0.58)", fontSize: { xs: "0.82rem", md: "0.9rem" }, lineHeight: 1.6 }}>
+                <Typography sx={{ color: "rgba(255,255,255,0.6)", fontSize: { xs: "0.82rem", md: "0.9rem" }, lineHeight: 1.6 }}>
                   ไพ่ทั้ง 3 ใบกำลังเผยคำตอบของวันนี้
                 </Typography>
               </Box>
@@ -587,9 +734,10 @@ export function TarotDailyClient() {
                   sx={{
                     p: { xs: 2.5, md: 5 },
                     borderRadius: { xs: "24px", md: "40px" },
-                    border: "1px solid rgba(212,175,55,0.1)",
-                    bgcolor: "rgba(255,255,255,0.01)",
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    bgcolor: "rgba(255,255,255,0.03)",
+                    backdropFilter: "blur(12px)",
+                    boxShadow: "0 18px 48px rgba(0,0,0,0.2)",
                     overflow: "hidden",
                     position: "relative",
                   }}
@@ -633,7 +781,7 @@ export function TarotDailyClient() {
                         </Typography>
                       </Box>
 
-                      <Typography sx={{ fontSize: { xs: '0.95rem', md: '1.1rem' }, color: "rgba(255,255,255,0.9)", lineHeight: 1.6, bgcolor: "rgba(255,255,255,0.02)", p: { xs: 2.5, md: 3.5 }, borderRadius: "16px", borderLeft: "4px solid var(--jewel-gold)" }}>
+                      <Typography sx={{ fontSize: { xs: '0.95rem', md: '1.1rem' }, color: "rgba(255,255,255,0.8)", lineHeight: 1.6, bgcolor: "rgba(255,255,255,0.05)", p: { xs: 2.5, md: 3.5 }, borderRadius: "16px", borderLeft: "4px solid var(--jewel-gold)" }}>
                         {card.overview}
                       </Typography>
 
@@ -644,7 +792,7 @@ export function TarotDailyClient() {
                               <Heart size={20} variant="Bulk" color="var(--jewel-ruby)" />
                               <Typography sx={{ fontSize: { xs: "0.82rem", md: "0.92rem" }, fontWeight: 900, color: "var(--jewel-ruby)", textTransform: "uppercase" }}>ความรัก</Typography>
                             </Stack>
-                            <Typography sx={{ fontSize: { xs: '0.98rem', md: '1.05rem' }, color: "#ccc", lineHeight: 1.65 }}>{card.love}</Typography>
+                            <Typography sx={{ fontSize: { xs: '0.98rem', md: '1.05rem' }, color: "rgba(255,255,255,0.7)", lineHeight: 1.65 }}>{card.love}</Typography>
                           </Stack>
                         </Box>
                         <Box>
@@ -653,7 +801,7 @@ export function TarotDailyClient() {
                               <Briefcase size={20} variant="Bulk" color="var(--jewel-sapphire)" />
                               <Typography sx={{ fontSize: { xs: "0.82rem", md: "0.92rem" }, fontWeight: 900, color: "var(--jewel-sapphire)", textTransform: "uppercase" }}>การงาน</Typography>
                             </Stack>
-                            <Typography sx={{ fontSize: { xs: '0.98rem', md: '1.05rem' }, color: "#ccc", lineHeight: 1.65 }}>{card.work}</Typography>
+                            <Typography sx={{ fontSize: { xs: '0.98rem', md: '1.05rem' }, color: "rgba(255,255,255,0.7)", lineHeight: 1.65 }}>{card.work}</Typography>
                           </Stack>
                         </Box>
                         <Box>
@@ -662,12 +810,12 @@ export function TarotDailyClient() {
                               <WalletMoney size={20} variant="Bulk" color="var(--jewel-jade)" />
                               <Typography sx={{ fontSize: { xs: "0.82rem", md: "0.92rem" }, fontWeight: 900, color: "var(--jewel-jade)", textTransform: "uppercase" }}>การเงิน</Typography>
                             </Stack>
-                            <Typography sx={{ fontSize: { xs: '0.98rem', md: '1.05rem' }, color: "#ccc", lineHeight: 1.65 }}>{card.money}</Typography>
+                            <Typography sx={{ fontSize: { xs: '0.98rem', md: '1.05rem' }, color: "rgba(255,255,255,0.7)", lineHeight: 1.65 }}>{card.money}</Typography>
                           </Stack>
                         </Box>
                       </Box>
 
-                      <Stack direction="row" spacing={2} sx={{ alignItems: "center", pt: 1.5, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                      <Stack direction="row" spacing={2} sx={{ alignItems: "center", pt: 1.5, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
                         <LampCharge size={24} variant="Bulk" color="var(--jewel-gold)" />
                         <Typography sx={{ fontStyle: "italic", color: "rgba(255,255,255,0.6)", fontWeight: 500, fontSize: { xs: '0.85rem', md: '1rem' }, lineHeight: 1.4 }}>
                           &ldquo;{card.advice}&rdquo;
@@ -685,15 +833,15 @@ export function TarotDailyClient() {
                 size="large"
                 onClick={reset}
                 sx={{
-                  borderColor: "var(--jewel-gold)",
-                  color: "var(--jewel-gold)",
+                  borderColor: "rgba(255,255,255,0.2)",
+                  color: "#fff",
                   px: { xs: 6, md: 8 },
                   py: 1.5,
                   borderRadius: "100px",
                   fontWeight: 900,
                   fontSize: "1rem",
                   borderWidth: "1px",
-                  "&:hover": { borderColor: "#FFD700", bgcolor: "rgba(212,175,55,0.05)" }
+                  "&:hover": { borderColor: "var(--primary)", bgcolor: "rgba(124,58,237,0.1)" }
                 }}
               >
                 ทำนายใหม่อีกครั้ง

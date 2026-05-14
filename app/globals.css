@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #000000;
-  --primary: #7c3aed;
-  --primary-light: #a78bfa;
-  --primary-glow: rgba(124, 58, 237, 0.12);
-  --primary-glow-lg: rgba(124, 58, 237, 0.06);
-  --secondary: #f9f7ff;        /* Ghost White with purple tint */
-  --accent: #d9f99d;           /* Lime/Yellow */
-  --dark-bg: #0a0a0a;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --primary: #3b82f6;          /* Modern Blue */
+  --primary-light: #60a5fa;
+  --primary-glow: rgba(59, 130, 246, 0.1);
+  --primary-glow-lg: rgba(59, 130, 246, 0.05);
+  --secondary: #ffffff;
+  --accent: #f59e0b;           /* Warm Amber */
+  --dark-bg: #020617;
   --border-light: #e2e8f0;
   --border-subtle: #f1f5f9;
   
-  /* Jewel Tones */
-  --jewel-gold: #D4AF37;
-  --jewel-gold-light: #F1E5AC;
-  --jewel-ruby: #E0115F;
-  --jewel-ruby-light: #FF5E9E;
-  --jewel-sapphire: #0F52BA;
-  --jewel-sapphire-light: #4A90E2;
-  --jewel-jade: #00A86B;
-  --jewel-jade-light: #50C878;
+  /* Modern Tones */
+  --jewel-gold: #f59e0b;
+  --jewel-gold-light: #fef3c7;
+  --jewel-ruby: #e11d48;
+  --jewel-ruby-light: #fb7185;
+  --jewel-sapphire: #2563eb;
+  --jewel-sapphire-light: #60a5fa;
+  --jewel-jade: #10b981;
+  --jewel-jade-light: #34d399;
 
   --font-prompt: 'Prompt', sans-serif;
   --font-serif: 'Playfair Display', serif;
@@ -51,286 +51,123 @@ html, body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-prompt);
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  color: var(--foreground);
+  letter-spacing: -0.025em;
+  font-weight: 800;
+  color: #1e293b;
 }
 
-/* Purple Card */
+/* Glass Card */
 .pro-card {
-  background: #ffffff;
-  border: 1px solid var(--border-light);
-  border-radius: 16px;
-  box-shadow: 0 4px 24px var(--primary-glow-lg);
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .pro-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 40px var(--primary-glow);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.1);
   border-color: var(--primary-light);
 }
 
-/* Purple Badge */
+/* Soft Badge */
 .pro-badge {
   background: var(--primary-glow);
   color: var(--primary);
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
-  border: 1px solid var(--border-light);
-  text-transform: uppercase;
-}
-
-/* Purple gradient text */
-.text-gradient {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.huge-text {
-  font-family: var(--font-prompt);
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  line-height: 1.1;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  padding: 6px 16px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
 }
 
 /* Animations */
 @keyframes smoothFadeIn {
-  from { opacity: 0; transform: translateY(15px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade {
+  animation: smoothFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-10px); }
 }
 
-.animate-fade {
-  animation: smoothFadeIn 0.8s ease-out forwards;
+.animate-float {
+  animation: float 4s ease-in-out infinite;
 }
 
-/* Purple glow orb */
-.purple-orb {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
-}
-
-/* Performance-Optimized Elite Tarot Animations */
+/* Tarot Card Animations */
 .card-scene {
   perspective: 1200px;
 }
 
 .card-container {
-  position: relative;
   width: 100%;
   height: 100%;
+  position: relative;
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   transform-style: preserve-3d;
-  will-change: transform; /* Hint for GPU acceleration */
+}
+
+.card-container.is-flipped {
+  transform: rotateY(180deg);
 }
 
 .card-face {
   position: absolute;
   width: 100%;
   height: 100%;
-  backface-visibility: hidden; /* Crucial for performance */
-  border-radius: 16px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: inherit;
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.12);
-}
-
-.card-face-front {
-  background: #fff;
 }
 
 .card-face-back {
-  background: #fff;
   transform: rotateY(180deg);
 }
 
-.is-flipped {
-  transform: rotateY(180deg);
+/* Shuffling Animation */
+@keyframes shufflePile {
+  0% { transform: translate(0, 0) rotate(0); z-index: 1; }
+  25% { transform: translate(30px, -20px) rotate(15deg); z-index: 5; }
+  50% { transform: translate(0, 0) rotate(0); z-index: 5; }
+  75% { transform: translate(-30px, -20px) rotate(-15deg); z-index: 10; }
+  100% { transform: translate(0, 0) rotate(0); z-index: 1; }
 }
 
-/* Optimized Golden Glint */
-@keyframes gold-glint {
-  0% { transform: translateX(-150%) skewX(-25deg); }
-  100% { transform: translateX(150%) skewX(-25deg); }
+.animate-shuffle-pile {
+  animation: shufflePile 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes resultFadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-result {
+  animation: resultFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .glint-effect {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(212, 175, 55, 0.05) 30%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(212, 175, 55, 0.05) 70%,
-    transparent 100%
-  );
-  z-index: 5;
-  transform: translateX(-150%) skewX(-25deg);
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+  transform: skewX(-20deg);
+  animation: glint 3s infinite;
+  z-index: 10;
   pointer-events: none;
 }
 
-.is-flipped .glint-effect {
-  animation: gold-glint 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 0.3s;
-}
-
-.card-mystic-aura {
-  position: absolute;
-  inset: -22%;
-  z-index: 4;
-  pointer-events: none;
-  opacity: 0;
-  background:
-    radial-gradient(circle at 50% 48%, rgba(255, 215, 0, 0.26) 0%, rgba(212, 175, 55, 0.13) 30%, transparent 64%),
-    linear-gradient(115deg, transparent 24%, rgba(255, 255, 255, 0.22) 47%, rgba(212, 175, 55, 0.14) 56%, transparent 78%);
-  mix-blend-mode: screen;
-  transform: scale(0.7) rotate(-14deg);
-}
-
-.animate-deal .card-mystic-aura {
-  animation: mysticAuraRise 1.22s cubic-bezier(0.2, 1, 0.24, 1) both;
-}
-
-@keyframes mysticAuraRise {
-  0% {
-    opacity: 0;
-    filter: blur(18px);
-    transform: translate3d(0, 18px, 0) scale(0.68) rotate(-8deg);
-  }
-  36% {
-    opacity: 0.52;
-    filter: blur(11px);
-    transform: translate3d(0, -6px, 0) scale(1.02) rotate(5deg);
-  }
-  66% {
-    opacity: 0.32;
-    filter: blur(9px);
-    transform: translate3d(0, -12px, 0) scale(1.1) rotate(10deg);
-  }
-  100% {
-    opacity: 0;
-    filter: blur(16px);
-    transform: translate3d(0, 0, 0) scale(1.18) rotate(14deg);
-  }
-}
-
-@keyframes shuffle-pile {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(-100px, -20px) rotate(-10deg) scale(1.05); z-index: 50; }
-  50% { transform: translate(100px, 20px) rotate(10deg) scale(1.05); z-index: 50; }
-  75% { transform: translate(0, 0) rotate(0deg); z-index: 1; }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-
-@keyframes cardDealArc {
-  0% {
-    opacity: 0;
-    filter: blur(12px) brightness(1.18);
-    transform:
-      translate3d(var(--deal-drift-x, 0px), 86px, 0)
-      rotateX(24deg)
-      rotateZ(calc(var(--deal-spin, 0deg) * -0.55))
-      scale(0.82);
-  }
-  42% {
-    opacity: 0.74;
-    filter: blur(4px) brightness(1.12);
-    transform:
-      translate3d(var(--deal-x, 0px), var(--deal-y, -58px), 0)
-      rotateX(0deg)
-      rotateZ(calc(var(--deal-spin, 0deg) * 0.62))
-      scale(1.012);
-  }
-  68% {
-    opacity: 0.96;
-    filter: blur(1px) brightness(1.05);
-    transform:
-      translate3d(calc(var(--deal-x, 0px) * -0.18), -18px, 0)
-      rotateX(0deg)
-      rotateZ(calc(var(--deal-spin, 0deg) * 0.28))
-      scale(1.004);
-  }
-  86% {
-    opacity: 1;
-    filter: blur(0) brightness(1.01);
-    transform:
-      translate3d(0, 5px, 0)
-      rotateZ(calc(var(--deal-rot, 0deg) * 0.9))
-      scale(0.996);
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0) brightness(1);
-    transform:
-      translate3d(0, 0, 0)
-      rotateZ(var(--deal-rot, 0deg))
-      scale(1);
-  }
-}
-
-.animate-shuffle-pile {
-  animation: shuffle-pile 0.7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-.animate-deal {
-  animation: cardDealArc 1.22s cubic-bezier(0.2, 1, 0.24, 1) both;
-}
-
-@keyframes mobileCardDeal {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 42px, 0) rotateZ(calc(var(--deal-rot, 0deg) * 0.25)) scale(0.94);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotateZ(var(--deal-rot, 0deg)) scale(1);
-  }
-}
-
-@media (max-width: 600px) {
-  .animate-deal,
-  .animate-deal.mobile-performance {
-    animation: mobileCardDeal 0.42s cubic-bezier(0.2, 0.9, 0.25, 1) both;
-  }
-
-  .animate-deal .card-mystic-aura,
-  .glint-effect {
-    display: none;
-  }
-
-  .card-container {
-    will-change: transform;
-  }
-
-  .card-face {
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-  }
-}
-
-@keyframes resultFadeIn {
-  from { opacity: 0; transform: scale(0.98) translateY(20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.animate-result {
-  animation: resultFadeIn 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+@keyframes glint {
+  0% { left: -100%; }
+  20%, 100% { left: 200%; }
 }

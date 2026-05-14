@@ -5,282 +5,247 @@ import {
   Box,
   Button,
   Container,
-  Stack,
-  Toolbar,
-  Typography,
-  IconButton,
+  Divider,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
-  Avatar,
-  Menu,
-  MenuItem,
+  Stack,
+  Toolbar,
+  Typography,
 } from "@mui/material";
+import { CloseSquare, HambergerMenu } from "iconsax-react";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React, { useState } from "react";
-import { HambergerMenu, CloseSquare, Logout, User, SearchNormal1 } from "iconsax-react";
-import { useSession, signIn, signOut } from "next-auth/react";
+
+const navItems = [
+  { label: "หน้าแรก", href: "/" },
+  { label: "ทำนายฝัน", href: "/#dreams" },
+  { label: "ไพ่ยิปซี", href: "/tarot" },
+  { label: "เลขเด็ด", href: "/lottery" },
+  { label: "บทความ", href: "/#stories" },
+  { label: "หมวดหมู่", href: "/#categories" },
+];
+
+function isNavActive(pathname: string, href: string, index: number) {
+  if (href === "/tarot") return pathname.startsWith("/tarot");
+  if (href === "/lottery") return pathname.startsWith("/lottery");
+  return pathname === "/" && index === 0;
+}
+
+function BrandMark() {
+  return (
+    <Typography
+      sx={{
+        color: "#fff",
+        fontFamily: "var(--font-serif), serif",
+        fontSize: { xs: "1.08rem", md: "1.45rem" },
+        letterSpacing: "0.15em",
+        fontWeight: 600,
+        lineHeight: 1,
+        whiteSpace: "nowrap",
+      }}
+    >
+      MUTELU
+    </Typography>
+  );
+}
+
+function GoogleMark() {
+  return (
+    <Box
+      component="svg"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      sx={{
+        width: 18,
+        height: 18,
+        display: "block",
+        flexShrink: 0,
+      }}
+    >
+      <path
+        fill="#4285F4"
+        d="M21.6 12.23c0-.72-.06-1.24-.18-1.79H12v3.26h5.53c-.11.81-.71 2.03-2.05 2.85l-.02.11 2.98 2.02.21.02c1.94-1.57 2.95-3.87 2.95-6.47z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 22c2.78 0 5.11-.8 6.81-2.19l-3.24-2.26c-.87.53-2.03.9-3.57.9-2.72 0-5.03-1.57-5.85-3.74l-.12.01-3.1 2.11-.04.1C4.58 19.93 8 22 12 22z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M6.15 14.71A5.55 5.55 0 0 1 5.84 12c0-.94.17-1.85.3-2.71l-.01-.12-3.14-2.15-.1.04A9.16 9.16 0 0 0 2 12c0 1.79.49 3.48 1.34 4.93l2.81-2.22z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.55c1.93 0 3.23.73 3.97 1.34l2.9-2.49C17.1 2.96 14.78 2 12 2 8 2 4.58 4.07 2.89 7.06l3.25 2.23C6.97 7.12 9.28 5.55 12 5.55z"
+      />
+    </Box>
+  );
+}
+
+const googleButtonSx = {
+  color: "#fff",
+  bgcolor: "rgba(255,255,255,0.05)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  borderRadius: "12px",
+  fontWeight: 500,
+  textTransform: "none",
+  "& .MuiButton-startIcon": {
+    mr: 1,
+  },
+  "&:hover": {
+    bgcolor: "rgba(255,255,255,0.1)",
+    borderColor: "rgba(255,255,255,0.2)",
+  },
+};
 
 export function Header() {
-  const { data: session } = useSession();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+    setMobileOpen((open) => !open);
   };
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const navItems = [
-    { label: "All", href: "/" },
-    { label: "Horoscope", href: "/" },
-    { label: "Tarot", href: "/tarot" },
-    { label: "Fashion", href: "/" },
-    { label: "Craft", href: "/" },
-  ];
 
   return (
     <>
       <AppBar
         position="fixed"
         sx={{
-          bgcolor: "transparent",
+          bgcolor: "rgba(36, 43, 50, 0.95)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
           boxShadow: "none",
-          borderBottom: "none",
           color: "#fff",
-          pt: { xs: 0, md: 3 },
-          px: { xs: 0, md: 4 },
-          left: 0,
-          right: 0,
-          pointerEvents: "none",
-          zIndex: 1100
+          zIndex: 1100,
+          borderBottom: "1px solid rgba(255,255,255,0.05)",
         }}
       >
-        <Container maxWidth="xl" disableGutters sx={{ px: { xs: 0, md: 2 } }}>
-          <Box
+        <Container maxWidth="xl">
+          <Toolbar
             sx={{
-              bgcolor: { xs: "rgba(0,0,0,0.85)", md: "#000" },
-              backdropFilter: { xs: "blur(10px)", md: "none" },
-              borderRadius: { xs: 0, md: "16px" },
-              pointerEvents: "auto",
-              boxShadow: { xs: "0 4px 20px rgba(0,0,0,0.3)", md: "0 10px 40px rgba(0,0,0,0.5)" },
-              borderBottom: { xs: "1px solid rgba(255,255,255,0.05)", md: "none" }
+              minHeight: { xs: "64px", md: "80px" },
+              px: { xs: 0, md: 0 },
+              justifyContent: "space-between",
             }}
           >
-            <Toolbar sx={{ justifyContent: "space-between", minHeight: { xs: "60px", md: "80px" }, px: { xs: 2, md: 4 }, position: "relative" }}>
-            {/* Left: Mobile Hamburger */}
-            <IconButton
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{
-                display: { md: "none" },
-                color: "#fff",
-                mr: 2
-              }}
-            >
-              <HambergerMenu size={24} variant="Outline" color="currentColor" />
-            </IconButton>
+            <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+              <IconButton
+                aria-label="open drawer"
+                onClick={handleDrawerToggle}
+                sx={{
+                  display: { md: "none" },
+                  color: "#fff",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                }}
+              >
+                <HambergerMenu size={24} variant="Outline" color="currentColor" />
+              </IconButton>
 
-            {/* Logo */}
-            <Box sx={{ 
-              display: "flex", 
-              justifyContent: { xs: "center", md: "flex-start" },
-              position: { xs: "absolute", md: "static" },
-              left: { xs: "50%", md: "auto" },
-              transform: { xs: "translateX(-50%)", md: "none" }
-            }}>
               <Link href="/" style={{ textDecoration: "none" }}>
-                <Typography sx={{ color: "#fff", fontFamily: "var(--font-serif), serif", fontSize: { xs: "1.1rem", md: "1.5rem" }, letterSpacing: "0.1em", fontWeight: 600, textTransform: "uppercase" }}>
-                  MUTELU
-                </Typography>
+                <BrandMark />
               </Link>
+            </Stack>
+
+            <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+              <Stack direction="row" spacing={1}>
+                {navItems.map((item, index) => {
+                  const isActive = isNavActive(pathname, item.href, index);
+                  return (
+                    <Link key={index} href={item.href} style={{ textDecoration: "none" }}>
+                      <Box
+                        sx={{
+                          px: 2,
+                          py: 1,
+                          color: isActive ? "#3b82f6" : "rgba(255,255,255,0.6)",
+                          transition: "all 0.2s",
+                          "&:hover": { color: "#fff" },
+                        }}
+                      >
+                        <Typography sx={{ fontSize: "0.95rem", fontWeight: 500 }}>
+                          {item.label}
+                        </Typography>
+                      </Box>
+                    </Link>
+                  );
+                })}
+              </Stack>
             </Box>
 
-            {/* Center: Navigation (Desktop Only) */}
-            <Stack 
-              direction="row" 
-              spacing={2} 
-              sx={{ 
-                display: { xs: "none", md: "flex" },
-                position: "absolute",
-                left: "50%",
-                transform: "translateX(-50%)",
-                alignItems: "center"
+            <Button
+              onClick={() => signIn("google")}
+              startIcon={<GoogleMark />}
+              sx={{
+                ...googleButtonSx,
+                display: { xs: "none", sm: "inline-flex" },
+                px: 2.5,
+                py: 1,
+                fontSize: "0.9rem",
               }}
             >
-              {navItems.map((item, index) => (
-                <React.Fragment key={item.label}>
-                  <Link href={item.href} style={{ textDecoration: "none" }}>
-                    <Typography
-                      sx={{
-                        fontSize: "0.95rem",
-                        fontWeight: 300,
-                        cursor: "pointer",
-                        color: "#fff",
-                        opacity: 0.9,
-                        "&:hover": { opacity: 1, color: "#d2b48c" },
-                        transition: "0.2s"
-                      }}
-                    >
-                      {item.label}
-                    </Typography>
-                  </Link>
-                  {index < navItems.length - 1 && (
-                    <Typography sx={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}>|</Typography>
-                  )}
-                </React.Fragment>
-              ))}
-            </Stack>
-
-            {/* Right: Actions */}
-            <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-              <IconButton sx={{ color: "#fff" }}>
-                <SearchNormal1 size={20} variant="Outline" color="currentColor" />
-              </IconButton>
-              
-              {session ? (
-                <>
-                  <IconButton onClick={handleMenuOpen} sx={{ p: 0, ml: 1 }}>
-                    <Avatar
-                      src={session.user?.image || ""}
-                      alt={session.user?.name || "User"}
-                      sx={{ width: 32, height: 32 }}
-                    />
-                  </IconButton>
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                    disableScrollLock={true}
-                    sx={{ mt: 1.5 }}
-                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                  >
-                    <Box sx={{ px: 2, py: 1.5, borderBottom: "1px solid rgba(0,0,0,0.05)", mb: 1 }}>
-                      <Typography sx={{ fontWeight: 900, fontSize: "0.9rem" }}>{session.user?.name}</Typography>
-                      <Typography sx={{ fontSize: "0.75rem", opacity: 0.5 }}>{session.user?.email}</Typography>
-                    </Box>
-                    <MenuItem onClick={handleMenuClose} sx={{ fontSize: "0.85rem", fontWeight: 700, gap: 1.5 }}>
-                      <User size={18} variant="Outline" color="currentColor" /> Profile
-                    </MenuItem>
-                    <MenuItem onClick={() => signOut()} sx={{ fontSize: "0.85rem", fontWeight: 700, gap: 1.5, color: "error.main" }}>
-                      <Logout size={18} variant="Outline" color="currentColor" /> Sign out
-                    </MenuItem>
-                  </Menu>
-                </>
-              ) : (
-                <IconButton onClick={() => signIn("google")} sx={{ color: "#fff" }}>
-                  <User size={22} variant="Bold" color="currentColor" />
-                </IconButton>
-              )}
-            </Stack>
+              เข้าสู่ระบบ
+            </Button>
           </Toolbar>
-          </Box>
         </Container>
       </AppBar>
 
-      {/* Mobile Drawer */}
       <Drawer
         anchor="left"
         open={mobileOpen}
         onClose={handleDrawerToggle}
         sx={{
-          display: { xs: "block", md: "none" },
-          "& .MuiDrawer-paper": { 
-            boxSizing: "border-box", 
-            width: "85%", 
-            maxWidth: 360, 
-            bgcolor: "#050505", 
+          "& .MuiDrawer-paper": {
+            width: "85%",
+            maxWidth: 360,
+            bgcolor: "#242b32",
             color: "#fff",
-            borderRight: "1px solid rgba(255,255,255,0.05)"
+            borderRight: "1px solid rgba(255,255,255,0.05)",
           },
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-          {/* Drawer Header */}
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 3, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-            <Typography sx={{ color: "#fff", fontFamily: "var(--font-serif), serif", fontSize: "1.2rem", letterSpacing: "0.1em", fontWeight: 600, textTransform: "uppercase" }}>
-              MUTELU
-            </Typography>
-            <IconButton onClick={handleDrawerToggle} sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "#fff" } }}>
-              <CloseSquare size={28} color="currentColor" variant="Outline" />
-            </IconButton>
-          </Box>
-
-          {/* Drawer Navigation Links */}
-          <Box sx={{ flexGrow: 1, py: 3, px: 2 }}>
-            <List sx={{ pt: 0 }}>
-              {navItems.map((item) => (
-                <ListItem key={item.label} disablePadding sx={{ mb: 1 }}>
-                  <ListItemButton
-                    component={Link}
-                    href={item.href}
-                    onClick={handleDrawerToggle}
-                    sx={{ 
-                      py: 1.8, 
-                      px: 2,
-                      borderRadius: "12px", 
-                      "&:hover": { bgcolor: "rgba(255, 255, 255, 0.05)" } 
-                    }}
-                  >
-                    <ListItemText
-                      primary={
-                        <Typography sx={{ fontWeight: 400, fontSize: "1.1rem", color: "#fff", letterSpacing: "0.05em" }}>
-                          {item.label}
-                        </Typography>
-                      }
-                    />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-
-          {/* Drawer Footer / User Actions */}
-          <Box sx={{ p: 3, borderTop: "1px solid rgba(255,255,255,0.05)", bgcolor: "rgba(255,255,255,0.02)" }}>
-            {session ? (
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Avatar src={session.user?.image || ""} sx={{ width: 40, height: 40, border: "2px solid var(--primary)" }} />
-                  <Box>
-                    <Typography sx={{ fontWeight: 700, fontSize: "0.95rem" }}>{session.user?.name}</Typography>
-                    <Typography sx={{ fontSize: "0.75rem", opacity: 0.5 }}>{session.user?.email}</Typography>
-                  </Box>
-                </Box>
-                <IconButton onClick={() => signOut()} sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "error.main" } }}>
-                  <Logout size={20} variant="Outline" color="currentColor" />
-                </IconButton>
-              </Box>
-            ) : (
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={() => signIn("google")}
-                startIcon={<User size={20} />}
-                sx={{ 
-                  borderColor: "rgba(255,255,255,0.2)", 
-                  color: "#fff", 
-                  fontWeight: 600, 
-                  py: 1.5,
-                  borderRadius: "12px",
-                  textTransform: "none",
-                  "&:hover": { borderColor: "#fff", bgcolor: "rgba(255, 255, 255, 0.1)" }
-                }}
-              >
-                Sign In / Register
-              </Button>
-            )}
-          </Box>
+        <Box sx={{ p: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <BrandMark />
+          <IconButton onClick={handleDrawerToggle} sx={{ color: "#fff" }}>
+            <CloseSquare size={28} variant="Outline" />
+          </IconButton>
+        </Box>
+        <Divider sx={{ borderColor: "rgba(255,255,255,0.05)" }} />
+        <List sx={{ p: 2 }}>
+          {navItems.map((item, index) => {
+            const isActive = isNavActive(pathname, item.href, index);
+            return (
+              <ListItem key={index} disablePadding sx={{ mb: 1 }}>
+                <ListItemButton
+                  component={Link}
+                  href={item.href}
+                  onClick={handleDrawerToggle}
+                  sx={{
+                    borderRadius: "12px",
+                    bgcolor: isActive ? "rgba(59, 130, 246, 0.1)" : "transparent",
+                    color: isActive ? "#3b82f6" : "#fff",
+                  }}
+                >
+                  <ListItemText primary={<Typography sx={{ fontWeight: 500, fontSize: "1.1rem" }}>{item.label}</Typography>} />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+        <Box sx={{ p: 3, mt: "auto" }}>
+          <Button
+            fullWidth
+            onClick={() => signIn("google")}
+            startIcon={<GoogleMark />}
+            sx={{ ...googleButtonSx, py: 1.5 }}
+          >
+            เข้าสู่ระบบด้วย Google
+          </Button>
         </Box>
       </Drawer>
     </>

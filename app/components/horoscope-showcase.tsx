@@ -1,6 +1,5 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Container, Stack, Typography } from "@mui/material";
 import Link from "next/link";
-import React from "react";
 
 interface Sign {
   id: string;
@@ -17,121 +16,127 @@ interface HoroscopeShowcaseProps {
 
 export function HoroscopeShowcase({ signs, weekLabel }: HoroscopeShowcaseProps) {
   return (
-    <Box sx={{ py: 8, bgcolor: "#fff", borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-      <Container maxWidth="lg">
-        {/* Compact Section Header */}
-        <Box sx={{ mb: 6, display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: { xs: "center", md: "flex-end" }, justifyContent: "space-between", gap: 3 }}>
-          <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
-            <Typography
-              variant="h2"
-              sx={{
-                fontSize: { xs: "2rem", md: "3rem" },
-                fontWeight: 900,
-                letterSpacing: "-0.02em",
-                textTransform: "uppercase",
-                lineHeight: 1,
-              }}
-            >
-              เช็กดวงชะตา<br />
-              <Box component="span" sx={{ color: "var(--primary)" }}>ราศีของคุณ</Box>
-            </Typography>
-            <Typography sx={{ color: "var(--primary)", fontWeight: 900, fontSize: "1.1rem", mt: 1 }}>
-              {weekLabel}
-            </Typography>
-          </Box>
-          <Typography sx={{ color: "#000", opacity: 0.6, fontSize: "1rem", maxWidth: 450, fontWeight: 600, lineHeight: 1.5, textAlign: { xs: "center", md: "right" } }}>
-            ดูดวงประจำเดือน {new Date().toLocaleDateString('th-TH', { month: 'long' })} {new Date().getFullYear() + 543} พร้อมอัปเดตคำทำนายแม่นยำรายสัปดาห์ เจาะลึกการงาน การเงิน ความรัก และไอเทมเสริมพลังงาน
-          </Typography>
-        </Box>
-
-        {/* Compact Zodiac Grid */}
+    <Box sx={{ py: { xs: 3, md: 4 }, bgcolor: "#fffaf5", borderBlock: "1px solid rgba(16,16,20,0.06)" }}>
+      <Container maxWidth="xl">
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "repeat(3, 1fr)", sm: "repeat(4, 1fr)", md: "repeat(6, 1fr)" },
-            gap: 2,
+            gridTemplateColumns: { xs: "1fr", lg: "300px minmax(0, 1fr)" },
+            gap: { xs: 2.25, lg: 3 },
+            alignItems: "stretch",
+            bgcolor: "#fff",
+            border: "1px solid rgba(16,16,20,0.08)",
+            borderRadius: "8px",
+            boxShadow: "0 16px 40px rgba(16,16,20,0.055)",
+            p: { xs: 2, md: 2.5 },
           }}
         >
-          {signs.map((sign) => (
-            <Link
-              key={sign.id}
-              href={`/zodiac/${sign.slug}`}
-              style={{ textDecoration: "none" }}
-            >
-              <Box
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              gap: 1.5,
+              borderRight: { lg: "1px solid rgba(16,16,20,0.08)" },
+              pr: { lg: 2.5 },
+            }}
+          >
+            <Box>
+              <Typography
                 sx={{
-                  p: 2.5,
-                  textAlign: "center",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 1,
-                  borderRadius: "24px",
-                  bgcolor: "#f9faff",
-                  border: "1px solid transparent",
-                  transition: "all 0.3s ease",
-                  cursor: "pointer",
-                  position: "relative",
-                  overflow: "hidden",
-                  "&:hover": {
-                    transform: "translateY(-5px)",
-                    borderColor: "var(--primary)",
-                    bgcolor: "#fff",
-                    boxShadow: "0 15px 30px rgba(124, 58, 237, 0.1)",
-                    "& .sign-emoji": { transform: "scale(1.1)" },
-                  },
+                  color: "var(--primary)",
+                  fontSize: "0.72rem",
+                  fontWeight: 900,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  mb: 0.75,
                 }}
               >
-                {/* Icon/Emoji */}
-                <Box
-                  className="sign-emoji"
-                  sx={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: "16px",
-                    bgcolor: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "1.8rem",
-                    transition: "transform 0.3s ease",
-                    mb: 0.5,
-                    boxShadow: "0 5px 15px rgba(0,0,0,0.05)",
-                    zIndex: 1,
-                  }}
-                >
-                  {sign.symbol || "✦"}
+                Zodiac Picker
+              </Typography>
+              <Typography
+                component="h2"
+                sx={{
+                  color: "#101014",
+                  fontSize: { xs: "1.55rem", md: "1.95rem" },
+                  fontWeight: 900,
+                  lineHeight: 1.02,
+                }}
+              >
+                เช็กดวงชะตา
+                <Box component="span" sx={{ display: "block", color: "var(--primary)" }}>
+                  ราศีของคุณ
                 </Box>
+              </Typography>
+            </Box>
+            <Box>
+              <Typography sx={{ color: "#102544", fontSize: "0.82rem", fontWeight: 900, mb: 0.5 }}>
+                {weekLabel}
+              </Typography>
+              <Typography sx={{ color: "rgba(16,16,20,0.56)", fontSize: "0.82rem", lineHeight: 1.55 }}>
+                เลือกราศีเพื่ออ่านคำทำนายรายสัปดาห์แบบเจาะลึก
+              </Typography>
+            </Box>
+          </Box>
 
-                <Typography
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", sm: "repeat(3, minmax(0, 1fr))", md: "repeat(4, minmax(0, 1fr))", xl: "repeat(6, minmax(0, 1fr))" },
+              gap: 1,
+              alignContent: "center",
+            }}
+          >
+            {signs.map((sign) => (
+              <Link key={sign.id} href={`/zodiac/${sign.slug}`} style={{ textDecoration: "none" }}>
+                <Box
                   sx={{
-                    color: "#000",
-                    fontSize: "1.1rem",
-                    fontWeight: 900,
-                    lineHeight: 1.2,
-                    zIndex: 1,
-                    textTransform: "uppercase"
+                    minHeight: 58,
+                    display: "grid",
+                    gridTemplateColumns: "34px minmax(0, 1fr)",
+                    alignItems: "center",
+                    gap: 1,
+                    px: 1.1,
+                    py: 0.85,
+                    borderRadius: "8px",
+                    bgcolor: "#fffaf5",
+                    border: "1px solid rgba(16,16,20,0.07)",
+                    transition: "all 0.18s ease",
+                    "&:hover": {
+                      bgcolor: "#fff",
+                      borderColor: "rgba(124,58,237,0.28)",
+                      boxShadow: "0 10px 24px rgba(124,58,237,0.1)",
+                      transform: "translateY(-1px)",
+                    },
                   }}
                 >
-                  {sign.name}
-                </Typography>
-                <Typography
-                  sx={{
-                    color: "var(--primary)",
-                    opacity: 0.8,
-                    fontSize: "0.65rem",
-                    fontWeight: 800,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    zIndex: 1,
-                    whiteSpace: "nowrap"
-                  }}
-                >
-                  {sign.dateRange}
-                </Typography>
-              </Box>
-            </Link>
-          ))}
+                  <Box
+                    sx={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: "8px",
+                      display: "grid",
+                      placeItems: "center",
+                      bgcolor: "rgba(124,58,237,0.07)",
+                      color: "var(--primary)",
+                      fontSize: "1.28rem",
+                      fontWeight: 900,
+                    }}
+                  >
+                    {sign.symbol || "✦"}
+                  </Box>
+                  <Stack spacing={0.2} sx={{ minWidth: 0 }}>
+                    <Typography sx={{ color: "#101014", fontSize: "0.9rem", fontWeight: 900, lineHeight: 1.15 }} noWrap>
+                      {sign.name}
+                    </Typography>
+                    <Typography sx={{ color: "rgba(16,16,20,0.48)", fontSize: "0.62rem", fontWeight: 700, lineHeight: 1.2 }} noWrap>
+                      {sign.dateRange}
+                    </Typography>
+                  </Stack>
+                </Box>
+              </Link>
+            ))}
+          </Box>
         </Box>
       </Container>
     </Box>

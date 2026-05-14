@@ -136,7 +136,7 @@ type SnapshotRow = RowDataPacket & {
   logicVersion: string;
 };
 
-const LOGIC_VERSION = "weekly-logic-v3";
+const LOGIC_VERSION = "weekly-logic-v4";
 
 const zodiacSigns: SignDefinition[] = [
   { id: 1, key: "Aries", slug: "เมษ", storageSlug: "aries", thaiName: "เมษ", startMonth: 3, startDay: 21, endMonth: 4, endDay: 19, element: "Fire", ruler: "Mars", aura: "กล้าตัดสินใจเรื่องสำคัญ", symbol: "♈" },
@@ -346,7 +346,7 @@ function getPlanetContribution(planet: PlanetKey, house: number): Contribution {
     finance: theme.finance * weight,
     obstacles: theme.obstacles * weight,
     health: theme.health * weight,
-    text: `ดาว${planetThaiNames[planet]}กระทบเรือน${house}เรื่อง${theme.text} และ${descriptor}`,
+    text: `จังหวะของดาว${planetThaiNames[planet]}โคจรเข้ามาส่งอิทธิพลต่อ${theme.text} ซึ่งจะ${descriptor}`,
     planet,
     categoryHint: theme.categoryHint,
   };
@@ -368,7 +368,7 @@ function getAspectContribution(
     finance: multiplier * (aspect.categoryHint === "finance" ? 2 : 1),
     obstacles: multiplier * (aspect.categoryHint === "obstacles" ? 2 : positive ? 0 : 1),
     health: multiplier * (aspect.categoryHint === "health" ? 2 : 1),
-    text: `ดาว${planetThaiNames[planet]}ทำมุม${aspect.label}กับแกนราศี${signName} จึงทำให้ธีมของสัปดาห์นี้เด่นขึ้น`,
+    text: `นอกจากนี้ พลังจากดาว${planetThaiNames[planet]}ยังส่งผลแบบ${aspect.label}ต่อชาวราศี${signName} ยิ่งเข้ามาช่วยกระตุ้นให้สถานการณ์ในช่วงนี้มีความชัดเจนและเข้มข้นมากขึ้น`,
     planet,
     categoryHint: aspect.categoryHint,
   };
@@ -429,7 +429,7 @@ function buildCategorySection(
   const text = [
     leadText[category],
     positive?.text ?? `โดยรวมแล้ว พลังในสัปดาห์นี้ยังคงช่วยหนุนเรื่อง${label}ให้ดำเนินไปได้อย่างราบรื่น`,
-    caution ? `แต่ขณะเดียวกัน ${caution.text}` : "",
+    caution ? `แต่ในอีกมุมหนึ่ง ${caution.text}` : "",
     moonSentence,
   ]
     .filter(Boolean)
@@ -474,7 +474,7 @@ function computeWeeklyHoroscope(sign: SignDefinition, weekOffset: number, moonEv
 
     if (getSignIndexFromLongitude(startLongitude) !== getSignIndexFromLongitude(endLongitude)) {
       const nextSignName = zodiacSigns[getSignIndexFromLongitude(endLongitude)]?.thaiName;
-      ingressNotes.push(`ดาว${planetThaiNames[planet]}เปลี่ยนราศีไปสู่${nextSignName}ภายในสัปดาห์นี้`);
+      ingressNotes.push(`จังหวะที่ดาว${planetThaiNames[planet]}ขยับย้ายเข้าสู่ราศี${nextSignName}ในสัปดาห์นี้ ถือเป็นช่วงเวลาสำคัญที่คุณควรเตรียมรับมือกับการเปลี่ยนแปลงใหม่ๆ`);
     }
   }
 
@@ -518,7 +518,7 @@ function computeWeeklyHoroscope(sign: SignDefinition, weekOffset: number, moonEv
     `สัปดาห์นี้ ราศี${sign.thaiName}จะสัมผัสได้ถึงพลังงานที่โดดเด่นเป็นพิเศษในเรื่อง${energy}`,
     strongest?.text ?? `ซึ่งดาว${planetThaiNames[sign.ruler]}จะเป็นแรงผลักดันสำคัญที่ช่วยนำทางคุณในสัปดาห์นี้`,
     weakest ? `อย่างไรก็ตาม ${weakest.text}` : "",
-    ingressNotes.length ? `ข้อสังเกตเพิ่มเติม: ${ingressNotes.join(" ")}` : "",
+    ingressNotes.length ? `เกร็ดโหราศาสตร์: ${ingressNotes.join(" ")}` : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -618,10 +618,10 @@ async function getStoredWeeklyHoroscopes(weekStart: Date): Promise<WeeklyHorosco
         methodology,
         logicVersion
       FROM WeeklyHoroscopeSnapshot
-      WHERE weekStart = ?
+      WHERE weekStart = ? AND logicVersion = ?
       ORDER BY zodiacSignId ASC
     `,
-    [weekStart],
+    [weekStart, LOGIC_VERSION],
   );
 
   if (rows.length !== zodiacSigns.length) {
@@ -800,7 +800,7 @@ export async function getWeeklyShowcaseData(weekOffset = 0): Promise<WeeklyShowc
     featured,
     horoscopes,
     weekLabel,
-    methodology: "อิงตำแหน่งดาวเชิงดาราศาสตร์และกฎ transit/aspect ของโหราศาสตร์ตะวันตก พร้อมบันทึก snapshot ลงฐานข้อมูล",
+    methodology: "อิงตำแหน่งดาวเชิงดาราศาสตร์และกฎ transit/aspect ของโหราศาสตร์ตะวันตก",
   };
 }
 
@@ -827,6 +827,6 @@ export async function getWeeklyHoroscopeBySlug(slug: string, weekOffset = 0) {
   return {
     horoscope,
     weekLabel,
-    methodology: "อิงตำแหน่งดาวเชิงดาราศาสตร์และกฎ transit/aspect ของโหราศาสตร์ตะวันตก พร้อมบันทึก snapshot ลงฐานข้อมูล",
+    methodology: "อิงตำแหน่งดาวเชิงดาราศาสตร์และกฎ transit/aspect ของโหราศาสตร์ตะวันตก",
   };
 }

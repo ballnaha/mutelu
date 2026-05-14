@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function TarotPage() {
   return (
-    <Box sx={{ bgcolor: "#fff", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "#242b32", minHeight: "100vh" }}>
       <Header />
       <TarotDailyClient />
       <Footer />

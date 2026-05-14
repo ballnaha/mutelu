@@ -31,14 +31,41 @@ import { usePathname } from "next/navigation";
 
 const drawerWidth = 280;
 
-const ADMIN_MENUS = [
-  { text: "แดชบอร์ด", icon: <Category size="22" />, path: "/admin" },
-  { text: "จัดการหน้าแรก (Hero)", icon: <Star1 size="22" />, path: "/admin/featured" },
-  { text: "คำทำนายราศี (Horoscopes)", icon: <Magicpen size="22" />, path: "/admin/horoscopes" },
-  { text: "บทความ/เคล็ดลับ", icon: <DocumentText size="22" />, path: "/admin/articles" },
-  { text: "สินค้าแอฟฟิลิเอท", icon: <Shop size="22" />, path: "/admin/products" },
-  { text: "จัดการสมาชิก", icon: <UserSquare size="22" />, path: "/admin/users" },
-  { text: "ตั้งค่าระบบ", icon: <Setting2 size="22" />, path: "/admin/settings" },
+type AdminMenuItem = {
+  text: string;
+  Icon: React.ElementType;
+  path: string;
+  color: string;
+};
+
+const ADMIN_MENU_GROUPS: { title: string; items: AdminMenuItem[] }[] = [
+  {
+    title: "ภาพรวม",
+    items: [
+      { text: "แดชบอร์ด", Icon: Category, path: "/admin", color: "#a78bfa" },
+    ],
+  },
+  {
+    title: "คอนเทนต์",
+    items: [
+      { text: "จัดการหน้าแรก (Hero)", Icon: Star1, path: "/admin/featured", color: "#facc15" },
+      { text: "คำทำนายราศี (Horoscopes)", Icon: Magicpen, path: "/admin/horoscopes", color: "#fb7185" },
+      { text: "บทความ/เคล็ดลับ", Icon: DocumentText, path: "/admin/articles", color: "#38bdf8" },
+    ],
+  },
+  {
+    title: "ร้านค้า",
+    items: [
+      { text: "สินค้าแอฟฟิลิเอท", Icon: Shop, path: "/admin/products", color: "#34d399" },
+    ],
+  },
+  {
+    title: "ระบบ",
+    items: [
+      { text: "จัดการสมาชิก", Icon: UserSquare, path: "/admin/users", color: "#f97316" },
+      { text: "ตั้งค่าระบบ", Icon: Setting2, path: "/admin/settings", color: "#c084fc" },
+    ],
+  },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -60,40 +87,74 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </Box>
 
       {/* Navigation */}
-      <Box sx={{ flexGrow: 1, py: 3, px: 2 }}>
-        <List>
-          {ADMIN_MENUS.map((item) => {
-            const isActive = pathname === item.path;
-            return (
-              <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
-                <ListItemButton 
-                  component={Link}
-                  href={item.path}
-                  sx={{ 
-                    borderRadius: "12px",
-                    bgcolor: isActive ? "rgba(124, 58, 237, 0.15)" : "transparent",
-                    color: isActive ? "var(--primary)" : "rgba(255,255,255,0.7)",
-                    "&:hover": { 
-                      bgcolor: isActive ? "rgba(124, 58, 237, 0.2)" : "rgba(255,255,255,0.05)",
-                      color: isActive ? "var(--primary)" : "#fff"
-                    }
-                  }}
-                >
-                  <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary={
-                      <Typography sx={{ fontSize: "0.95rem", fontWeight: isActive ? 700 : 500 }}>
-                        {item.text}
-                      </Typography>
-                    } 
-                  />
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
-        </List>
+      <Box sx={{ flexGrow: 1, py: 2.5, px: 2, overflowY: "auto" }}>
+        {ADMIN_MENU_GROUPS.map((group) => (
+          <Box key={group.title} sx={{ mb: 2.5 }}>
+            <Typography
+              sx={{
+                px: 1.5,
+                mb: 1,
+                color: "rgba(255,255,255,0.38)",
+                fontSize: "0.72rem",
+                fontWeight: 800,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              {group.title}
+            </Typography>
+            <List disablePadding>
+              {group.items.map((item) => {
+                const isActive = item.path === "/admin" ? pathname === item.path : pathname.startsWith(item.path);
+                const Icon = item.Icon;
+
+                return (
+                  <ListItem key={item.text} disablePadding sx={{ mb: 0.75 }}>
+                    <ListItemButton
+                      component={Link}
+                      href={item.path}
+                      sx={{
+                        borderRadius: "12px",
+                        border: isActive ? "1px solid rgba(255,255,255,0.08)" : "1px solid transparent",
+                        bgcolor: isActive ? "rgba(255,255,255,0.08)" : "transparent",
+                        color: isActive ? "#fff" : "rgba(255,255,255,0.72)",
+                        px: 1.5,
+                        py: 1.15,
+                        "&:hover": {
+                          bgcolor: isActive ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
+                          color: "#fff",
+                        },
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 42 }}>
+                        <Box
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "10px",
+                            display: "grid",
+                            placeItems: "center",
+                            bgcolor: isActive ? `${item.color}24` : "rgba(255,255,255,0.06)",
+                            boxShadow: isActive ? `0 0 0 1px ${item.color}30` : "none",
+                          }}
+                        >
+                          <Icon size="20" color={item.color} variant={isActive ? "Bold" : "Outline"} />
+                        </Box>
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography sx={{ fontSize: "0.93rem", fontWeight: isActive ? 700 : 500 }}>
+                            {item.text}
+                          </Typography>
+                        }
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Box>
+        ))}
       </Box>
 
       {/* Footer User */}

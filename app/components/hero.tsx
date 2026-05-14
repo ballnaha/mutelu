@@ -2,237 +2,201 @@
 
 import {
   Box,
+  Button,
   Container,
   Typography,
   Stack,
-  Divider
+  Divider,
 } from "@mui/material";
-import React from "react";
-import { Clock } from "iconsax-react";
+import React, { useState } from "react";
+import { ArrowRight, Clock, TrendUp, MessageText, Magicpen } from "iconsax-react";
 
-// Mock Data for the 3-column layout
-const MAIN_FEATURE = {
-  category: "ดูดวงรายสัปดาห์",
-  categoryColor: "var(--primary)", // Deep Purple
-  title: "อัปเดตดวงชะตาประจำสัปดาห์ พร้อมวิธีเสริมดวงให้ปังยิ่งขึ้น",
-  author: "หมอดูแม่นๆ",
-  readTime: "อ่าน 5 นาที",
-  comments: "12 ความเห็น",
-  image: "https://images.unsplash.com/photo-1515562141207-7a8e7353e1eb?q=80&w=1200&auto=format&fit=crop"
-};
-
-const LEFT_FEATURES = [
-  {
-    id: 1,
-    category: "ความเชื่อ",
-    categoryColor: "#902e47", // Ruby Red (Power)
-    title: "5 เครื่องรางที่ควรมีติดตัว สำหรับคนเกิดวันจันทร์",
-    author: "Mutelu Team",
-    readTime: "อ่าน 3 นาที",
-    image: "https://images.unsplash.com/photo-1599643478524-fb66f70a00eb?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: 2,
-    category: "เคล็ดลับ",
-    categoryColor: "#1D3557", // Sapphire Blue (Wisdom)
-    title: "จัดโต๊ะทำงานอย่างไร ให้งานรุ่ง เงินเข้าไม่ขาดสาย",
-    author: "Mutelu Team",
-    readTime: "อ่าน 4 นาที",
-    image: "https://images.unsplash.com/photo-1601445638532-3c6f6c3aa1d6?q=80&w=800&auto=format&fit=crop"
-  }
+const STORIES = [
+  { id: 1, category: "ความเชื่อ", color: "#3b82f6", title: "5 วัตถุมงคลเสริมดวงปี 2569", image: "https://images.unsplash.com/photo-1615483125219-c454e9967e85?q=80&w=400" },
+  { id: 2, category: "ฮวงจุ้ย", color: "#3b82f6", title: "เคล็ดลับจัดโต๊ะทำงานเรียกทรัพย์", image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=400" },
 ];
 
-const RIGHT_TRENDING = [
-  {
-    id: 1,
-    category: "เครื่องประดับ",
-    categoryColor: "#D4AF37", // Gold (Wealth)
-    title: "ตะกรุดมหามนต์ ยอดขายอันดับ 1",
-    readTime: "รีวิว 150+",
-    image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=200&auto=format&fit=crop"
-  },
-  {
-    id: 2,
-    category: "เสริมดวงความรัก",
-    categoryColor: "#B76E79", // Rose Gold (Love)
-    title: "แหวนกังหันด้ายแดง ดึงดูดเนื้อคู่",
-    readTime: "รีวิว 89+",
-    image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=200&auto=format&fit=crop"
-  },
-  {
-    id: 3,
-    category: "โชคลาภ",
-    categoryColor: "#2E8B57", // Jade Green (Luck/Money)
-    title: "สร้อยคอหินมงคล ดึงดูดทรัพย์",
-    readTime: "รีวิว 210+",
-    image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=200&auto=format&fit=crop"
-  },
-  {
-    id: 4,
-    category: "วอลเปเปอร์",
-    categoryColor: "var(--primary)", // Purple
-    title: "วอลเปเปอร์พระพิฆเนศ ฟรี!",
-    readTime: "ดาวน์โหลด 5k+",
-    image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=200&auto=format&fit=crop"
-  }
+const ZODIACS_FALLBACK = [
+  { name: "เมษ", slug: "aries", date: "13 เม.ย. - 13 พ.ค." },
+  { name: "พฤษภ", slug: "taurus", date: "14 พ.ค. - 13 มิ.ย." },
+  { name: "เมถุน", slug: "gemini", date: "14 มิ.ย. - 14 ก.ค." },
+  { name: "กรกฎ", slug: "cancer", date: "15 ก.ค. - 16 ส.ค." },
+  { name: "สิงห์", slug: "leo", date: "17 ส.ค. - 16 ก.ย." },
+  { name: "กันย์", slug: "virgo", date: "17 ก.ย. - 16 ต.ค." },
+  { name: "ตุลย์", slug: "libra", date: "17 ต.ค. - 15 พ.ย." },
+  { name: "พิจิก", slug: "scorpio", date: "16 พ.ย. - 15 ธ.ค." },
+  { name: "ธนู", slug: "sagittarius", date: "16 ธ.ค. - 13 ม.ค." },
+  { name: "มังกร", slug: "capricorn", date: "14 ม.ค. - 12 ก.พ." },
+  { name: "กุมภ์", slug: "aquarius", date: "13 ก.พ. - 13 มี.ค." },
+  { name: "มีน", slug: "pisces", date: "14 มี.ค. - 12 เม.ย." },
 ];
 
-// Helper component for Category Badge
-const CategoryBadge = ({ text, color }: { text: string, color: string }) => (
-  <Box sx={{ 
-    bgcolor: color, 
-    color: "#fff", 
-    px: 1.2, 
-    py: 0.4, 
-    borderRadius: "4px", 
-    fontSize: "0.65rem", 
-    fontWeight: 800, 
-    textTransform: "uppercase",
-    display: "inline-block",
-    mb: 1
-  }}>
-    {text}
-  </Box>
-);
+interface Sign {
+  id: string;
+  name: string;
+  slug: string;
+  dateRange: string;
+  symbol: string;
+}
 
-export function Hero() {
+interface HeroProps {
+  signs?: Sign[];
+  weekLabel?: string;
+}
+
+export function Hero({ signs = [], weekLabel = "คำทำนายรายสัปดาห์" }: HeroProps) {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const displaySigns = signs.length > 0 ? signs : ZODIACS_FALLBACK.map(z => ({
+    id: z.slug,
+    name: z.name,
+    slug: z.slug,
+    dateRange: z.date,
+    symbol: "✦"
+  }));
+
+  const handleGo = () => {
+    if (selected) {
+      window.location.href = `/zodiac/${selected}`;
+    } else {
+      alert("กรุณาเลือกราศีของคุณ");
+    }
+  };
+
   return (
-    <Box sx={{ pt: { xs: 12, md: 16 }, pb: { xs: 6, md: 8 }, bgcolor: "var(--background)", minHeight: "100vh" }}>
+    <Box sx={{ pt: { xs: 12, md: 16 }, pb: { xs: 4, md: 6 }, bgcolor: "#242b32", color: "#fff" }}>
       <Container maxWidth="xl">
         <Box sx={{ 
           display: "grid", 
-          gridTemplateColumns: { xs: "1fr", md: "1fr 2fr 1fr" }, 
-          gap: { xs: 3, md: 2, lg: 3 } 
+          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "2.1fr 1fr 1fr" }, 
+          gap: 2,
+          minHeight: { md: "460px" }
         }}>
           
-          {/* LEFT COLUMN: 2 Stacked Cards */}
-          <Box sx={{ display: "flex", flexDirection: "column", gap: { xs: 3, md: 2, lg: 3 } }}>
-            {LEFT_FEATURES.map((item) => (
-              <Box 
-                key={item.id}
-                sx={{ 
-                  position: "relative", 
-                  borderRadius: "12px", 
-                  overflow: "hidden", 
-                  flex: 1,
-                  minHeight: { xs: "250px", md: "auto" },
-                  cursor: "pointer",
-                  "&:hover img": { transform: "scale(1.05)" }
-                }}
-              >
+          {/* Main Card */}
+          <Box 
+            sx={{ 
+              position: "relative", 
+              borderRadius: "24px", 
+              overflow: "hidden", 
+              cursor: "pointer",
+              border: "1px solid rgba(255,255,255,0.05)",
+              "&:hover img": { transform: "scale(1.02)" }
+            }}
+          >
+            <Box 
+              component="img" 
+              src="https://images.unsplash.com/photo-1532667449560-72a95c8d381b?q=80&w=1200&auto=format&fit=crop" 
+              sx={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0, transition: "transform 0.8s ease" }} 
+            />
+            <Box sx={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, transparent 60%)" }} />
+            <Box sx={{ position: "absolute", bottom: 0, left: 0, p: 4, width: "100%" }}>
+              <Box sx={{ bgcolor: "#3b82f6", color: "#fff", px: 1, py: 0.2, borderRadius: "4px", fontSize: "0.65rem", fontWeight: 500, width: "fit-content", mb: 1.5 }}>แนะนำ</Box>
+              <Typography sx={{ color: "#fff", fontWeight: 500, fontSize: { xs: "1.5rem", md: "2.4rem" }, lineHeight: 1.1, mb: 1 }}>
+                อัปเดตดวงรายสัปดาห์: โชคลาภและการเงิน
+              </Typography>
+              <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", fontWeight: 400 }}>โดย มูเตลู กูรู • อ่าน 5 นาที</Typography>
+            </Box>
+          </Box>
+
+          {/* Sub Stories */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {STORIES.map((item) => (
+              <Box key={item.id} sx={{ 
+                position: "relative", 
+                flex: 1,
+                borderRadius: "24px",
+                overflow: "hidden",
+                cursor: "pointer",
+                border: "1px solid rgba(255,255,255,0.05)",
+                "&:hover img": { transform: "scale(1.03)" }
+              }}>
                 <Box 
                   component="img" 
                   src={item.image} 
-                  sx={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0, transition: "transform 0.5s ease" }} 
+                  sx={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0, transition: "transform 0.6s ease" }} 
                 />
-                <Box sx={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%)" }} />
-                <Box sx={{ position: "absolute", bottom: 0, left: 0, p: 2.5, width: "100%" }}>
-                  <CategoryBadge text={item.category} color={item.categoryColor} />
-                  <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: { xs: "1.1rem", lg: "1.2rem" }, lineHeight: 1.3, mb: 1.5 }}>
-                    {item.title}
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, color: "rgba(255,255,255,0.7)", fontSize: "0.75rem", fontWeight: 500 }}>
-                    <Typography component="span" sx={{ fontSize: "inherit" }}>by {item.author}</Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                      <Clock size="14" variant="Outline" /> {item.readTime}
-                    </Box>
-                  </Box>
+                <Box sx={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 70%)" }} />
+                <Box sx={{ position: "absolute", bottom: 0, left: 0, p: 2.5 }}>
+                  <Typography sx={{ fontSize: "0.6rem", fontWeight: 500, color: "#3b82f6", mb: 0.5 }}>{item.category}</Typography>
+                  <Typography sx={{ fontSize: "1.1rem", fontWeight: 500, color: "#fff", lineHeight: 1.2 }}>{item.title}</Typography>
                 </Box>
               </Box>
             ))}
           </Box>
 
-          {/* CENTER COLUMN: 1 Large Feature Card */}
-          <Box 
-            sx={{ 
-              position: "relative", 
-              borderRadius: "12px", 
-              overflow: "hidden", 
-              minHeight: { xs: "350px", md: "400px", lg: "500px" },
-              cursor: "pointer",
-              "&:hover img": { transform: "scale(1.05)" }
-            }}
-          >
-            <Box 
-              component="img" 
-              src={MAIN_FEATURE.image} 
-              sx={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0, transition: "transform 0.5s ease" }} 
-            />
-            <Box sx={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%)" }} />
-            <Box sx={{ position: "absolute", bottom: 0, left: 0, p: { xs: 3, md: 4 }, width: "100%" }}>
-              <CategoryBadge text={MAIN_FEATURE.category} color={MAIN_FEATURE.categoryColor} />
-              <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: { xs: "1.5rem", md: "2rem", lg: "2.4rem" }, lineHeight: 1.2, mb: 2, textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
-                {MAIN_FEATURE.title}
+          {/* Zodiac Check Bento */}
+          <Box sx={{ 
+            bgcolor: "#2d363f", 
+            borderRadius: "24px", 
+            p: 3, 
+            border: "1px solid rgba(255,255,255,0.05)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}>
+            <Box>
+              <Typography sx={{ fontSize: "1.05rem", fontWeight: 600, mb: 0.5, color: "#fff", display: "flex", alignItems: "center", gap: 1 }}>
+                เช็กดวงชะตา <Magicpen size={18} color="#3b82f6" variant="Bold" />
               </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2, color: "rgba(255,255,255,0.8)", fontSize: "0.85rem", fontWeight: 500 }}>
-                <Typography component="span" sx={{ fontSize: "inherit" }}>by {MAIN_FEATURE.author}</Typography>
-                <Typography component="span" sx={{ fontSize: "inherit", opacity: 0.5 }}>|</Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Clock size="16" variant="Outline" /> {MAIN_FEATURE.readTime}
-                </Box>
-                <Typography component="span" sx={{ fontSize: "inherit", opacity: 0.5 }}>|</Typography>
-                <Typography component="span" sx={{ fontSize: "inherit" }}>{MAIN_FEATURE.comments}</Typography>
+              <Box sx={{ bgcolor: "rgba(59, 130, 246, 0.1)", color: "#3b82f6", px: 1, py: 0.3, borderRadius: "4px", fontSize: "0.7rem", fontWeight: 500, width: "fit-content", mb: 2 }}>
+                {weekLabel}
+              </Box>
+              
+              <Box sx={{ 
+                display: "grid", 
+                gridTemplateColumns: "repeat(2, 1fr)", 
+                gap: 1.2
+              }}>
+                {displaySigns.map((zodiac) => (
+                  <Box 
+                    key={zodiac.slug} 
+                    onClick={() => setSelected(zodiac.slug)}
+                    sx={{ 
+                      bgcolor: selected === zodiac.slug ? "rgba(59, 130, 246, 0.15)" : "rgba(255,255,255,0.02)", 
+                      border: "1px solid",
+                      borderColor: selected === zodiac.slug ? "#3b82f6" : "rgba(255,255,255,0.04)",
+                      borderRadius: "14px",
+                      p: 1.5,
+                      textAlign: "center",
+                      cursor: "pointer",
+                      transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                      "&:hover": { 
+                        bgcolor: "rgba(59, 130, 246, 0.08)", 
+                        borderColor: "#3b82f6",
+                        transform: "translateY(-2px)"
+                      }
+                    }}
+                  >
+                    <Typography sx={{ fontSize: "1rem", fontWeight: 500, color: selected === zodiac.slug ? "#3b82f6" : "#fff", mb: 0.2 }}>
+                      {zodiac.name}
+                    </Typography>
+                    <Typography sx={{ fontSize: "0.7rem", fontWeight: 300, color: selected === zodiac.slug ? "rgba(59, 130, 246, 0.8)" : "rgba(255,255,255,0.4)", whiteSpace: "nowrap" }}>
+                      {zodiac.dateRange}
+                    </Typography>
+                  </Box>
+                ))}
               </Box>
             </Box>
-          </Box>
 
-          {/* RIGHT COLUMN: Trending List */}
-          <Box sx={{ display: "flex", flexDirection: "column", bgcolor: "var(--foreground)", borderRadius: "12px", border: "1px solid var(--border-light)", p: 2 }}>
-            <Stack spacing={0} divider={<Divider sx={{ my: "12px !important", opacity: 0.1 }} />}>
-              {RIGHT_TRENDING.map((item) => (
-                <Box 
-                  key={item.id} 
-                  sx={{ 
-                    display: "flex", 
-                    justifyContent: "space-between", 
-                    alignItems: "center", 
-                    gap: 2,
-                    cursor: "pointer",
-                    "&:hover .title": { color: "var(--primary)" }
-                  }}
-                >
-                  <Box sx={{ flex: 1 }}>
-                    <CategoryBadge text={item.category} color={item.categoryColor} />
-                    <Typography className="title" sx={{ color: "var(--background)", fontWeight: 800, fontSize: "0.95rem", lineHeight: 1.3, mb: 0.5, transition: "color 0.2s" }}>
-                      {item.title}
-                    </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "var(--background)", opacity: 0.5, fontSize: "0.75rem", fontWeight: 600 }}>
-                      <Clock size="14" variant="Outline" /> {item.readTime}
-                    </Box>
-                  </Box>
-                  
-                  {/* Circular Image with Number Badge */}
-                  <Box sx={{ position: "relative", width: 64, height: 64, flexShrink: 0 }}>
-                    <Box 
-                      component="img" 
-                      src={item.image} 
-                      sx={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%", border: "2px solid var(--border-light)" }} 
-                    />
-                    <Box 
-                      sx={{ 
-                        position: "absolute", 
-                        top: -5, 
-                        left: -5, 
-                        width: 22, 
-                        height: 22, 
-                        bgcolor: "#D4AF37", // Gold luxury badge
-                        color: "#000", // High contrast for gold
-                        borderRadius: "50%", 
-                        display: "flex", 
-                        alignItems: "center", 
-                        justifyContent: "center",
-                        fontSize: "0.75rem",
-                        fontWeight: 900,
-                        border: "2px solid var(--foreground)",
-                        boxShadow: "0 2px 5px rgba(0,0,0,0.5)"
-                      }}
-                    >
-                      {item.id}
-                    </Box>
-                  </Box>
-                </Box>
-              ))}
-            </Stack>
+            <Button 
+              fullWidth 
+              variant="contained" 
+              onClick={handleGo}
+              sx={{ 
+                bgcolor: "#3b82f6", 
+                borderRadius: "14px", 
+                fontWeight: 500, 
+                fontSize: "0.95rem", 
+                py: 1.5,
+                mt: 3,
+                boxShadow: "0 10px 25px rgba(59, 130, 246, 0.25)",
+                textTransform: "none",
+                "&:hover": { bgcolor: "#2563eb" }
+              }}
+            >
+              ดูคำพยากรณ์
+            </Button>
           </Box>
 
         </Box>

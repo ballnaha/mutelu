@@ -11,7 +11,7 @@ import React from "react";
 
 export function Footer() {
   return (
-    <Box sx={{ py: 3, bgcolor: "#fff", borderTop: "1px solid rgba(0,0,0,0.05)" }}>
+    <Box sx={{ py: 3, bgcolor: "rgba(255,255,255,0.02)", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
       <Container maxWidth="lg">
         <Box 
           sx={{ 
@@ -25,9 +25,9 @@ export function Footer() {
           {/* Logo Side */}
           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
             <Box sx={{ width: 28, height: 28, bgcolor: "var(--primary)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Typography sx={{ color: "#fff", fontSize: "0.8rem", fontWeight: 900 }}>✦</Typography>
+              <Typography sx={{ color: "#fff", fontSize: "0.8rem", fontWeight: 700 }}>✦</Typography>
             </Box>
-            <Typography sx={{ fontWeight: 900, color: "#000", fontSize: "1.2rem", letterSpacing: "0.1em" }}>MUTELU</Typography>
+            <Typography sx={{ fontWeight: 800, color: "#fff", fontSize: "1.2rem", letterSpacing: "0.1em" }}>MUTELU</Typography>
           </Stack>
 
           {/* Minimal Links */}
@@ -39,11 +39,11 @@ export function Footer() {
               justifyContent: "center",
               "& .footer-link": {
                 fontSize: "0.85rem",
-                fontWeight: 700,
-                opacity: 0.5,
+                fontWeight: 500,
+                color: "rgba(255,255,255,0.5)",
                 cursor: "pointer",
                 transition: "0.2s",
-                "&:hover": { opacity: 1, color: "var(--primary)" }
+                "&:hover": { color: "var(--primary)" }
               }
             }}
           >
@@ -55,7 +55,7 @@ export function Footer() {
 
           {/* Social / Copy */}
           <Box sx={{ textAlign: { xs: "center", md: "right" } }}>
-            <Typography sx={{ fontSize: "0.75rem", fontWeight: 700, opacity: 0.3, letterSpacing: "0.05em" }}>
+            <Typography sx={{ fontSize: "0.75rem", fontWeight: 500, color: "rgba(255,255,255,0.3)", letterSpacing: "0.05em" }}>
               © 2025 MUTELU. ALL RIGHTS RESERVED.
             </Typography>
           </Box>

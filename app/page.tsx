@@ -2,13 +2,9 @@ import { Box } from "@mui/material";
 import React from "react";
 import { Header } from "./components/header";
 import { Hero } from "./components/hero";
-import { FreshlyPublished } from "./components/freshly-published";
-import { FeaturedPosts } from "./components/featured-posts";
-import { FeaturedCategories } from "./components/featured-categories";
-import { Newsletter } from "./components/newsletter";
 import { Footer } from "./components/footer";
-import { HoroscopeShowcase } from "./components/horoscope-showcase";
 import { LuckyNumbers } from "./components/lucky-numbers";
+import { CategoryTabs } from "./components/category-tabs";
 import { getWeeklyShowcaseData } from "@/lib/horoscopes";
 import { getLuckyNumbersData } from "@/lib/lucky-numbers";
 
@@ -17,33 +13,19 @@ export default async function Home() {
   const luckyNumbersData = await getLuckyNumbersData();
 
   return (
-    <Box sx={{ bgcolor: "#fff", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "#242b32", minHeight: "100vh" }}>
       <Header />
       
       {/* Hero Section */}
-      <Hero />
-      
-      {/* 
-          Horoscope Showcase (Maintaining the app's core feature)
-      */}
-      <Box sx={{ mt: -5, position: 'relative', zIndex: 5 }}>
-        <HoroscopeShowcase signs={weeklyData.signs} weekLabel={weeklyData.weekLabel} />
-      </Box>
+      <Hero signs={weeklyData.signs} weekLabel={weeklyData.weekLabel} />
 
       {/* Lucky Numbers Section */}
       <LuckyNumbers data={luckyNumbersData} />
 
-      {/* Freshly Published Section */}
-      <FreshlyPublished />
-
-      {/* Featured Posts Section */}
-      <FeaturedPosts />
-
-      {/* Featured Categories Section */}
-      <FeaturedCategories />
-
-      {/* Newsletter Section */}
-      <Newsletter />
+      {/* Category Tabs Section */}
+      <Box id="categories" sx={{ scrollMarginTop: { xs: "80px", md: "96px" } }}>
+        <CategoryTabs />
+      </Box>
 
       {/* Footer Section */}
       <Footer />
