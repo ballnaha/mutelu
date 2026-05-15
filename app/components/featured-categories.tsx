@@ -31,9 +31,9 @@ export function FeaturedCategories() {
   const nextRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <Box sx={{ py: 8, bgcolor: "#f8f9ff" }}>
+    <Box sx={{ py: 4, bgcolor: "#f8f9ff" }}>
       <Container maxWidth="lg">
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 5 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
           <Typography variant="h2" sx={{ fontSize: { xs: "2rem", md: "3rem" }, fontWeight: 900, letterSpacing: "-0.02em" }}>
             หมวดหมู่แนะนำ
           </Typography>

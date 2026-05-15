@@ -4,6 +4,11 @@ import { notFound } from "next/navigation";
 import { Box, Button, Container, Typography } from "@mui/material";
 import { getHoroscopeTopicBySlug, horoscopeTopics } from "@/lib/horoscope-topics";
 
+type PageProps = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
 export async function generateStaticParams() {
   return horoscopeTopics.map((topic) => ({
     slug: topic.slug,
@@ -11,7 +16,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(
-  props: PageProps<"/topics/[slug]">,
+  props: PageProps,
 ): Promise<Metadata> {
   const { slug } = await props.params;
   const topic = getHoroscopeTopicBySlug(slug);
@@ -28,7 +33,7 @@ export async function generateMetadata(
   };
 }
 
-export default async function TopicPage(props: PageProps<"/topics/[slug]">) {
+export default async function TopicPage(props: PageProps) {
   const { slug } = await props.params;
   const topic = getHoroscopeTopicBySlug(slug);
 

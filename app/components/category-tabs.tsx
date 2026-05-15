@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { Box, Container, Typography, Tab, Tabs, Stack, Button } from "@mui/material";
-import { ArrowRight } from "iconsax-react";
+import React, { useState, useRef } from "react";
+import { Box, Container, Typography, Button } from "@mui/material";
 
 const CATEGORIES = [
   { id: "horoscope", label: "ดูดวง", icon: "🔮" },
-  { id: "tarot", label: "ไพ่ยิปซี", icon: "🃏" },
+  { id: "tarot", label: "ไพ่ยิปซีรายวัน", icon: "🃏" },
   { id: "belief", label: "ความเชื่อ", icon: "🙏" },
   { id: "amulet", label: "วัตถุมงคล", icon: "📿" },
   { id: "offering", label: "แก้บน", icon: "💐" },
@@ -58,14 +57,14 @@ export function CategoryTabs() {
   };
 
   return (
-    <Box sx={{ py: 8, bgcolor: "#242b32" }}>
+    <Box sx={{ py: 4, bgcolor: "#f8fafc" }}>
       <Container maxWidth="xl">
-        {/* Centered Header */}
-        <Box sx={{ textAlign: "center", mb: 6 }}>
-          <Typography sx={{ color: "#3b82f6", fontWeight: 600, fontSize: "0.8rem", letterSpacing: "0.2em", mb: 1, textTransform: "uppercase" }}>
-            EXPLORE TOPICS
-          </Typography>
-          <Typography sx={{ color: "#fff", fontWeight: 500, fontSize: { xs: "1.8rem", md: "2.8rem" }, lineHeight: 1.2 }}>
+        {/* Header */}
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1, bgcolor: "#eef2ff", color: "#4f46e5", px: 1.5, py: 0.5, borderRadius: "99px", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", mb: 2 }}>
+            ✦ EXPLORE TOPICS
+          </Box>
+          <Typography sx={{ color: "#0f172a", fontWeight: 700, fontSize: { xs: "1.8rem", md: "2.4rem" }, lineHeight: 1.2 }}>
             เจาะลึกทุกเรื่องมู
           </Typography>
         </Box>
@@ -79,14 +78,13 @@ export function CategoryTabs() {
             position: "absolute",
             top: 0,
             bottom: 0,
-            width: 50,
+            width: 40,
             zIndex: 2,
             pointerEvents: "none",
           },
-          "&::before": { left: 0, background: "linear-gradient(to right, #242b32, transparent)" },
-          "&::after": { right: 0, background: "linear-gradient(to left, #242b32, transparent)" },
+          "&::before": { left: 0, background: "linear-gradient(to right, #f8fafc, transparent)" },
+          "&::after": { right: 0, background: "linear-gradient(to left, #f8fafc, transparent)" },
         }}>
-          {/* Native scrollable container - bypasses MUI Tabs scroll interception */}
           <Box
             ref={scrollRef}
             onMouseDown={handleMouseDown}
@@ -96,64 +94,76 @@ export function CategoryTabs() {
             sx={{
               display: "flex",
               overflowX: "auto",
+              gap: 1,
               width: "100%",
               cursor: draggingState ? "grabbing" : "grab",
               scrollbarWidth: "none",
               msOverflowStyle: "none",
               "&::-webkit-scrollbar": { display: "none" },
-              borderBottom: "1px solid rgba(255,255,255,0.05)",
+              pb: 1,
             }}
           >
-            {CATEGORIES.map((cat) => (
-              <Box
-                key={cat.id}
-                onClick={() => !isDraggingRef.current && setActiveTab(cat.id)}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  px: 3,
-                  py: 2,
-                  whiteSpace: "nowrap",
-                  cursor: draggingState ? "grabbing" : "pointer",
-                  userSelect: "none",
-                  flexShrink: 0,
-                  fontSize: "1.05rem",
-                  fontWeight: 500,
-                  color: activeTab === cat.id ? "#fff" : "rgba(255,255,255,0.4)",
-                  borderBottom: "3px solid",
-                  borderColor: activeTab === cat.id ? "#3b82f6" : "transparent",
-                  transition: "color 0.2s, border-color 0.2s",
-                  "&:hover": { color: "rgba(255,255,255,0.8)" },
-                }}
-              >
-                <span>{cat.label}</span>
-              </Box>
-            ))}
+            {CATEGORIES.map((cat) => {
+              const isActive = activeTab === cat.id;
+              return (
+                <Box
+                  key={cat.id}
+                  onClick={() => !isDraggingRef.current && setActiveTab(cat.id)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    px: 2,
+                    py: 1,
+                    whiteSpace: "nowrap",
+                    cursor: draggingState ? "grabbing" : "pointer",
+                    userSelect: "none",
+                    flexShrink: 0,
+                    fontSize: "0.9rem",
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? "#4f46e5" : "#64748b",
+                    bgcolor: isActive ? "#eef2ff" : "#fff",
+                    border: "1px solid",
+                    borderColor: isActive ? "#c7d2fe" : "#f1f5f9",
+                    borderRadius: "12px",
+                    boxShadow: isActive ? "0 2px 8px rgba(79,70,229,0.1)" : "0 1px 3px rgba(0,0,0,0.03)",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      bgcolor: isActive ? "#e0e7ff" : "#f8fafc",
+                      color: isActive ? "#4338ca" : "#0f172a",
+                      borderColor: isActive ? "#a5b4fc" : "#e2e8f0",
+                    },
+                  }}
+                >
+                  <span>{cat.icon}</span>
+                  <span>{cat.label}</span>
+                </Box>
+              );
+            })}
           </Box>
         </Box>
 
-        {/* Tab Content Grid - 4 Columns */}
+        {/* Tab Content Grid */}
         <Box sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "repeat(4, 1fr)" },
-          gap: 3
+          gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(3, 1fr)", lg: "repeat(4, 1fr)" },
+          gap: { xs: 2, md: 3 }
         }}>
           {MOCK_CONTENT[activeTab]?.map((item) => (
             <Box
               key={item.id}
               sx={{
-                group: "true",
                 cursor: "pointer",
                 "&:hover img": { transform: "scale(1.05)" },
-                "&:hover h3": { color: "#3b82f6" }
               }}
             >
               <Box sx={{
-                borderRadius: "20px",
+                borderRadius: "18px",
                 overflow: "hidden",
                 aspectRatio: "16/10",
-                mb: 2,
-                border: "1px solid rgba(255,255,255,0.05)"
+                mb: 1.5,
+                border: "1px solid #f1f5f9",
+                boxShadow: "0 4px 12px -4px rgba(0,0,0,0.06)",
               }}>
                 <Box
                   component="img"
@@ -161,22 +171,23 @@ export function CategoryTabs() {
                   sx={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease" }}
                 />
               </Box>
-              <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", mb: 0.5 }}>
+              <Typography sx={{ color: "#94a3b8", fontSize: "0.75rem", mb: 0.5, fontWeight: 500 }}>
                 {item.date}
               </Typography>
               <Typography
                 component="h3"
                 sx={{
-                  color: "#fff",
-                  fontWeight: 500,
-                  fontSize: "1rem",
-                  lineHeight: 1.4,
+                  color: "#0f172a",
+                  fontWeight: 600,
+                  fontSize: "0.95rem",
+                  lineHeight: 1.45,
                   transition: "color 0.2s",
                   display: "-webkit-box",
                   WebkitLineClamp: 2,
                   WebkitBoxOrient: "vertical",
                   overflow: "hidden",
                   wordBreak: "break-word",
+                  "&:hover": { color: "#4f46e5" },
                 }}
               >
                 {item.title}
@@ -190,17 +201,21 @@ export function CategoryTabs() {
           <Button
             variant="outlined"
             sx={{
-              borderColor: "rgba(255,255,255,0.1)",
-              color: "#fff",
-              borderRadius: "12px",
+              borderColor: "#e2e8f0",
+              color: "#475569",
+              borderRadius: "14px",
               px: 4,
-              py: 1.2,
+              py: 1.25,
               textTransform: "none",
-              fontWeight: 500,
-              "&:hover": { borderColor: "#3b82f6", bgcolor: "rgba(59, 130, 246, 0.05)" }
+              fontWeight: 600,
+              fontSize: "0.9rem",
+              bgcolor: "#fff",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+              "&:hover": { borderColor: "#c7d2fe", bgcolor: "#eef2ff", color: "#4f46e5" },
+              transition: "all 0.2s"
             }}
           >
-            ดูทั้งหมดในหมวดหมู่นี้
+            ดูทั้งหมดในหมวดหมู่นี้ →
           </Button>
         </Box>
       </Container>

@@ -28,6 +28,7 @@ import {
 } from "iconsax-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 
 const drawerWidth = 280;
 
@@ -71,6 +72,7 @@ const ADMIN_MENU_GROUPS: { title: string; items: AdminMenuItem[] }[] = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -159,14 +161,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Footer User */}
       <Box sx={{ p: 3, borderTop: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Avatar sx={{ width: 36, height: 36, bgcolor: "var(--primary)" }}>A</Avatar>
-          <Box>
-            <Typography sx={{ fontWeight: 700, fontSize: "0.9rem" }}>Admin User</Typography>
-            <Typography sx={{ fontSize: "0.75rem", opacity: 0.5 }}>Superadmin</Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, minWidth: 0 }}>
+          <Avatar src={session?.user?.image || ""} sx={{ width: 36, height: 36, bgcolor: "var(--primary)" }}>
+            {session?.user?.name?.[0] || "A"}
+          </Avatar>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography noWrap sx={{ fontWeight: 700, fontSize: "0.9rem" }}>{session?.user?.name || "Admin User"}</Typography>
+            <Typography noWrap sx={{ fontSize: "0.75rem", opacity: 0.5 }}>{session?.user?.email || "Superadmin"}</Typography>
           </Box>
         </Box>
-        <IconButton sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "error.main" } }}>
+        <IconButton onClick={() => signOut({ callbackUrl: "/" })} sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "error.main" }, flexShrink: 0 }}>
           <Logout size={20} variant="Outline" />
         </IconButton>
       </Box>
