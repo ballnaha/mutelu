@@ -28,6 +28,7 @@ import React, { useState } from "react";
 const navItems = [
   { label: "หน้าแรก", href: "/" },
   { label: "ทำนายฝัน", href: "/#dreams" },
+  { label: "ซาจู", href: "/saju" },
   { label: "ไพ่ยิปซีรายวัน", href: "/tarot" },
   { label: "สีมงคล", href: "/lucky-colors" },
   { label: "ตรวจลอตเตอรี่", href: "/lottery" },
@@ -37,6 +38,7 @@ const navItems = [
 
 function isNavActive(pathname: string, href: string, index: number) {
   if (href === "/tarot") return pathname.startsWith("/tarot");
+  if (href === "/saju") return pathname.startsWith("/saju");
   if (href === "/lucky-colors") return pathname.startsWith("/lucky-colors");
   if (href === "/lottery") return pathname.startsWith("/lottery");
   if (href.startsWith("/blog")) return pathname.startsWith("/blog");

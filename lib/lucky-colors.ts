@@ -136,15 +136,13 @@ function parseMonth(month?: string | null) {
 
 function getColorSet(weekday: ThaiWeekday, day: number, monthIndex: number): Record<LuckyColorGoal, LuckyColor> {
   const rules = weekdayRules[weekday];
-  const monthShift = monthIndex % 3;
-  const luckKey = monthShift === 0 ? rules.luck : monthShift === 1 ? rules.money : rules.work;
   const loveKey = day % 5 === 0 ? "rose" : rules.love;
 
   return {
     work: colorBank[rules.work],
     money: colorBank[rules.money],
     love: colorBank[loveKey],
-    luck: colorBank[luckKey],
+    luck: colorBank[rules.luck],
     avoid: colorBank[rules.avoid],
   };
 }

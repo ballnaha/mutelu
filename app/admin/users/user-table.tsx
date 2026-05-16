@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Typography,
@@ -24,11 +25,14 @@ import {
   FormControl,
   InputLabel,
   Select,
+  TextField,
 } from "@mui/material";
 import { More, Edit2, Trash } from "iconsax-react";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
-import { updateUserRole, deleteUser } from "./actions";
+import { updateUser, deleteUser } from "./actions";
+import { uploadImage } from "../blog/actions";
+import ImageUpload from "../blog/_components/image-upload";
 
 type User = {
   id: string;
@@ -40,12 +44,15 @@ type User = {
 };
 
 export function UserTable({ users }: { users: User[] }) {
+  const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const [editRoleOpen, setEditRoleOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("user");
+  const [selectedName, setSelectedName] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: User) => {
@@ -60,6 +67,8 @@ export function UserTable({ users }: { users: User[] }) {
   const openEditDialog = () => {
     if (selectedUser) {
       setSelectedRole(selectedUser.role);
+      setSelectedName(selectedUser.name || "");
+      setSelectedImage(selectedUser.image);
       setEditRoleOpen(true);
     }
     handleMenuClose();
@@ -70,18 +79,39 @@ export function UserTable({ users }: { users: User[] }) {
     handleMenuClose();
   };
 
-  const handleUpdateRole = async () => {
+  const handleUpdateUser = async () => {
     if (!selectedUser) return;
     setIsSubmitting(true);
-    await updateUserRole(selectedUser.id, selectedRole);
-    setIsSubmitting(false);
-    setEditRoleOpen(false);
+    
+    try {
+      let imageUrl = typeof selectedImage === "string" ? selectedImage : selectedUser.image;
+      
+      // If a new file is selected, upload it first
+      if (selectedImage instanceof File) {
+        const formData = new FormData();
+        formData.append("file", selectedImage);
+        imageUrl = await uploadImage(formData);
+      }
+
+      await updateUser(selectedUser.id, { 
+        name: selectedName,
+        role: selectedRole, 
+        image: imageUrl 
+      });
+      router.refresh();
+      setEditRoleOpen(false);
+    } catch (error) {
+      console.error("Failed to update user:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
     setIsSubmitting(true);
     await deleteUser(selectedUser.id);
+    router.refresh();
     setIsSubmitting(false);
     setDeleteConfirmOpen(false);
   };
@@ -171,9 +201,28 @@ export function UserTable({ users }: { users: User[] }) {
         <DialogTitle sx={{ fontWeight: 700 }}>แก้ไขสิทธิ์ผู้ใช้งาน</DialogTitle>
         <DialogContent>
           <Box sx={{ py: 1 }}>
-            <Typography sx={{ mb: 2, color: "#4b5563" }}>
-              ผู้ใช้งาน: <strong>{selectedUser?.name || selectedUser?.email}</strong>
-            </Typography>
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                fullWidth
+                label="ชื่อผู้ใช้งาน"
+                value={selectedName}
+                onChange={(e) => setSelectedName(e.target.value)}
+                size="small"
+                variant="outlined"
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
+              />
+            </Box>
+            
+            <Box sx={{ mb: 3 }}>
+              <Typography sx={{ mb: 1, fontSize: "0.85rem", fontWeight: 700, color: "#374151" }}>
+                รูปโปรไฟล์
+              </Typography>
+              <ImageUpload 
+                value={selectedImage || ""} 
+                onChange={setSelectedImage} 
+              />
+            </Box>
+
             <FormControl fullWidth size="small">
               <InputLabel>ระดับสิทธิ์</InputLabel>
               <Select
@@ -191,7 +240,7 @@ export function UserTable({ users }: { users: User[] }) {
           <Button onClick={() => setEditRoleOpen(false)} disabled={isSubmitting} color="inherit">
             ยกเลิก
           </Button>
-          <Button onClick={handleUpdateRole} disabled={isSubmitting} variant="contained" disableElevation>
+          <Button onClick={handleUpdateUser} disabled={isSubmitting} variant="contained" disableElevation>
             บันทึก
           </Button>
         </DialogActions>

@@ -7,8 +7,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Account {
-  id                String  @id @default(cuid())
+model account {
+  id                String  @id
   userId            String
   type              String
   provider          String
@@ -20,37 +20,151 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
+  user              user    @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Account_userId_fkey")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId], map: "Account_provider_providerAccountId_key")
+  @@index([userId], map: "Account_userId_fkey")
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
+model blogaffiliateproduct {
+  id          String   @id
+  postId      String
+  masterProductId String?
+  title       String
+  platform    String
+  productSlug String
+  image       String?
+  priceLabel  String?
+  highlights  Json?
+  badge       String?
+  accent      String   @default("#2563eb")
+  targetUrl   String   @db.Text
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  blogpost    blogpost @relation(fields: [postId], references: [id], onDelete: Cascade, map: "BlogAffiliateProduct_postId_fkey")
+  masterProduct MasterAffiliateProduct? @relation(fields: [masterProductId], references: [id], map: "BlogAffiliateProduct_masterProductId_fkey")
+
+  @@unique([platform, productSlug], map: "BlogAffiliateProduct_platform_productSlug_key")
+  @@index([isActive], map: "BlogAffiliateProduct_isActive_idx")
+  @@index([masterProductId], map: "BlogAffiliateProduct_masterProductId_idx")
+  @@index([postId, sortOrder], map: "BlogAffiliateProduct_postId_sortOrder_idx")
+}
+
+model blogcategory {
+  id          String     @id
+  name        String     @unique(map: "BlogCategory_name_key")
+  slug        String     @unique(map: "BlogCategory_slug_key")
+  description String?    @db.Text
+  image       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime
+  blogpost    blogpost[]
+}
+
+model blogpost {
+  id                   String                 @id
+  slug                 String                 @unique(map: "BlogPost_slug_key")
+  title                String
+  excerpt              String                 @db.Text
+  publishedAt          DateTime?
+  authorName           String                 @default("MUTELU Editorial")
+  authorRole           String?
+  authorImage          String?
+  heroImage            String?
+  tags                 Json?
+  seoTitle             String?
+  seoDescription       String?                @db.Text
+  status               blogpost_status        @default(DRAFT)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  categoryId           String?
+  blogaffiliateproduct blogaffiliateproduct[]
+  blogcategory         blogcategory?          @relation(fields: [categoryId], references: [id], map: "BlogPost_categoryId_fkey")
+  blogpostsection      blogpostsection[]
+
+  @@index([categoryId], map: "BlogPost_categoryId_idx")
+  @@index([status, publishedAt], map: "BlogPost_status_publishedAt_idx")
+}
+
+model blogpostsection {
+  id         String   @id
+  postId     String
+  heading    String
+  paragraphs Json
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  blogpost   blogpost @relation(fields: [postId], references: [id], onDelete: Cascade, map: "BlogPostSection_postId_fkey")
+
+  @@index([postId, sortOrder], map: "BlogPostSection_postId_sortOrder_idx")
+}
+
+model session {
+  id           String   @id
+  sessionToken String   @unique(map: "Session_sessionToken_key")
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         user     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Session_userId_fkey")
+
+  @@index([userId], map: "Session_userId_fkey")
 }
 
-model User {
-  id            String    @id @default(cuid())
+model user {
+  id            String    @id
   name          String?
-  email         String?   @unique
+  email         String?   @unique(map: "User_email_key")
   emailVerified DateTime?
   image         String?
   role          String    @default("user")
-  accounts      Account[]
-  sessions      Session[]
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  updatedAt     DateTime
+  account       account[]
+  session       session[]
 }
 
-model VerificationToken {
+model verificationtoken {
   identifier String
-  token      String   @unique
+  token      String   @unique(map: "VerificationToken_token_key")
   expires    DateTime
 
-  @@unique([identifier, token])
+  @@unique([identifier, token], map: "VerificationToken_identifier_token_key")
+}
+
+model MasterAffiliateProduct {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @db.Text
+  price       String
+  image       String   @db.Text
+  url         String   @db.Text
+  platform    String   @default("shopee")
+  productSlug String?
+  element     Element  @default(NONE)
+  category    String   @default("general")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  blogaffiliateproduct blogaffiliateproduct[]
+
+  @@index([element])
+  @@index([category])
+  @@index([isActive])
+  @@index([platform, productSlug], map: "MasterAffiliateProduct_platform_productSlug_idx")
+}
+
+enum Element {
+  WOOD
+  FIRE
+  EARTH
+  METAL
+  WATER
+  NONE
+}
+
+enum blogpost_status {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }

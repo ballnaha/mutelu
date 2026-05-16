@@ -1,34 +1,36 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Box, 
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
-  ListItemText, 
-  Typography, 
-  AppBar, 
-  Toolbar, 
+import {
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  AppBar,
+  Toolbar,
   IconButton,
   Avatar
 } from "@mui/material";
-import { 
-  Category, 
-  Magicpen, 
-  DocumentText, 
-  Shop, 
-  Star1, 
-  UserSquare, 
-  Setting2, 
-  HambergerMenu, 
+import {
+  Element4,
+  Hierarchy,
+  Magicpen,
+  DocumentText,
+  Shop,
+  Star,
+  UserSquare,
+  Setting2,
+  HambergerMenu,
   Logout
 } from "iconsax-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import { SnackbarProvider } from "./_context/snackbar-context";
 
 const drawerWidth = 280;
 
@@ -43,28 +45,29 @@ const ADMIN_MENU_GROUPS: { title: string; items: AdminMenuItem[] }[] = [
   {
     title: "ภาพรวม",
     items: [
-      { text: "แดชบอร์ด", Icon: Category, path: "/admin", color: "#a78bfa" },
+      { text: "แดชบอร์ด", Icon: Element4, path: "/admin", color: "#818cf8" }, // Indigo
     ],
   },
   {
     title: "คอนเทนต์",
     items: [
-      { text: "จัดการหน้าแรก (Hero)", Icon: Star1, path: "/admin/featured", color: "#facc15" },
-      { text: "คำทำนายราศี (Horoscopes)", Icon: Magicpen, path: "/admin/horoscopes", color: "#fb7185" },
-      { text: "บทความ/เคล็ดลับ", Icon: DocumentText, path: "/admin/articles", color: "#38bdf8" },
+      { text: "จัดการหน้าแรก (Hero)", Icon: Star, path: "/admin/featured", color: "#fbbf24" }, // Amber
+      { text: "คำทำนายราศี (Horoscopes)", Icon: Magicpen, path: "/admin/horoscopes", color: "#f472b6" }, // Pink
+      { text: "บทความ/เคล็ดลับ", Icon: DocumentText, path: "/admin/blog", color: "#38bdf8" }, // Sky
+      { text: "หมวดหมู่บทความ", Icon: Hierarchy, path: "/admin/categories", color: "#c084fc" }, // Purple
     ],
   },
   {
     title: "ร้านค้า",
     items: [
-      { text: "สินค้าแอฟฟิลิเอท", Icon: Shop, path: "/admin/products", color: "#34d399" },
+      { text: "สินค้าแอฟฟิลิเอท", Icon: Shop, path: "/admin/affiliate", color: "#34d399" }, // Emerald
     ],
   },
   {
     title: "ระบบ",
     items: [
-      { text: "จัดการสมาชิก", Icon: UserSquare, path: "/admin/users", color: "#f97316" },
-      { text: "ตั้งค่าระบบ", Icon: Setting2, path: "/admin/settings", color: "#c084fc" },
+      { text: "จัดการสมาชิก", Icon: UserSquare, path: "/admin/users", color: "#fb923c" }, // Orange
+      { text: "ตั้งค่าระบบ", Icon: Setting2, path: "/admin/settings", color: "#94a3b8" }, // Slate
     ],
   },
 ];
@@ -89,7 +92,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </Box>
 
       {/* Navigation */}
-      <Box sx={{ flexGrow: 1, py: 2.5, px: 2, overflowY: "auto" }}>
+      <Box
+        sx={{
+          flexGrow: 1,
+          py: 2.5,
+          px: 2,
+          overflowY: "auto",
+          "&::-webkit-scrollbar": {
+            width: "5px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "rgba(255,255,255,0.1)",
+            borderRadius: "10px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            background: "rgba(255,255,255,0.2)",
+          },
+        }}
+      >
         {ADMIN_MENU_GROUPS.map((group) => (
           <Box key={group.title} sx={{ mb: 2.5 }}>
             <Typography
@@ -136,8 +159,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             borderRadius: "10px",
                             display: "grid",
                             placeItems: "center",
-                            bgcolor: isActive ? `${item.color}24` : "rgba(255,255,255,0.06)",
-                            boxShadow: isActive ? `0 0 0 1px ${item.color}30` : "none",
+                            bgcolor: isActive ? `${item.color}15` : "rgba(255,255,255,0.03)",
+                            boxShadow: isActive ? `0 0 20px ${item.color}30` : "none",
+                            transition: "all 0.2s ease",
                           }}
                         >
                           <Icon size="20" color={item.color} variant={isActive ? "Bold" : "Outline"} />
@@ -170,8 +194,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Typography noWrap sx={{ fontSize: "0.75rem", opacity: 0.5 }}>{session?.user?.email || "Superadmin"}</Typography>
           </Box>
         </Box>
-        <IconButton onClick={() => signOut({ callbackUrl: "/" })} sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "error.main" }, flexShrink: 0 }}>
-          <Logout size={20} variant="Outline" />
+        <IconButton
+          onClick={() => signOut({ callbackUrl: "/" })}
+          sx={{
+            color: "#ef4444",
+            bgcolor: "rgba(239, 68, 68, 0.1)",
+            borderRadius: "10px",
+            "&:hover": {
+              bgcolor: "#ef4444",
+              color: "#fff"
+            },
+            flexShrink: 0
+          }}
+        >
+          <Logout size={20} variant="Outline" color="currentColor" />
         </IconButton>
       </Box>
     </Box>
@@ -198,11 +234,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { md: "none" } }}
           >
-            <HambergerMenu size={24} />
+            <HambergerMenu size={24} color="currentColor" />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700 }}>
+          <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700, flexGrow: 1 }}>
             Mutelu Admin
           </Typography>
+          <IconButton onClick={() => signOut({ callbackUrl: "/" })} color="error" size="small">
+            <Logout size={20} variant="Outline" color="currentColor" />
+          </IconButton>
         </Toolbar>
       </AppBar>
 
@@ -224,7 +263,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         >
           {drawer}
         </Drawer>
-        
+
         {/* Desktop Sidebar */}
         <Drawer
           variant="permanent"
@@ -241,16 +280,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main Content Area */}
       <Box
         component="main"
-        sx={{ 
-          flexGrow: 1, 
-          p: { xs: 3, md: 4 }, 
+        sx={{
+          flexGrow: 1,
+          p: { xs: 3, md: 4 },
           width: { md: `calc(100% - ${drawerWidth}px)` },
           mt: { xs: 8, md: 0 },
           bgcolor: "#f8f9fa", // Light background for admin panel
           minHeight: "100vh"
         }}
       >
-        {children}
+        <SnackbarProvider>
+          {children}
+        </SnackbarProvider>
       </Box>
     </Box>
   );

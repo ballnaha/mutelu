@@ -9,98 +9,39 @@ import {
   Divider,
   Stack,
   Typography,
+  Avatar,
+  Breadcrumbs,
 } from "@mui/material";
 import {
-  ArrowLeft,
-  ArrowRight,
-  Bag2,
+  Share,
+  Verify,
   Calendar,
-  Eye,
-  Link21,
-  ShieldTick,
-  Star1,
-  TickCircle,
 } from "iconsax-react";
+import { AffiliateCard } from "@/app/components/affiliate-card";
 import { Footer } from "@/app/components/footer";
 import { Header } from "@/app/components/header";
-
-type BlogPost = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  date: string;
-  readTime: string;
-  author: string;
-  heroImage: string;
-  products: AffiliateProduct[];
-};
-
-type AffiliateProduct = {
-  title: string;
-  platform: "Shopee" | "Lazada" | "TikTok Shop";
-  slug: string;
-  image: string;
-  priceLabel: string;
-  highlights: string[];
-  badge: string;
-  accent: string;
-};
-
-const mockPosts: BlogPost[] = [
-  {
-    slug: "lucky-work-desk-items-2026",
-    title: "จัดโต๊ะทำงานเสริมดวงปี 2569: ไอเทมเล็ก ๆ ที่ช่วยให้โฟกัสดีขึ้นและงานไหลลื่น",
-    excerpt:
-      "ไกด์ตัวอย่างสำหรับบทความ affiliate: เนื้อหายังให้ประโยชน์ก่อน แล้วค่อยแทรกสินค้าแบบพอดี มี disclosure และปุ่มออกไป shopping app",
-    category: "งาน / การเงิน",
-    date: "15 พ.ค. 2569",
-    readTime: "อ่าน 6 นาที",
-    author: "MUTELU Editorial",
-    heroImage: "/images/hero-bg.png",
-    products: [
-      {
-        title: "โคมไฟตั้งโต๊ะปรับแสง โทนอบอุ่น",
-        platform: "Shopee",
-        slug: "warm-desk-lamp",
-        image: "/images/ring.png",
-        priceLabel: "เริ่มต้น 299 บาท",
-        highlights: ["ปรับแสงได้หลายระดับ", "เหมาะกับโต๊ะทำงานขนาดเล็ก", "โทนอุ่นช่วยให้มุมทำงานดูนุ่มขึ้น"],
-        badge: "เหมาะกับสายโฟกัส",
-        accent: "#2563eb",
-      },
-      {
-        title: "ถาดหินมงคลวางโต๊ะ สีเขียวหยก",
-        platform: "Lazada",
-        slug: "jade-stone-tray",
-        image: "/images/bracelet.png",
-        priceLabel: "เริ่มต้น 189 บาท",
-        highlights: ["ใช้เป็นถาดเครื่องประดับหรือของจุกจิก", "สีเขียวเข้ากับธีมการเงิน", "ช่วยให้โต๊ะดูเป็นระเบียบ"],
-        badge: "ตัวอย่าง affiliate",
-        accent: "#10b981",
-      },
-    ],
-  },
-];
+import {
+  getPublishedBlogPostBySlug,
+  getPublishedBlogPostSlugs,
+} from "@/lib/blog-posts";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-function getPostBySlug(slug: string) {
-  return mockPosts.find((post) => post.slug === slug);
-}
+export async function generateStaticParams() {
+  const slugs = await getPublishedBlogPostSlugs();
 
-export function generateStaticParams() {
-  return mockPosts.map((post) => ({
-    slug: post.slug,
+  return slugs.map((slug) => ({
+    slug,
   }));
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const { slug } = await props.params;
-  const post = getPostBySlug(slug);
+  const decodedSlug = decodeURIComponent(slug);
+  const post = await getPublishedBlogPostBySlug(decodedSlug);
 
   if (!post) {
     return {
@@ -109,304 +50,278 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   }
 
   return {
-    title: `${post.title} | MUTELU`,
-    description: post.excerpt,
+    title: `${post.seoTitle} | MUTELU`,
+    description: post.seoDescription,
+    openGraph: {
+      title: post.seoTitle,
+      description: post.seoDescription,
+      images: [post.heroImage],
+      type: "article",
+      publishedTime: post.date,
+      authors: [post.author],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.seoTitle,
+      description: post.seoDescription,
+      images: [post.heroImage],
+    },
   };
-}
-
-function AffiliateCard({ product }: { product: AffiliateProduct }) {
-  const href = `/go/${product.platform.toLowerCase().replaceAll(" ", "-")}/${product.slug}`;
-
-  return (
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: { xs: "1fr", sm: "160px 1fr" },
-        gap: 2.5,
-        p: { xs: 2, md: 2.5 },
-        border: "1px solid #e2e8f0",
-        borderRadius: "8px",
-        bgcolor: "#fff",
-        boxShadow: "0 18px 45px rgba(15, 23, 42, 0.06)",
-      }}
-    >
-      <Box
-        sx={{
-          minHeight: 160,
-          borderRadius: "8px",
-          bgcolor: "#f8fafc",
-          border: "1px solid #f1f5f9",
-          overflow: "hidden",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Box
-          component="img"
-          src={product.image}
-          alt={product.title}
-          sx={{ width: "86%", height: 140, objectFit: "contain" }}
-        />
-      </Box>
-
-      <Stack spacing={1.5}>
-        <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", gap: 1 }}>
-          <Chip
-            label={product.badge}
-            size="small"
-            sx={{
-              height: 26,
-              borderRadius: "8px",
-              bgcolor: `${product.accent}14`,
-              color: product.accent,
-              fontWeight: 700,
-            }}
-          />
-          <Chip
-            label={product.platform}
-            size="small"
-            sx={{ height: 26, borderRadius: "8px", bgcolor: "#f8fafc", color: "#475569", fontWeight: 700 }}
-          />
-        </Stack>
-
-        <Typography component="h3" sx={{ fontSize: { xs: "1.1rem", md: "1.25rem" }, fontWeight: 800, color: "#0f172a", lineHeight: 1.35, letterSpacing: 0 }}>
-          {product.title}
-        </Typography>
-
-        <Typography sx={{ color: "#2563eb", fontWeight: 800, fontSize: "0.95rem" }}>
-          {product.priceLabel}
-        </Typography>
-
-        <Stack spacing={0.75}>
-          {product.highlights.map((highlight) => (
-            <Stack key={highlight} direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
-              <TickCircle size={18} color={product.accent} variant="Bold" />
-              <Typography sx={{ color: "#475569", fontSize: "0.92rem", lineHeight: 1.55 }}>
-                {highlight}
-              </Typography>
-            </Stack>
-          ))}
-        </Stack>
-
-        <Button
-          component="a"
-          href={href}
-          target="_blank"
-          rel="nofollow sponsored noopener"
-          variant="contained"
-          endIcon={<ArrowRight size={18} color="currentColor" />}
-          sx={{
-            alignSelf: { xs: "stretch", sm: "flex-start" },
-            mt: 0.5,
-            bgcolor: "#0f172a",
-            color: "#fff",
-            borderRadius: "8px",
-            px: 2.5,
-            py: 1.1,
-            fontWeight: 800,
-            textTransform: "none",
-            boxShadow: "none",
-            "&:hover": { bgcolor: "#1e293b", boxShadow: "none" },
-          }}
-        >
-          ดูสินค้าใน {product.platform}
-        </Button>
-      </Stack>
-    </Box>
-  );
 }
 
 export default async function BlogPostPage(props: PageProps) {
   const { slug } = await props.params;
-  const post = getPostBySlug(slug);
+  const decodedSlug = decodeURIComponent(slug);
+  const post = await getPublishedBlogPostBySlug(decodedSlug);
 
   if (!post) {
     notFound();
   }
 
+  // JSON-LD Structured Data for SEO
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.excerpt,
+    "image": post.heroImage,
+    "datePublished": post.date,
+    "author": {
+      "@type": "Person",
+      "name": post.author,
+      "jobTitle": post.authorRole
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MUTELU",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://mutelu.com/logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://mutelu.com/blog/${post.slug}`
+    }
+  };
+
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f8fafc", color: "#0f172a" }}>
+      {/* Inject JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <Header />
 
-      <Box component="main" sx={{ pt: { xs: 8, md: 9 } }}>
-        <Box sx={{ bgcolor: "#fff", borderBottom: "1px solid #e2e8f0" }}>
-          <Container maxWidth="lg" sx={{ py: { xs: 4, md: 7 } }}>
-            <Link href="/" style={{ textDecoration: "none" }}>
-              <Button
-                startIcon={<ArrowLeft size={18} color="currentColor" />}
-                sx={{
-                  color: "#64748b",
-                  fontWeight: 700,
-                  textTransform: "none",
-                  mb: 3,
-                  px: 0,
-                  "&:hover": { bgcolor: "transparent", color: "#0f172a" },
-                }}
-              >
-                กลับหน้าแรก
-              </Button>
-            </Link>
+      <Box component="main" sx={{ pt: { xs: 9, md: 12 }, pb: 10 }}>
+        {/* Minimal Hero Section */}
+        <Container maxWidth="md">
+          {/* SEO Breadcrumbs */}
+          <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
+            <Breadcrumbs
+              separator={<Box sx={{ width: 4, height: 4, borderRadius: "50%", bgcolor: "#cbd5e1" }} />}
+              sx={{ "& .MuiBreadcrumbs-ol": { justifyContent: "center" } }}
+            >
+              <Link href="/" style={{ textDecoration: "none" }}>
+                <Typography sx={{ color: "#94a3b8", fontSize: "0.85rem", fontWeight: 600, "&:hover": { color: "#4f46e5" } }}>
+                  หน้าแรก
+                </Typography>
+              </Link>
+              <Link href="/blog" style={{ textDecoration: "none" }}>
+                <Typography sx={{ color: "#94a3b8", fontSize: "0.85rem", fontWeight: 600, "&:hover": { color: "#4f46e5" } }}>
+                  บทความ
+                </Typography>
+              </Link>
+              <Typography sx={{ color: "#0f172a", fontSize: "0.85rem", fontWeight: 700 }}>
+                {post.category}
+              </Typography>
+            </Breadcrumbs>
+          </Box>
 
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1.05fr 0.95fr" }, gap: { xs: 4, md: 6 }, alignItems: "center" }}>
-              <Box>
-                <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mb: 2 }}>
-                  <Chip label={post.category} sx={{ borderRadius: "8px", bgcolor: "#eff6ff", color: "#2563eb", fontWeight: 800 }} />
-                  <Stack direction="row" spacing={0.75} sx={{ alignItems: "center", color: "#64748b" }}>
-                    <Calendar size={17} color="currentColor" />
-                    <Typography sx={{ fontSize: "0.88rem", fontWeight: 600 }}>{post.date}</Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={0.75} sx={{ alignItems: "center", color: "#64748b" }}>
-                    <Eye size={17} color="currentColor" />
-                    <Typography sx={{ fontSize: "0.88rem", fontWeight: 600 }}>{post.readTime}</Typography>
-                  </Stack>
-                </Stack>
+          <Box sx={{ textAlign: "center", mb: 6 }}>
+            <Typography
+              variant="h1"
+              sx={{
+                fontSize: { xs: "2.5rem", md: "4rem" },
+                lineHeight: 1.1,
+                fontWeight: 900,
+                color: "#0f172a",
+                mb: 4,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              {post.title}
+            </Typography>
 
-                <Typography
-                  variant="h1"
-                  sx={{
-                    fontSize: { xs: "2rem", md: "3.5rem" },
-                    lineHeight: 1.16,
-                    fontWeight: 900,
-                    letterSpacing: 0,
-                    color: "#0f172a",
-                    mb: 2,
+            <Typography sx={{ color: "#64748b", fontSize: { xs: "1.15rem", md: "1.25rem" }, lineHeight: 1.6, mb: 4, maxWidth: 700, mx: "auto" }}>
+              {post.excerpt}
+            </Typography>
+
+            {/* Redesigned Premium Author/Meta Bar */}
+            <Stack spacing={4} sx={{ alignItems: "center", mt: 6 }}>
+              <Box sx={{ position: "relative" }}>
+                <Avatar 
+                  src={post.authorImage || ""}
+                  sx={{ 
+                    width: 100, 
+                    height: 100, 
+                    bgcolor: "#fff", 
+                    color: "#4f46e5", 
+                    fontSize: "1.75rem", 
+                    fontWeight: 900, 
+                    border: "3px solid #4f46e5",
+                    boxShadow: "0 8px 32px -8px rgba(79, 70, 229, 0.4)"
                   }}
                 >
-                  {post.title}
+                  {post.author[0]}
+                </Avatar>
+                <Box 
+                  sx={{ 
+                    position: "absolute", 
+                    bottom: 0, 
+                    right: 0, 
+                    bgcolor: "#4f46e5", 
+                    borderRadius: "50%", 
+                    width: 32, 
+                    height: 32, 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "center",
+                    border: "3px solid #fff"
+                  }}
+                >
+                  <Verify size={18} color="#fff" variant="Bold" />
+                </Box>
+              </Box>
+
+              <Stack spacing={0.5} sx={{ textAlign: "center" }}>
+                <Typography sx={{ color: "#0f172a", fontSize: "1.25rem", fontWeight: 900, letterSpacing: "0.01em" }}>
+                  {post.author}
                 </Typography>
-
-                <Typography sx={{ color: "#475569", fontSize: { xs: "1rem", md: "1.08rem" }, lineHeight: 1.8, maxWidth: 760 }}>
-                  {post.excerpt}
+                <Typography sx={{ color: "#4f46e5", fontSize: "0.85rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em" }}>
+                  {post.authorRole || "ทีมบรรณาธิการ MUTELU"}
                 </Typography>
+              </Stack>
 
-                <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mt: 3 }}>
-                  <Box sx={{ width: 40, height: 40, borderRadius: "50%", bgcolor: "#0f172a", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900 }}>
-                    M
-                  </Box>
-                  <Box>
-                    <Typography sx={{ fontWeight: 800, color: "#0f172a", fontSize: "0.95rem" }}>{post.author}</Typography>
-                    <Typography sx={{ color: "#94a3b8", fontSize: "0.82rem" }}>ตัวอย่างบทความสำหรับระบบหลังบ้าน</Typography>
-                  </Box>
-                </Stack>
-              </Box>
+              <Stack direction="row" spacing={3} sx={{ alignItems: "center" }}>
+                <Typography sx={{ color: "#94a3b8", fontSize: "0.9rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 1 }}>
+                  <Calendar size={18} color="#94a3b8" /> {post.date}
+                </Typography>
+              </Stack>
+            </Stack>
+          </Box>
 
-              <Box
-                sx={{
-                  minHeight: { xs: 260, md: 420 },
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  border: "1px solid #e2e8f0",
-                  bgcolor: "#e0f2fe",
-                }}
-              >
-                <Box
-                  component="img"
-                  src={post.heroImage}
-                  alt={post.title}
-                  sx={{ width: "100%", height: "100%", minHeight: { xs: 260, md: 420 }, objectFit: "cover", display: "block" }}
-                />
-              </Box>
-            </Box>
-          </Container>
-        </Box>
+          {/* Featured Image */}
+          <Box sx={{
+            borderRadius: "32px",
+            overflow: "hidden",
+            aspectRatio: "16/9",
+            mb: 8,
+            boxShadow: "0 24px 60px -12px rgba(0,0,0,0.1)",
+            border: "1px solid #f1f5f9"
+          }}>
+            <Box
+              component="img"
+              src={post.heroImage}
+              alt={post.title}
+              sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </Box>
 
-        <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1fr) 300px" }, gap: { xs: 4, md: 5 }, alignItems: "start" }}>
-            <Stack component="article" spacing={3.5}>
-              <Box sx={{ p: 2.5, borderRadius: "8px", bgcolor: "#fff7ed", border: "1px solid #fed7aa" }}>
-                <Stack direction="row" spacing={1.25} sx={{ alignItems: "flex-start" }}>
-                  <ShieldTick size={22} color="#ea580c" variant="Bold" />
-                  <Typography sx={{ color: "#9a3412", fontSize: "0.94rem", lineHeight: 1.7, fontWeight: 600 }}>
-                    บทความนี้เป็น mockup สำหรับระบบ Affiliate บางลิงก์เป็นลิงก์แนะนำสินค้า หากผู้ใช้งานซื้อผ่านลิงก์ เว็บไซต์อาจได้รับค่าคอมมิชชันโดยไม่มีค่าใช้จ่ายเพิ่มเติม
-                  </Typography>
-                </Stack>
-              </Box>
+          {/* Article Body */}
+          <Box sx={{ maxWidth: 720, mx: "auto" }}>
+            <Stack component="article" spacing={6}>
 
-              <Box sx={{ bgcolor: "#fff", borderRadius: "8px", border: "1px solid #e2e8f0", p: { xs: 2.5, md: 4 } }}>
-                <Stack spacing={2.5}>
-                  <Typography component="h2" sx={{ fontSize: { xs: "1.45rem", md: "1.8rem" }, fontWeight: 900, color: "#0f172a", letterSpacing: 0 }}>
-                    ทำไมโต๊ะทำงานถึงมีผลกับพลังงานของวัน
-                  </Typography>
-                  <Typography sx={{ color: "#334155", lineHeight: 1.95, fontSize: "1rem" }}>
-                    มุมทำงานเป็นจุดที่เราใช้ตัดสินใจ คิดงาน และรับข่าวสารตลอดวัน ถ้าโต๊ะรกเกินไปหรือแสงไม่พอดี สมาธิจะหลุดง่าย บทความตัวอย่างนี้จึงเริ่มจากการจัดพื้นที่ให้ใช้งานจริงก่อน แล้วค่อยแนะนำไอเทมที่เข้ากับบริบทของผู้อ่าน
-                  </Typography>
-                  <Typography sx={{ color: "#334155", lineHeight: 1.95, fontSize: "1rem" }}>
-                    หลักที่ใช้ได้ง่ายคือเลือกของที่มีหน้าที่ชัดเจนหนึ่งอย่าง เช่น เพิ่มแสง เก็บของ หรือช่วยสร้างจุดพักสายตา แล้วให้สีและวัสดุช่วยเสริมอารมณ์ของพื้นที่ ไม่จำเป็นต้องซื้อเยอะ แต่ควรเลือกให้เข้ากับกิจวัตรประจำวัน
-                  </Typography>
-                </Stack>
-              </Box>
+              {/* Dynamic Content Blocks */}
+              {post.content.map((block, idx) => {
+                if (block.type === "section") {
+                  return (
+                    <Box key={`section-${idx}`}>
+                      <Stack spacing={3}>
+                        <Typography component="h2" sx={{ fontSize: { xs: "1.75rem", md: "2.25rem" }, fontWeight: 900, color: "#0f172a", letterSpacing: "-0.02em" }}>
+                          {block.heading}
+                        </Typography>
+                        <Stack spacing={2.5}>
+                          {block.paragraphs.map((paragraph, pIdx) => (
+                            <Typography 
+                              key={pIdx} 
+                              sx={{ color: "#334155", lineHeight: 2, fontSize: "1.15rem", fontWeight: 400 }}
+                              dangerouslySetInnerHTML={{ __html: paragraph }}
+                            />
+                          ))}
+                        </Stack>
+                      </Stack>
+                    </Box>
+                  );
+                }
 
-              <Box sx={{ bgcolor: "#fff", borderRadius: "8px", border: "1px solid #e2e8f0", p: { xs: 2.5, md: 4 } }}>
-                <Stack spacing={2.5}>
-                  <Stack direction="row" spacing={1.25} sx={{ alignItems: "center" }}>
-                    <Bag2 size={24} color="#2563eb" variant="Bold" />
-                    <Typography component="h2" sx={{ fontSize: { xs: "1.35rem", md: "1.65rem" }, fontWeight: 900, color: "#0f172a", letterSpacing: 0 }}>
-                      สินค้าแนะนำในบทความ
-                    </Typography>
-                  </Stack>
+                if (block.type === "product") {
+                  return (
+                    <Box key={`product-${idx}`} sx={{ my: 1 }}>
+                      <AffiliateCard
+                        name={block.title}
+                        price={block.priceLabel}
+                        image={block.image}
+                        platform={block.platform}
+                        platformLabel={block.platformLabel}
+                        productSlug={block.slug}
+                        badge={block.badge}
+                        highlights={block.highlights}
+                        accentColor={block.accent}
+                        variant="article"
+                      />
+                    </Box>
+                  );
+                }
 
-                  <Stack spacing={2}>
-                    {post.products.map((product) => (
-                      <AffiliateCard key={product.slug} product={product} />
-                    ))}
-                  </Stack>
-                </Stack>
-              </Box>
+                return null;
+              })}
 
-              <Box sx={{ bgcolor: "#fff", borderRadius: "8px", border: "1px solid #e2e8f0", p: { xs: 2.5, md: 4 } }}>
-                <Stack spacing={2.5}>
-                  <Typography component="h2" sx={{ fontSize: { xs: "1.35rem", md: "1.65rem" }, fontWeight: 900, color: "#0f172a", letterSpacing: 0 }}>
-                    วิธีแทรกสินค้าให้บทความยังน่าอ่าน
-                  </Typography>
-                  <Typography sx={{ color: "#334155", lineHeight: 1.95, fontSize: "1rem" }}>
-                    จุดที่เหมาะคือหลังจากอธิบายปัญหาและเกณฑ์เลือกซื้อแล้ว เพราะผู้อ่านเข้าใจเหตุผลก่อนเห็นปุ่มซื้อ ในหลังบ้านควรให้ editor เลือกสินค้าเข้ามาเป็น block ได้ พร้อมแก้ข้อความปุ่ม จุดเด่น และ platform ได้ทีละรายการ
-                  </Typography>
-                  <Divider />
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
-                    {["เนื้อหาก่อนขาย", "ลิงก์ผ่าน /go", "วัดคลิกได้", "แก้สินค้าได้จากหลังบ้าน"].map((item) => (
+              {/* Minimal Footer */}
+              <Box sx={{ pt: 6 }}>
+                <Divider sx={{ mb: 6, borderColor: "#f1f5f9" }} />
+
+                <Stack spacing={6}>
+                  <Stack direction="row" spacing={1.5} sx={{ flexWrap: "wrap", gap: 1.5, justifyContent: "center" }}>
+                    {post.tags.map((item) => (
                       <Chip
                         key={item}
-                        icon={<Star1 size={15} color="#f59e0b" variant="Bold" />}
-                        label={item}
-                        sx={{ justifyContent: "flex-start", borderRadius: "8px", bgcolor: "#fffbeb", color: "#92400e", fontWeight: 700 }}
+                        label={`#${item}`}
+                        clickable
+                        sx={{
+                          borderRadius: "12px",
+                          bgcolor: "#fff",
+                          color: "#64748b",
+                          fontWeight: 700,
+                          px: 1,
+                          border: "1px solid #e2e8f0",
+                          "&:hover": { bgcolor: "#eef2ff", color: "#4f46e5", borderColor: "#c7d2fe" }
+                        }}
                       />
                     ))}
                   </Stack>
-                </Stack>
-              </Box>
-            </Stack>
 
-            <Stack
-              spacing={2}
-              sx={{
-                position: { md: "sticky" },
-                top: { md: 88 },
-              }}
-            >
-              <Box sx={{ bgcolor: "#fff", border: "1px solid #e2e8f0", borderRadius: "8px", p: 2.5 }}>
-                <Typography sx={{ fontWeight: 900, color: "#0f172a", mb: 1.5 }}>โครงสร้าง mockup</Typography>
-                <Stack spacing={1.25}>
-                  {["Hero + SEO intro", "Disclosure", "Article content", "Affiliate product block", "Tracking redirect"].map((item) => (
-                    <Stack key={item} direction="row" spacing={1} sx={{ alignItems: "center" }}>
-                      <TickCircle size={18} color="#10b981" variant="Bold" />
-                      <Typography sx={{ color: "#475569", fontSize: "0.92rem" }}>{item}</Typography>
-                    </Stack>
-                  ))}
+                  <Box sx={{ textAlign: "center" }}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Share size={20} color="currentColor" />}
+                      sx={{
+                        borderRadius: "16px",
+                        px: 4,
+                        py: 1.5,
+                        borderColor: "#e2e8f0",
+                        color: "#475569",
+                        textTransform: "none",
+                        fontWeight: 700,
+                        "&:hover": { bgcolor: "#f8fafc", borderColor: "#cbd5e1" }
+                      }}
+                    >
+                      แชร์บทความนี้
+                    </Button>
+                  </Box>
                 </Stack>
-              </Box>
-
-              <Box sx={{ bgcolor: "#0f172a", color: "#fff", borderRadius: "8px", p: 2.5 }}>
-                <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>
-                  <Link21 size={20} color="currentColor" />
-                  <Typography sx={{ fontWeight: 900 }}>ตัวอย่าง URL</Typography>
-                </Stack>
-                <Typography sx={{ color: "#cbd5e1", fontSize: "0.9rem", lineHeight: 1.7 }}>
-                  /blog/{post.slug}
-                </Typography>
-                <Typography sx={{ color: "#94a3b8", fontSize: "0.82rem", lineHeight: 1.7, mt: 1 }}>
-                  ปุ่มสินค้าใช้ /go/platform/productSlug ก่อน redirect ออกไป shopping app
-                </Typography>
               </Box>
             </Stack>
           </Box>

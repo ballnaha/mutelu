@@ -93,7 +93,7 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
               border: "1px solid #f1f5f9"
             }}>
               <Box sx={{ textAlign: "center" }}>
-                <Typography sx={{ fontSize: "0.75rem", fontWeight: 600, color: "#94a3b8", mb: 1, textTransform: "uppercase", letterSpacing: "0.06em" }}>เลขเด่น 3 ตัวตรง</Typography>
+                <Typography sx={{ fontSize: "0.75rem", fontWeight: 600, color: "#94a3b8", mb: 1, textTransform: "uppercase", letterSpacing: "0.06em" }}>เลขเด่น 3 ตัว</Typography>
                 <Stack direction="row" spacing={1.5} sx={{ justifyContent: "center" }}>
                   {data.threeDigits.map((n) => (
                     <Box key={n} sx={{ minWidth: 44, px: 1.5, height: 52, borderRadius: "12px", bgcolor: "#eef2ff", border: "1px solid #e0e7ff", display: "grid", placeItems: "center" }}>

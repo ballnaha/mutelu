@@ -3,17 +3,17 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function updateUserRole(userId: string, role: string) {
+export async function updateUser(userId: string, data: { name?: string | null, role?: string, image?: string | null }) {
   try {
     await prisma.user.update({
       where: { id: userId },
-      data: { role },
+      data: data,
     });
     revalidatePath("/admin/users");
     return { success: true };
   } catch (error) {
     console.error("Error updating user:", error);
-    return { success: false, error: "Failed to update user role." };
+    return { success: false, error: "Failed to update user." };
   }
 }
 
