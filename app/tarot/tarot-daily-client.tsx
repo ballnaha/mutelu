@@ -289,6 +289,8 @@ function TarotImage({
   performanceMode?: boolean;
 }) {
   const rot = isSmall ? 0 : fixedRots[index % fixedRots.length];
+  const [frontFailed, setFrontFailed] = useState(false);
+  const [backFailed, setBackFailed] = useState(!card.imagePath || card.imagePath.includes("generic-tarot.png"));
 
   return (
     <Box
@@ -315,11 +317,41 @@ function TarotImage({
         }}
       >
         <Box className="card-face card-face-front">
-          <Box
-            component="img"
-            src="/images/tarot/tarot-back.webp"
-            sx={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
+          {!frontFailed ? (
+            <Box
+              component="img"
+              src="/images/tarot/tarot-back.webp"
+              onError={() => setFrontFailed(true)}
+              sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            // Premium Astro Back Fallback
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                background: "radial-gradient(circle at center, #1e1b4b 0%, #3b0764 45%, #020617 100%)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1.5,
+                p: 2,
+                boxSizing: "border-box"
+              }}
+            >
+              <svg width="45%" height="45%" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="1.2" style={{ filter: "drop-shadow(0 0 12px rgba(245, 158, 11, 0.4))" }}>
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 1v22M1 12h22" />
+                <path d="M4.22 4.22l15.56 15.56M19.78 4.22L4.22 19.78" />
+                <circle cx="12" cy="12" r="3.5" fill="#020617" />
+                <circle cx="12" cy="12" r="1.5" fill="#f59e0b" />
+              </svg>
+              <Typography sx={{ color: "#d97706", fontSize: isSmall ? "0.45rem" : "0.62rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.15em", mt: 0.5 }}>
+                MUTELU DECK
+              </Typography>
+            </Box>
+          )}
           <Box sx={{ position: "absolute", inset: 8, border: "1px solid rgba(212,175,55,0.2)", borderRadius: "10px" }} />
 
           {isSelected && !isSmall && (
@@ -331,17 +363,94 @@ function TarotImage({
 
         <Box className="card-face card-face-back">
           <Box className="glint-effect" />
-          <Box
-            component="img"
-            src={card.imagePath}
-            sx={{ 
-              width: "100%", 
-              height: "100%", 
-              objectFit: "cover",
-              transform: isReversed ? "rotate(180deg)" : "none",
-              transition: "transform 0.4s ease"
-            }}
-          />
+          {!backFailed ? (
+            <Box
+              component="img"
+              src={card.imagePath}
+              onError={() => setBackFailed(true)}
+              sx={{ 
+                width: "100%", 
+                height: "100%", 
+                objectFit: "cover",
+                transform: isReversed ? "rotate(180deg)" : "none",
+                transition: "transform 0.4s ease"
+              }}
+            />
+          ) : (
+            // Premium Astro Front Fallback
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                background: (() => {
+                  const id = card.id;
+                  if (id.endsWith("-of-wands")) return "radial-gradient(circle at center, #450a0a 0%, #1c0505 60%, #030712 100%)";
+                  if (id.endsWith("-of-cups")) return "radial-gradient(circle at center, #062f4f 0%, #0b1a2e 60%, #030712 100%)";
+                  if (id.endsWith("-of-swords")) return "radial-gradient(circle at center, #1e293b 0%, #111827 60%, #030712 100%)";
+                  if (id.endsWith("-of-pentacles")) return "radial-gradient(circle at center, #064e3b 0%, #0b2e21 60%, #030712 100%)";
+                  return "radial-gradient(circle at center, #3b0764 0%, #20043b 60%, #030712 100%)";
+                })(),
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                p: 2,
+                boxSizing: "border-box",
+                transform: isReversed ? "rotate(180deg)" : "none",
+                transition: "transform 0.4s ease"
+              }}
+            >
+              <Box sx={{ mb: isSmall ? 1 : 2, display: "flex", justifyContent: "center" }}>
+                {(() => {
+                  const id = card.id;
+                  const size = isSmall ? 24 : 44;
+                  if (id.endsWith("-of-wands")) {
+                    return (
+                      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#fca5a5" strokeWidth="1.2" style={{ filter: "drop-shadow(0 0 10px rgba(252, 165, 165, 0.4))" }}>
+                        <path d="M8 19L19 8M19 8c1.5-1.5 3-3 3-3s-1.5.5-3 2l-11 11M16 5l3 3M5 19l-2 2 1 1 2-2" />
+                        <path d="M12 9c-1-1-1.5-2.5-1-4 .5 1.5 2 2 2.5 3.5M15 12c-1-1-1.5-2.5-1-4 .5 1.5 2 2 2.5 3.5" />
+                      </svg>
+                    );
+                  }
+                  if (id.endsWith("-of-cups")) {
+                    return (
+                      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#93c5fd" strokeWidth="1.2" style={{ filter: "drop-shadow(0 0 10px rgba(147, 197, 253, 0.4))" }}>
+                        <path d="M6 3h12v6c0 4-3 7-6 7s-6-3-6-7V3z" />
+                        <path d="M12 16v5M8 21h8M6 6c3 1.5 9 1.5 12 0" />
+                      </svg>
+                    );
+                  }
+                  if (id.endsWith("-of-swords")) {
+                    return (
+                      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.2" style={{ filter: "drop-shadow(0 0 10px rgba(203, 213, 225, 0.4))" }}>
+                        <path d="M12 2v15M9 15h6M12 17v4" />
+                        <path d="M6 8c2-1 4-1 6 0M18 12c-2 1-4 1-6 0" />
+                      </svg>
+                    );
+                  }
+                  if (id.endsWith("-of-pentacles")) {
+                    return (
+                      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#fcd34d" strokeWidth="1.2" style={{ filter: "drop-shadow(0 0 10px rgba(252, 211, 77, 0.4))" }}>
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 3l2.5 6h6.5l-5 4 2 6-6-4-6 4 2-6-5-4h6.5z" />
+                      </svg>
+                    );
+                  }
+                  // Major Arcana (Cosmic Wheel / Sun-Moon)
+                  return (
+                    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#fef08a" strokeWidth="1.2" style={{ filter: "drop-shadow(0 0 10px rgba(254, 240, 138, 0.5))" }}>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 2v20M2 12h20M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10z" />
+                      <path d="M7 7l1 1M17 17l1 1M17 7l-1 1M7 17l-1 1" />
+                    </svg>
+                  );
+                })()}
+              </Box>
+              <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: isSmall ? "0.4rem" : "0.55rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", mb: 0.5 }}>
+                {card.id.includes("-of-") ? "MINOR ARCANA" : "MAJOR ARCANA"}
+              </Typography>
+            </Box>
+          )}
           <Box
             sx={{
               position: "absolute",
@@ -355,10 +464,10 @@ function TarotImage({
               textAlign: "center",
             }}
           >
-            <Typography sx={{ color: "#fff", fontSize: "0.85rem", fontWeight: 800, mb: 0.1 }}>
+            <Typography sx={{ color: "#fff", fontSize: isSmall ? "0.6rem" : "0.85rem", fontWeight: 800, mb: 0.1 }}>
               {card.thaiName}
             </Typography>
-            <Typography sx={{ color: "var(--jewel-gold)", fontSize: "0.55rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+            <Typography sx={{ color: "var(--jewel-gold)", fontSize: isSmall ? "0.45rem" : "0.55rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>
               {card.name} {isReversed ? "• (กลับหัว)" : ""}
             </Typography>
           </Box>
