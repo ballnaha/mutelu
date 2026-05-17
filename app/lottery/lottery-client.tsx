@@ -180,6 +180,11 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
             </Typography>
 
             <Box
+              component="form"
+              onSubmit={(e: React.FormEvent) => {
+                e.preventDefault();
+                handleCheck();
+              }}
               sx={{
                 borderRadius: "28px",
                 bgcolor: "#ffffff",
@@ -280,7 +285,7 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                 </Box>
 
                 <Button
-                  onClick={handleCheck}
+                  type="submit"
                   disabled={!lottery || cleanNumber.length !== 6 || checking}
                   sx={{
                     minWidth: { xs: "100%", md: 200 },
@@ -383,34 +388,93 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                 </Box>
               </Box>
 
-              <Stack spacing={1.25}>
-                {loading ? (
-                  [0, 1, 2].map((i) => <Box key={i} sx={{ height: 60, borderRadius: "16px", bgcolor: "#f8fafc" }} />)
-                ) : (
-                  featuredPrizes.map((prize) => {
-                    const isFirst = prize.id === "prizeFirst";
-                    return (
+              <Box sx={{ position: "relative", minHeight: 200 }}>
+                {/* Smooth Loading Skeleton Overlay */}
+                {loading && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 1.25,
+                      bgcolor: "#ffffff",
+                      zIndex: 2,
+                      animation: "fadeIn 0.2s ease-in-out",
+                      "@keyframes fadeIn": {
+                        "0%": { opacity: 0 },
+                        "100%": { opacity: 1 },
+                      },
+                    }}
+                  >
+                    {[0, 1, 2].map((i) => (
                       <Box
-                        key={prize.id}
+                        key={i}
                         sx={{
-                          p: 1.5,
+                          height: 70,
                           borderRadius: "16px",
-                          bgcolor: isFirst ? "#fefce8" : "#f8fafc",
-                          border: "1px solid",
-                          borderColor: isFirst ? "#fef08a" : "#f1f5f9",
+                          bgcolor: "#f8fafc",
+                          position: "relative",
+                          overflow: "hidden",
+                          "&::after": {
+                            content: '""',
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)",
+                            animation: "shimmer 1.5s infinite",
+                            "@keyframes shimmer": {
+                              "0%": { transform: "translateX(-100%)" },
+                              "100%": { transform: "translateX(100%)" },
+                            },
+                          },
                         }}
-                      >
-                        <Typography sx={{ color: isFirst ? "#a16207" : "#64748b", fontSize: "0.7rem", fontWeight: 800, mb: 0.5, textTransform: "uppercase" }}>
-                          {prize.name}
-                        </Typography>
-                        <Typography sx={{ color: isFirst ? "#854d0e" : "#0f172a", fontSize: isFirst ? "1.4rem" : "1.1rem", fontWeight: 900, letterSpacing: "0.05em" }}>
-                          {prize.numbers.join(", ")}
-                        </Typography>
-                      </Box>
-                    );
-                  })
+                      />
+                    ))}
+                  </Box>
                 )}
-              </Stack>
+
+                {/* Main Content with Fade & Scale Effect */}
+                <Box
+                  sx={{
+                    opacity: loading ? 0.3 : 1,
+                    transform: loading ? "scale(0.98)" : "scale(1)",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
+                  <Stack spacing={1.25}>
+                    {featuredPrizes.map((prize) => {
+                      const isFirst = prize.id === "prizeFirst";
+                      return (
+                        <Box
+                          key={prize.id}
+                          sx={{
+                            p: 1.5,
+                            borderRadius: "16px",
+                            bgcolor: isFirst ? "#fefce8" : "#f8fafc",
+                            border: "1px solid",
+                            borderColor: isFirst ? "#fef08a" : "#f1f5f9",
+                            boxShadow: isFirst ? "0 4px 12px rgba(254,240,138,0.3)" : "none",
+                            transition: "all 0.3s",
+                          }}
+                        >
+                          <Typography sx={{ color: isFirst ? "#a16207" : "#64748b", fontSize: "0.7rem", fontWeight: 800, mb: 0.5, textTransform: "uppercase" }}>
+                            {prize.name}
+                          </Typography>
+                          <Typography sx={{ color: isFirst ? "#854d0e" : "#0f172a", fontSize: isFirst ? "1.4rem" : "1.1rem", fontWeight: 900, letterSpacing: "0.05em" }}>
+                            {prize.numbers.join(", ")}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
+                  </Stack>
+                </Box>
+              </Box>
 
               <Button
                 fullWidth

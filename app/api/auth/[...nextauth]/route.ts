@@ -1,10 +1,24 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
+import type { AdapterAccount, AdapterSession, AdapterUser, VerificationToken } from "next-auth/adapters";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 
+const adapter = PrismaAdapter(prisma);
+
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: {
+    ...adapter,
+    createUser: (data: Omit<AdapterUser, "id">) => prisma.user.create({ data: { id: randomUUID(), updatedAt: new Date(), ...data } }),
+    linkAccount: (data: AdapterAccount) => prisma.account.create({ data: { id: randomUUID(), ...data } }),
+    createSession: (data: AdapterSession) => prisma.session.create({ data: { id: randomUUID(), ...data } }),
+    createVerificationToken: (data: VerificationToken) => prisma.verificationtoken.create({ data }),
+    useVerificationToken: (identifier_token: { identifier: string; token: string }) =>
+      prisma.verificationtoken.delete({
+        where: { identifier_token },
+      }),
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",

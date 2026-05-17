@@ -19,6 +19,8 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
   const [digit1, setDigit1] = useState<string>("?");
   const [digit2, setDigit2] = useState<string>("?");
   const [isRolling, setIsRolling] = useState(false);
+  const threeDigits = Array.from(new Set(data.threeDigits));
+  const twoDigits = Array.from(new Set(data.twoDigits));
 
   const generateRandom = () => {
     if (isRolling) return;
@@ -95,7 +97,7 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
               <Box sx={{ textAlign: "center" }}>
                 <Typography sx={{ fontSize: "0.75rem", fontWeight: 600, color: "#94a3b8", mb: 1, textTransform: "uppercase", letterSpacing: "0.06em" }}>เลขเด่น 3 ตัว</Typography>
                 <Stack direction="row" spacing={1.5} sx={{ justifyContent: "center" }}>
-                  {data.threeDigits.map((n) => (
+                  {threeDigits.map((n) => (
                     <Box key={n} sx={{ minWidth: 44, px: 1.5, height: 52, borderRadius: "12px", bgcolor: "#eef2ff", border: "1px solid #e0e7ff", display: "grid", placeItems: "center" }}>
                       <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#4f46e5", lineHeight: 1, whiteSpace: "nowrap" }}>
                         {n}
@@ -110,7 +112,7 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
               <Box sx={{ textAlign: "center" }}>
                 <Typography sx={{ fontSize: "0.75rem", fontWeight: 600, color: "#94a3b8", mb: 1, textTransform: "uppercase", letterSpacing: "0.06em" }}>เลขท้าย 2 ตัว</Typography>
                 <Stack direction="row" spacing={1.5} sx={{ justifyContent: "center" }}>
-                  {data.twoDigits.map((n) => (
+                  {twoDigits.map((n) => (
                     <Box key={n} sx={{ minWidth: 44, px: 1.5, height: 52, borderRadius: "12px", bgcolor: "#fce7f3", border: "1px solid #fbcfe8", display: "grid", placeItems: "center" }}>
                       <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#be185d", lineHeight: 1, whiteSpace: "nowrap" }}>
                         {n}
