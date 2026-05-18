@@ -50,6 +50,7 @@ export function AffiliateCard({
   highlights = [],
   variant = "article",
   accentColor = "#FF8E9E",
+  ctaLabel,
   rating: propRating,
   reviewCount: propReviewCount,
   originalPrice: propOriginalPrice,
@@ -98,38 +99,39 @@ export function AffiliateCard({
   const isLazada = platform?.toLowerCase().includes("lazada");
   const platformColor = isShopee ? "#f9643f" : isLazada ? "#0f136d" : "#7296F8";
   const platformBg = isShopee ? "#ffeae6" : isLazada ? "#eceeff" : "#E6F3FF";
+  const accent = accentColor || "#FF8E9E";
+  const actionLabel = ctaLabel || (isSidebar ? "ดูสินค้า" : "ดูรายละเอียด");
 
   if (isSidebar) {
     return (
       <Box
         sx={{
-          bgcolor: "#FFFDF9",
-          borderRadius: "16px",
-          border: "2.5px solid #2D2520",
-          borderLeft: `6px solid ${accentColor || "#FF8E9E"}`, // Beautiful colored left-edge stripe
-          p: 1.5,
-          pl: 1.2, // Offset left padding slightly for balance
-          boxShadow: `4px 4px 0px ${accentColor || "#2D2520"}`, // Colored 2.5D element-themed shadow
-          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+          bgcolor: "#FFFFFF",
+          borderRadius: "8px",
+          border: "1px solid rgba(45,37,32,0.16)",
+          borderTop: `4px solid ${accent}`,
+          p: 1.4,
+          boxShadow: "0 12px 28px rgba(45,37,32,0.10)",
+          transition: "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease",
           display: "flex",
-          gap: 2,
+          gap: 1.5,
           alignItems: "center",
           "&:hover": {
-            transform: "translate(-2px, -2px)", // Lift up on hover instead of sinking
-            boxShadow: `6px 6px 0px ${accentColor || "#2D2520"}`, // Shadow gets thicker when lifted
+            borderColor: accent,
+            transform: "translateY(-2px)",
+            boxShadow: "0 18px 34px rgba(45,37,32,0.14)",
           },
         }}
       >
         {/* Compact Square Image Left */}
         <Box
           sx={{
-            width: 120,
-            height: 120,
+            width: 104,
+            height: 104,
             flexShrink: 0,
-            borderRadius: "10px",
-            border: "2px solid #2D2520",
-            boxShadow: "2px 2px 0px #2D2520",
-            bgcolor: "#FAF8F2",
+            borderRadius: "8px",
+            border: "1px solid rgba(45,37,32,0.12)",
+            background: "linear-gradient(180deg, #FFFDF9 0%, #FAF8F2 100%)",
             overflow: "hidden",
             display: "grid",
             placeItems: "center"
@@ -146,7 +148,7 @@ export function AffiliateCard({
               <Chip
                 label={badge}
                 size="small"
-                sx={{ height: 18, borderRadius: "4px", bgcolor: "#FFE6EA", color: "#FF8E9E", border: "1px solid #2D2520", fontWeight: 800, fontSize: "0.55rem", fontFamily: "var(--font-prompt), sans-serif" }}
+                sx={{ height: 18, borderRadius: "5px", bgcolor: `${accent}18`, color: accent, border: `1px solid ${accent}55`, fontWeight: 800, fontSize: "0.55rem", fontFamily: "var(--font-prompt), sans-serif" }}
               />
             )}
             {displayPlatform && (
@@ -181,7 +183,7 @@ export function AffiliateCard({
           {/* Product Name */}
           <Typography
             sx={{
-              fontSize: "0.85rem",
+              fontSize: "0.86rem",
               fontWeight: 950,
               color: "#2D2520",
               lineHeight: 1.25,
@@ -227,7 +229,7 @@ export function AffiliateCard({
                   </Typography>
                 </Stack>
               )}
-              <Typography sx={{ fontSize: "0.95rem", fontWeight: 950, color: "#FF8E9E", lineHeight: 1.1, fontFamily: "var(--font-prompt), sans-serif" }}>
+              <Typography sx={{ fontSize: "1rem", fontWeight: 950, color: accent, lineHeight: 1.1, fontFamily: "var(--font-prompt), sans-serif" }}>
                 {price}
               </Typography>
             </Stack>
@@ -240,10 +242,10 @@ export function AffiliateCard({
               rel="nofollow sponsored noopener"
               sx={{
                 borderRadius: "8px",
-                bgcolor: accentColor || "#FF8E9E",
+                bgcolor: accent,
                 color: "#FFFDF9",
-                border: "2px solid #2D2520",
-                boxShadow: "2px 2px 0px #2D2520",
+                border: "1px solid rgba(45,37,32,0.18)",
+                boxShadow: "none",
                 textTransform: "none",
                 fontSize: "0.72rem",
                 fontWeight: 900,
@@ -253,13 +255,13 @@ export function AffiliateCard({
                 fontFamily: "var(--font-prompt), sans-serif",
                 transition: "all 0.15s ease-in-out",
                 "&:hover": {
-                  bgcolor: accentColor || "#FF8E9E",
-                  transform: "scale(1.08) translateY(-1px)", // Scales slightly on hover
-                  boxShadow: "3.5px 3.5px 0px #2D2520"
+                  bgcolor: accent,
+                  filter: "brightness(0.96)",
+                  transform: "translateY(-1px)",
                 }
               }}
             >
-              สั่งซื้อ
+              {actionLabel}
             </Button>
           </Stack>
         </Stack>
@@ -272,17 +274,18 @@ export function AffiliateCard({
       sx={{
         display: "grid",
         gridTemplateColumns: { xs: "1fr", sm: "160px 1fr", md: "160px 1fr 220px" },
-        gap: { xs: 2.5, sm: 3, md: 4 },
-        p: { xs: 2.5, md: 3 },
-        bgcolor: "#FFFDF9",
-        border: "2.5px solid #2D2520",
-        borderLeft: `8px solid ${accentColor || "#FF8E9E"}`,
-        borderRadius: "24px",
-        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-        boxShadow: "6px 6px 0px #2D2520",
+        gap: { xs: 2.25, sm: 3, md: 3.5 },
+        p: { xs: 2.25, md: 2.75 },
+        bgcolor: "#FFFFFF",
+        border: "1px solid rgba(45,37,32,0.16)",
+        borderTop: `5px solid ${accent}`,
+        borderRadius: "8px",
+        transition: "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease",
+        boxShadow: "0 16px 36px rgba(45,37,32,0.10)",
         "&:hover": {
-          transform: "translate(-3px, -3px)",
-          boxShadow: "9px 9px 0px #2D2520",
+          borderColor: `${accent}88`,
+          transform: "translateY(-2px)",
+          boxShadow: "0 22px 44px rgba(45,37,32,0.14)",
         },
       }}
     >
@@ -291,10 +294,9 @@ export function AffiliateCard({
         sx={{
           width: "100%",
           aspectRatio: "1/1",
-          borderRadius: "16px",
-          border: "2px solid #2D2520",
-          boxShadow: "3px 3px 0px #2D2520",
-          bgcolor: "#FAF8F2",
+          borderRadius: "8px",
+          border: "1px solid rgba(45,37,32,0.12)",
+          background: "linear-gradient(180deg, #FFFDF9 0%, #FAF8F2 100%)",
           overflow: "hidden",
           display: "flex",
           alignItems: "center",
@@ -319,11 +321,10 @@ export function AffiliateCard({
               size="small"
               sx={{
                 height: 22,
-                borderRadius: "6px",
-                bgcolor: "#FFE6EA",
-                color: "#FF8E9E",
-                border: "1.5px solid #2D2520",
-                boxShadow: "1.5px 1.5px 0px #2D2520",
+                borderRadius: "5px",
+                bgcolor: `${accent}18`,
+                color: accent,
+                border: `1px solid ${accent}55`,
                 fontWeight: 800,
                 fontSize: "0.68rem",
                 fontFamily: "var(--font-prompt), sans-serif"
@@ -340,7 +341,6 @@ export function AffiliateCard({
                 bgcolor: platformBg,
                 color: platformColor,
                 border: `1.5px solid ${platformColor}`,
-                boxShadow: "1.5px 1.5px 0px #2D2520",
                 fontWeight: 800,
                 fontSize: "0.68rem",
                 fontFamily: "var(--font-prompt), sans-serif"
@@ -396,7 +396,7 @@ export function AffiliateCard({
           <Stack spacing={0.75} sx={{ mt: 0.5 }}>
             {highlights.map((highlight) => (
               <Stack key={highlight} direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
-                <TickCircle size={16} color="#FF8E9E" variant="Bold" style={{ flexShrink: 0, marginTop: 1.5 }} />
+                <TickCircle size={16} color={accent} variant="Bold" style={{ flexShrink: 0, marginTop: 1.5 }} />
                 <Typography sx={{ color: "#5A4D43", fontSize: "0.82rem", lineHeight: 1.4, fontWeight: 600, fontFamily: "var(--font-prompt), sans-serif" }}>
                   {highlight}
                 </Typography>
@@ -421,7 +421,7 @@ export function AffiliateCard({
                   />
                 </Stack>
               )}
-              <Typography sx={{ color: "#FF8E9E", fontWeight: 950, fontSize: "1.25rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+              <Typography sx={{ color: accent, fontWeight: 950, fontSize: "1.25rem", fontFamily: "var(--font-prompt), sans-serif" }}>
                 {price}
               </Typography>
             </Stack>
@@ -433,20 +433,20 @@ export function AffiliateCard({
               rel="nofollow sponsored noopener"
               variant="contained"
               sx={{
-                bgcolor: accentColor || "#FF8E9E",
+                bgcolor: accent,
                 color: "#FFFDF9",
-                borderRadius: "10px",
+                borderRadius: "8px",
                 px: 2.5,
                 py: 0.75,
                 fontWeight: 900,
                 textTransform: "none",
-                boxShadow: "2px 2px 0px #2D2520",
-                border: "2px solid #2D2520",
+                boxShadow: "none",
+                border: "1px solid rgba(45,37,32,0.18)",
                 fontFamily: "var(--font-prompt), sans-serif",
                 fontSize: "0.8rem",
               }}
             >
-              สั่งซื้อเลย
+              {actionLabel}
             </Button>
           </Stack>
         </Box>
@@ -461,9 +461,8 @@ export function AffiliateCard({
           alignItems: "center",
           p: 2,
           bgcolor: "#FAF8F2",
-          border: "2px solid #2D2520",
-          boxShadow: "4px 4px 0px #2D2520",
-          borderRadius: "18px",
+          border: "1px solid rgba(45,37,32,0.12)",
+          borderRadius: "8px",
           textAlign: "center",
           minHeight: "100%",
           gap: 1.5,
@@ -482,12 +481,12 @@ export function AffiliateCard({
                   sx={{ height: 18, fontSize: "0.68rem", fontWeight: 900, bgcolor: "#fecdd3", color: "#e11d48", border: "1px solid #e11d48", borderRadius: "4px" }}
                 />
               </Stack>
-              <Typography sx={{ color: "#FF8E9E", fontWeight: 950, fontSize: "1.45rem", fontFamily: "var(--font-prompt), sans-serif", lineHeight: 1.1 }}>
+              <Typography sx={{ color: accent, fontWeight: 950, fontSize: "1.45rem", fontFamily: "var(--font-prompt), sans-serif", lineHeight: 1.1 }}>
                 {price}
               </Typography>
             </>
           ) : (
-            <Typography sx={{ color: "#FF8E9E", fontWeight: 950, fontSize: "1.45rem", fontFamily: "var(--font-prompt), sans-serif", lineHeight: 1.1 }}>
+            <Typography sx={{ color: accent, fontWeight: 950, fontSize: "1.45rem", fontFamily: "var(--font-prompt), sans-serif", lineHeight: 1.1 }}>
               {price}
             </Typography>
           )}
@@ -505,25 +504,25 @@ export function AffiliateCard({
           endIcon={<ArrowRight size={16} variant="Outline" />}
           sx={{
             width: "100%",
-            bgcolor: accentColor || "#FF8E9E",
+            bgcolor: accent,
             color: "#FFFDF9",
-            borderRadius: "12px",
+            borderRadius: "8px",
             py: 1,
             fontWeight: 900,
             textTransform: "none",
-            boxShadow: "3px 3px 0px #2D2520",
-            border: "2px solid #2D2520",
+            boxShadow: "none",
+            border: "1px solid rgba(45,37,32,0.18)",
             fontFamily: "var(--font-prompt), sans-serif",
             fontSize: "0.88rem",
             transition: "all 0.15s ease-in-out",
             "&:hover": {
-              bgcolor: accentColor || "#FF8E9E",
-              transform: "scale(1.04) translateY(-1px)",
-              boxShadow: "4.5px 4.5px 0px #2D2520"
+              bgcolor: accent,
+              filter: "brightness(0.96)",
+              transform: "translateY(-1px)",
             }
           }}
         >
-          สั่งซื้อเลย
+          {actionLabel}
         </Button>
       </Box>
     </Box>

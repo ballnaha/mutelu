@@ -422,8 +422,7 @@ export default async function LuckyColorsPage() {
               </Stack>
             </Box>
 
-            {products.length > 0 && (
-              <Box
+            <Box
                 sx={{
                   bgcolor: "#FFFDF9",
                   p: 3,
@@ -448,7 +447,7 @@ export default async function LuckyColorsPage() {
                 </Stack>
 
                 <Stack spacing={2.2}>
-                  {products.map((product) => (
+                  {products.length > 0 ? products.map((product) => (
                     <AffiliateCard
                       key={product.id}
                       name={product.name}
@@ -466,14 +465,32 @@ export default async function LuckyColorsPage() {
                       accentColor="#FF8E9E"
                       badge={product.aspect === "love" ? "หนุนดวงความรัก" : product.aspect === "wealth" ? "ดึงดูดทรัพย์เสี่ยงดวง" : product.aspect === "health" ? "หนุนสุขภาพกายใจ" : "เสริมการงานและอำนาจ"}
                     />
-                  ))}
+                  )) : (
+                    <Box
+                      sx={{
+                        minHeight: 150,
+                        borderRadius: "16px",
+                        border: "2px dashed rgba(45,37,32,0.35)",
+                        bgcolor: "#FAF8F2",
+                        display: "grid",
+                        placeItems: "center",
+                        px: 2,
+                        textAlign: "center",
+                      }}
+                    >
+                      <Typography sx={{ color: "#5A4D43", fontSize: "0.92rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
+                        ยังไม่มีสินค้า
+                      </Typography>
+                    </Box>
+                  )}
                 </Stack>
 
-                <Typography sx={{ color: "#5A4D43", fontSize: "0.65rem", textAlign: "center", mt: 2.5, fontStyle: "italic", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
-                  * แนะนำตามพลังสีมงคลและสินค้า active ล่าสุด
-                </Typography>
+                {products.length > 0 ? (
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.65rem", textAlign: "center", mt: 2.5, fontStyle: "italic", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
+                    * แนะนำตามพลังสีมงคลและสินค้า active ล่าสุด
+                  </Typography>
+                ) : null}
               </Box>
-            )}
           </Box>
 
           <MobileColorList

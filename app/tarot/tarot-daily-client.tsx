@@ -939,6 +939,7 @@ export function TarotDailyClient() {
       default: return "ภาพรวมดวงชะตา";
     }
   };
+  const recommendedProducts = getRecommendedProducts();
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
@@ -1932,6 +1933,98 @@ export function TarotDailyClient() {
                 </Box>
               </Paper>
 
+              {/* Marketing Recommended Products Section */}
+              <Paper
+                elevation={0}
+                sx={{
+                  p: { xs: 3, md: 5 },
+                  mb: 5,
+                  borderRadius: "28px",
+                  border: "3px solid #2D2520",
+                  bgcolor: "#FFFDF9",
+                  boxShadow: "6px 6px 0px 0px #2D2520",
+                  animation: "smoothFadeIn 0.6s ease"
+                }}
+              >
+                <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
+                  <Box
+                    sx={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: "10px",
+                      display: "grid",
+                      placeItems: "center",
+                      bgcolor: "rgba(255, 142, 158, 0.15)",
+                      border: "2px solid #2D2520"
+                    }}
+                  >
+                    <MagicStar size={22} variant="Bulk" color="#FF8E9E" className="pulse-slow" />
+                  </Box>
+                  <Box>
+                    <Typography sx={{ color: "#FF8E9E", fontWeight: 950, fontSize: "0.78rem", letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
+                      SPIRITUAL ITEMS FOR YOU
+                    </Typography>
+                    <Typography variant="h5" sx={{ color: "#2D2520", fontWeight: 950, fontSize: { xs: "1.2rem", md: "1.5rem" }, fontFamily: "var(--font-prompt), sans-serif" }}>
+                      ของมงคลนำโชคหนุนนำดวงชะตา คุณ{userName}
+                    </Typography>
+                  </Box>
+                </Stack>
+
+                <Typography sx={{ color: "#5A4D43", fontSize: "0.9rem", mb: 4, lineHeight: 1.6, fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  จากเจตนา &ldquo;{question}&rdquo; และหน้าไพ่ชะตาชีวิตของคุณในวันนี้ อาจารย์ขอแนะนำของมงคลนำโชคด้านล่างนี้ที่ถูกประจุพลังงานสอดรับกับหมวด {getCategoryLabel(focusCategory)} เพื่อเป็นเกราะคุ้มครอง บูชาดึงดูดสิ่งดี ๆ เข้าสู่ชีวิตครับ
+                </Typography>
+
+                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", lg: "repeat(3, minmax(0, 1fr))" }, gap: 3 }}>
+                  {recommendedProducts.length > 0 ? recommendedProducts.map((product) => (
+                    <AffiliateCard
+                      key={product.id}
+                      name={product.name}
+                      description={product.description}
+                      price={product.price}
+                      originalPrice={product.originalPrice}
+                      image={product.image}
+                      link={product.url}
+                      platform={product.platform}
+                      platformLabel={product.platform}
+                      productSlug={product.productSlug}
+                      rating={product.rating}
+                      reviewCount={product.reviewCount}
+                      variant="sidebar"
+                      accentColor="#FF8E9E"
+                      badge={
+                        product.aspect === "love"
+                          ? "หนุนดวงความรัก"
+                          : product.aspect === "wealth"
+                          ? "ดึงดูดทรัพย์เสี่ยงดวง"
+                          : product.aspect === "career"
+                          ? "เสริมการงานและการเรียน"
+                          : product.aspect === "health"
+                          ? "หนุนสุขภาพกายใจ"
+                          : "ของมงคลนำโชคดวงดี"
+                      }
+                    />
+                  )) : (
+                    <Box
+                      sx={{
+                        minHeight: 170,
+                        borderRadius: "16px",
+                        border: "2px dashed rgba(45,37,32,0.35)",
+                        bgcolor: "#FAF8F2",
+                        display: "grid",
+                        placeItems: "center",
+                        px: 2,
+                        textAlign: "center",
+                        gridColumn: { xs: "auto", md: "1 / -1" },
+                      }}
+                    >
+                      <Typography sx={{ color: "#5A4D43", fontSize: "0.95rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
+                        ยังไม่มีสินค้า
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              </Paper>
+
               {/* Tabbed Aspect Selection */}
               <Box sx={{ mb: 5, display: "flex", justifyContent: "center" }}>
                 <Tabs
@@ -2223,82 +2316,6 @@ export function TarotDailyClient() {
                   );
                 })}
               </Stack>
-
-              {/* Marketing Recommended Products Section */}
-              {getRecommendedProducts().length > 0 && (
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: { xs: 3, md: 5 },
-                    mt: 6,
-                    borderRadius: "28px",
-                    border: "3px solid #2D2520",
-                    bgcolor: "#FFFDF9",
-                    boxShadow: "6px 6px 0px 0px #2D2520",
-                    animation: "smoothFadeIn 0.6s ease"
-                  }}
-                >
-                  <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
-                    <Box
-                      sx={{
-                        width: 38,
-                        height: 38,
-                        borderRadius: "10px",
-                        display: "grid",
-                        placeItems: "center",
-                        bgcolor: "rgba(255, 142, 158, 0.15)",
-                        border: "2px solid #2D2520"
-                      }}
-                    >
-                      <MagicStar size={22} variant="Bulk" color="#FF8E9E" className="pulse-slow" />
-                    </Box>
-                    <Box>
-                      <Typography sx={{ color: "#FF8E9E", fontWeight: 950, fontSize: "0.78rem", letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
-                        SPIRITUAL ITEMS FOR YOU
-                      </Typography>
-                      <Typography variant="h5" sx={{ color: "#2D2520", fontWeight: 950, fontSize: { xs: "1.2rem", md: "1.5rem" }, fontFamily: "var(--font-prompt), sans-serif" }}>
-                        ของมงคลนำโชคหนุนนำดวงชะตา คุณ{userName}
-                      </Typography>
-                    </Box>
-                  </Stack>
-
-                  <Typography sx={{ color: "#5A4D43", fontSize: "0.9rem", mb: 4, lineHeight: 1.6, fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
-                    จากเจตนา &ldquo;{question}&rdquo; และหน้าไพ่ชะตาชีวิตของคุณในวันนี้ อาจารย์ขอแนะนำของมงคลนำโชคด้านล่างนี้ที่ถูกประจุพลังงานสอดรับกับหมวด {getCategoryLabel(focusCategory)} เพื่อเป็นเกราะคุ้มครอง บูชาดึงดูดสิ่งดี ๆ เข้าสู่ชีวิตครับ
-                  </Typography>
-
-                  <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", lg: "repeat(3, minmax(0, 1fr))" }, gap: 3 }}>
-                    {getRecommendedProducts().map((product) => (
-                      <AffiliateCard
-                        key={product.id}
-                        name={product.name}
-                        description={product.description}
-                        price={product.price}
-                        originalPrice={product.originalPrice}
-                        image={product.image}
-                        link={product.url}
-                        platform={product.platform}
-                        platformLabel={product.platform}
-                        productSlug={product.productSlug}
-                        rating={product.rating}
-                        reviewCount={product.reviewCount}
-                        variant="sidebar"
-                        accentColor="#FF8E9E"
-                        badge={
-                          product.aspect === "love"
-                            ? "หนุนดวงความรัก"
-                            : product.aspect === "wealth"
-                            ? "ดึงดูดทรัพย์เสี่ยงดวง"
-                            : product.aspect === "career"
-                            ? "เสริมการงานและการเรียน"
-                            : product.aspect === "health"
-                            ? "หนุนสุขภาพกายใจ"
-                            : "ของมงคลนำโชคดวงดี"
-                        }
-                      />
-                    ))}
-                  </Box>
-                </Paper>
-              )}
 
               <Box sx={{ textAlign: "center", mt: 8 }}>
                 <Button

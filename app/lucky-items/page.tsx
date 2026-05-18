@@ -37,6 +37,11 @@ const categoryFilters = [
   { value: "all", label: "ทุกประเภท" },
 ] as const;
 
+type FilterOption = {
+  value: string;
+  label: string;
+};
+
 const aspectLabels: Record<string, string> = {
   love: "หนุนดวงความรัก",
   career: "เสริมการงานและการเรียน",
@@ -64,6 +69,10 @@ function buildHref(aspect: string, element: string, category: string) {
   return query ? `/lucky-items?${query}` : "/lucky-items";
 }
 
+function findFilterLabel(options: readonly FilterOption[], value: string) {
+  return options.find((item) => item.value === value)?.label ?? "";
+}
+
 export default async function LuckyItemsPage({
   searchParams,
 }: {
@@ -80,22 +89,33 @@ export default async function LuckyItemsPage({
   });
   const dynamicCategoryFilters = [
     ...categoryFilters,
-    ...affiliateCategories.map((category) => ({ value: category.name, label: category.name })),
+    ...affiliateCategories.map((category) => ({ value: category.slug, label: category.name })),
   ];
+  const categoryBySlugOrName = new Map<string, string>();
+  affiliateCategories.forEach((item) => {
+    categoryBySlugOrName.set(item.slug, item.name);
+    categoryBySlugOrName.set(item.name, item.name);
+  });
 
   const validAspects = new Set(aspectFilters.map((item) => item.value));
   const validElements = new Set(elementFilters.map((item) => item.value));
-  const validCategories = new Set(dynamicCategoryFilters.map((item) => item.value));
   const aspect = validAspects.has(selectedAspect as (typeof aspectFilters)[number]["value"]) ? selectedAspect : "all";
   const element = validElements.has(selectedElement as (typeof elementFilters)[number]["value"]) ? selectedElement : "all";
-  const category = validCategories.has(selectedCategory as (typeof categoryFilters)[number]["value"]) ? selectedCategory : "all";
+  const category = selectedCategory === "all" || categoryBySlugOrName.has(selectedCategory) ? selectedCategory : "all";
+  const categoryName = category === "all" ? "all" : categoryBySlugOrName.get(category) ?? "all";
+  const activeCategoryValue = dynamicCategoryFilters.some((item) => item.value === category) ? category : affiliateCategories.find((item) => item.name === category)?.slug ?? "all";
+  const selectedFilterSummary = [
+    findFilterLabel(aspectFilters, aspect),
+    findFilterLabel(elementFilters, element),
+    findFilterLabel(dynamicCategoryFilters, activeCategoryValue),
+  ].filter(Boolean);
 
   const where: Prisma.MasterAffiliateProductWhereInput = {
     isActive: true,
   };
   if (aspect !== "all") where.aspect = aspect;
   if (element !== "all") where.element = element as Element;
-  if (category !== "all") where.category = category;
+  if (categoryName !== "all") where.category = categoryName;
 
   const products = await prisma.masterAffiliateProduct.findMany({
     where,
@@ -146,7 +166,7 @@ export default async function LuckyItemsPage({
                 </Typography>
               </Stack>
               <Typography sx={{ color: "#5A4D43", fontSize: { xs: "0.82rem", md: "0.9rem" }, lineHeight: 1.55, fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
-                เลือกด้านที่อยากหนุนหรือกรองตามธาตุ แล้วดูสินค้าได้ทันที
+                เลือกด้านที่อยากหนุน กรองตามธาตุและประเภทสินค้า แล้วดูรายการที่ตรงเจตนาได้ทันที
               </Typography>
             </Box>
             <Typography sx={{ justifySelf: { xs: "start", md: "end" }, color: "#2D2520", bgcolor: "#FAF8F2", border: "2px solid #2D2520", borderRadius: "999px", px: 1.5, py: 0.5, fontSize: "0.82rem", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }}>
@@ -167,7 +187,7 @@ export default async function LuckyItemsPage({
               gap: { xs: 2, lg: 3 },
             }}
           >
-            <Box>
+            <Box role="group" aria-label="กรองตามด้านเสริมดวง">
               <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.9rem", fontFamily: "var(--font-prompt), sans-serif" }}>
                 ด้านเสริมดวง
               </Typography>
@@ -179,7 +199,8 @@ export default async function LuckyItemsPage({
                     <Button
                       key={item.value}
                       component="a"
-                      href={buildHref(item.value, element, category)}
+                      href={buildHref(item.value, element, activeCategoryValue)}
+                      aria-pressed={active}
                       startIcon={<Icon size={16} variant="Bulk" color={active ? "#FFFDF9" : item.color} />}
                       sx={{
                         color: active ? "#FFFDF9" : "#2D2520",
@@ -204,7 +225,7 @@ export default async function LuckyItemsPage({
               </Stack>
             </Box>
 
-            <Box>
+            <Box role="group" aria-label="กรองตามธาตุ">
               <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.9rem", fontFamily: "var(--font-prompt), sans-serif" }}>
                 ธาตุ
               </Typography>
@@ -215,7 +236,8 @@ export default async function LuckyItemsPage({
                     <Button
                       key={item.value}
                       component="a"
-                      href={buildHref(aspect, item.value, category)}
+                      href={buildHref(aspect, item.value, activeCategoryValue)}
+                      aria-pressed={active}
                       sx={{
                         minWidth: "auto",
                         color: active ? "#FFFDF9" : "#2D2520",
@@ -239,18 +261,19 @@ export default async function LuckyItemsPage({
               </Stack>
             </Box>
 
-            <Box>
+            <Box role="group" aria-label="กรองตามประเภทสินค้า">
               <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.9rem", fontFamily: "var(--font-prompt), sans-serif" }}>
                 ประเภทสินค้า
               </Typography>
               <Stack direction="row" spacing={0.8} sx={{ flexWrap: "wrap", rowGap: 0.9 }}>
                 {dynamicCategoryFilters.map((item) => {
-                  const active = category === item.value;
+                  const active = activeCategoryValue === item.value;
                   return (
                     <Button
                       key={item.value}
                       component="a"
                       href={buildHref(aspect, element, item.value)}
+                      aria-pressed={active}
                       sx={{
                         minWidth: "auto",
                         color: active ? "#FFFDF9" : "#2D2520",
@@ -276,7 +299,10 @@ export default async function LuckyItemsPage({
             </Box>
           </Box>
 
-          <Stack direction="row" sx={{ justifyContent: "flex-end", alignItems: "center", mb: 2, gap: 2, flexWrap: "wrap" }}>
+          <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 2, gap: 2, flexWrap: "wrap" }}>
+            <Typography sx={{ color: "#5A4D43", fontSize: "0.86rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
+              กำลังแสดง: {selectedFilterSummary.join(" • ")}
+            </Typography>
             {(aspect !== "all" || element !== "all" || category !== "all") && (
               <Button component="a" href="/lucky-items" sx={{ color: "#FF8E9E", fontWeight: 900, textTransform: "none", fontFamily: "var(--font-prompt), sans-serif" }}>
                 ล้างตัวกรอง

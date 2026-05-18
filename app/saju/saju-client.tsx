@@ -2596,14 +2596,29 @@ return (
                       ))}
                     </Stack>
                   ) : (
-                    <Box sx={{ p: 2, bgcolor: "#FAF8F2", borderRadius: "12px", border: "2px solid #2D2520", textAlign: "center" }}>
-                      <Typography sx={{ fontSize: "0.8rem", color: "#5A4D43", fontFamily: "var(--font-prompt), sans-serif" }}>ยังไม่มีสินค้าแนะนำสำหรับธาตุนี้</Typography>
+                    <Box
+                      sx={{
+                        minHeight: 150,
+                        borderRadius: "16px",
+                        border: `2px dashed ${elementMeta[reading.luckyElement].color}`,
+                        bgcolor: "#FAF8F2",
+                        display: "grid",
+                        placeItems: "center",
+                        px: 2,
+                        textAlign: "center",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: "0.92rem", fontWeight: 800, color: "#5A4D43", fontFamily: "var(--font-prompt), sans-serif" }}>
+                        ยังไม่มีสินค้า
+                      </Typography>
                     </Box>
                   )}
                   
-                  <Typography sx={{ color: "#5A4D43", fontSize: "0.65rem", textAlign: "center", mt: 2.5, fontStyle: "italic", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
-                    * แนะนำของมงคลตามพลังงานธาตุ{elementMeta[reading.luckyElement].label} เพื่อปรับหนุนและเสริมจุดบกพร่องของชะตาชีวิตคุณ
-                  </Typography>
+                  {affiliateProducts.length > 0 ? (
+                    <Typography sx={{ color: "#5A4D43", fontSize: "0.65rem", textAlign: "center", mt: 2.5, fontStyle: "italic", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
+                      * แนะนำของมงคลตามพลังงานธาตุ{elementMeta[reading.luckyElement].label} เพื่อปรับหนุนและเสริมจุดบกพร่องของชะตาชีวิตคุณ
+                    </Typography>
+                  ) : null}
                 </Box>
 
                 {/* Remedy Action Plan Card */}

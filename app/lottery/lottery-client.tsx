@@ -423,24 +423,50 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                     </Box>
                   </Box>
                 ) : (
-                  <Alert
-                    severity="info"
-                    icon={false}
+                  <Box
                     sx={{
-                      borderRadius: "16px",
-                      py: 2,
-                      px: 3,
-                      fontSize: "1.05rem",
-                      fontWeight: 800,
-                      bgcolor: "#FAF8F2",
-                      color: "#5A4D43",
-                      border: "2.5px solid #2D2520",
-                      boxShadow: "4px 4px 0px #2D2520",
-                      fontFamily: "var(--font-prompt), sans-serif"
+                      position: "relative",
+                      overflow: "hidden",
+                      borderRadius: "20px",
+                      p: { xs: 2.5, sm: 3 },
+                      bgcolor: "#FFF1F2",
+                      color: "#2D2520",
+                      border: "3px solid #E76161",
+                      borderLeft: "10px solid #E76161",
+                      boxShadow: "6px 6px 0px #2D2520",
+                      fontFamily: "var(--font-prompt), sans-serif",
                     }}
                   >
-                    ไม่พบรางวัลสำหรับเลข {cleanNumber} ในงวดนี้ พยายามใหม่ในงวดหน้านะครับ
-                  </Alert>
+                    <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: { xs: "flex-start", sm: "center" } }}>
+                      <Box
+                        sx={{
+                          width: 56,
+                          height: 56,
+                          borderRadius: "14px",
+                          bgcolor: "#E76161",
+                          color: "#FFFDF9",
+                          border: "2px solid #2D2520",
+                          boxShadow: "3px 3px 0px #2D2520",
+                          display: "grid",
+                          placeItems: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <ShieldTick size={30} variant="Bold" color="currentColor" />
+                      </Box>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography sx={{ color: "#E76161", fontSize: "0.82rem", fontWeight: 950, letterSpacing: "0.08em", textTransform: "uppercase", mb: 0.4, fontFamily: "var(--font-prompt), sans-serif" }}>
+                          ไม่พบรางวัล
+                        </Typography>
+                        <Typography sx={{ color: "#2D2520", fontSize: { xs: "1.25rem", sm: "1.5rem" }, fontWeight: 950, lineHeight: 1.2, fontFamily: "var(--font-prompt), sans-serif" }}>
+                          เลข {cleanNumber} ยังไม่ถูกรางวัลในงวดนี้
+                        </Typography>
+                        <Typography sx={{ color: "#5A4D43", fontSize: "0.92rem", fontWeight: 650, lineHeight: 1.6, mt: 0.75, fontFamily: "var(--font-prompt), sans-serif" }}>
+                          ลองตรวจเลขอื่น หรือเก็บไว้ลุ้นใหม่ในงวดหน้าครับ
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Box>
                 )}
               </Box>
             )}
@@ -640,8 +666,7 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
         </Box>
 
         {/* Recommended Wealth Products Section */}
-        {wealthProducts.length > 0 && (
-          <Box
+        <Box
             sx={{
               p: { xs: 3, md: 5 },
               mt: { xs: 5, md: 6 },
@@ -680,7 +705,7 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
             </Typography>
 
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", lg: "repeat(3, minmax(0, 1fr))" }, gap: 3 }}>
-              {wealthProducts.map((product) => (
+              {wealthProducts.length > 0 ? wealthProducts.map((product) => (
                 <AffiliateCard
                   key={product.id}
                   name={product.name}
@@ -698,10 +723,27 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                   accentColor="#FF8E9E"
                   badge="ดึงดูดทรัพย์เสี่ยงดวง"
                 />
-              ))}
+              )) : (
+                <Box
+                  sx={{
+                    minHeight: 170,
+                    borderRadius: "16px",
+                    border: "2px dashed rgba(45,37,32,0.35)",
+                    bgcolor: "#FAF8F2",
+                    display: "grid",
+                    placeItems: "center",
+                    px: 2,
+                    textAlign: "center",
+                    gridColumn: { xs: "auto", md: "1 / -1" },
+                  }}
+                >
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.95rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
+                    ยังไม่มีสินค้า
+                  </Typography>
+                </Box>
+              )}
             </Box>
           </Box>
-        )}
 
         {/* History Table Section */}
         <Box sx={{ mt: { xs: 5, md: 6 } }}>
