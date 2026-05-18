@@ -2,18 +2,16 @@ import type { Metadata } from "next";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { Briefcase, Heart, MagicStar, MoneyRecive, Shop, ShieldTick } from "iconsax-react";
 import { Element, Prisma } from "@prisma/client";
+import { cache } from "react";
 
 import { AffiliateCard } from "@/app/components/affiliate-card";
 import { Footer } from "@/app/components/footer";
 import { Header } from "@/app/components/header";
 import { prisma } from "@/lib/prisma";
 
-export const metadata: Metadata = {
-  title: "ของมงคลแนะนำ | mulamoon.",
-  description: "รวมไอเทมมงคลและสินค้า affiliate แนะนำ แยกตามความรัก การงาน การเงิน สุขภาพกายใจ และธาตุเสริมดวง",
-};
-
 export const dynamic = "force-dynamic";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mulamoon.com";
 
 const aspectFilters = [
   { value: "all", label: "ทั้งหมด", icon: MagicStar, color: "#8B5CF6" },
@@ -73,16 +71,17 @@ function findFilterLabel(options: readonly FilterOption[], value: string) {
   return options.find((item) => item.value === value)?.label ?? "";
 }
 
-export default async function LuckyItemsPage({
-  searchParams,
-}: {
-  searchParams: LuckyItemsSearchParams;
-}) {
-  const params = await searchParams;
-  const selectedAspect = firstParam(params.aspect) || "all";
-  const selectedElement = firstParam(params.element) || "all";
-  const selectedCategory = firstParam(params.category) || "all";
+function buildCanonicalPath(aspect: string, element: string, category: string) {
+  return buildHref(aspect, element, category);
+}
 
+function buildParentCanonicalPath(aspect: string, category: string) {
+  if (category !== "all") return buildHref("all", "all", category);
+  if (aspect !== "all") return buildHref(aspect, "all", "all");
+  return "/lucky-items";
+}
+
+const resolveLuckyItemsData = cache(async (selectedAspect: string, selectedElement: string, selectedCategory: string) => {
   const affiliateCategories = await prisma.affiliateCategory.findMany({
     where: { isActive: true },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
@@ -121,9 +120,134 @@ export default async function LuckyItemsPage({
     where,
     orderBy: { createdAt: "desc" },
   });
+  const selectedFilterCount = [aspect, element, activeCategoryValue].filter((value) => value !== "all").length;
+  const canonicalPath = buildCanonicalPath(aspect, element, activeCategoryValue);
+  const parentCanonicalPath = buildParentCanonicalPath(aspect, activeCategoryValue);
+  const shouldIndex = products.length >= 3 && selectedFilterCount <= 1;
+
+  return {
+    affiliateCategories,
+    dynamicCategoryFilters,
+    aspect,
+    element,
+    category,
+    categoryName,
+    activeCategoryValue,
+    selectedFilterSummary,
+    products,
+    selectedFilterCount,
+    canonicalPath,
+    parentCanonicalPath,
+    shouldIndex,
+  };
+});
+
+function buildLuckyItemsTitle(summary: string[]) {
+  const filterText = summary.filter((item) => item !== "ทั้งหมด" && item !== "ทุกธาตุ" && item !== "ทุกประเภท").join(" ");
+  return filterText ? `ของมงคล${filterText} | mulamoon.` : "ของมงคลแนะนำ | mulamoon.";
+}
+
+function buildLuckyItemsDescription(summary: string[], productCount: number) {
+  const filterText = summary.filter((item) => item !== "ทั้งหมด" && item !== "ทุกธาตุ" && item !== "ทุกประเภท").join(" ");
+  const scopedText = filterText ? `${filterText} ` : "";
+  return `รวมสินค้าและไอเทมมงคล${scopedText}คัดตามด้านเสริมดวง ธาตุ และประเภทสินค้า มี ${productCount} รายการให้เลือกดูใน mulamoon.`;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: LuckyItemsSearchParams;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const selectedAspect = firstParam(params.aspect) || "all";
+  const selectedElement = firstParam(params.element) || "all";
+  const selectedCategory = firstParam(params.category) || "all";
+  const data = await resolveLuckyItemsData(selectedAspect, selectedElement, selectedCategory);
+  const title = buildLuckyItemsTitle(data.selectedFilterSummary);
+  const description = buildLuckyItemsDescription(data.selectedFilterSummary, data.products.length);
+  const canonical = data.shouldIndex ? data.canonicalPath : data.parentCanonicalPath;
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title,
+    description,
+    keywords: [
+      "ของมงคล",
+      "ไอเทมมงคล",
+      "สินค้าเสริมดวง",
+      "สายมู",
+      ...data.selectedFilterSummary,
+      "mulamoon",
+    ],
+    alternates: {
+      canonical,
+    },
+    robots: {
+      index: data.shouldIndex,
+      follow: true,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      siteName: "mulamoon.",
+      locale: "th_TH",
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+  };
+}
+
+export default async function LuckyItemsPage({
+  searchParams,
+}: {
+  searchParams: LuckyItemsSearchParams;
+}) {
+  const params = await searchParams;
+  const selectedAspect = firstParam(params.aspect) || "all";
+  const selectedElement = firstParam(params.element) || "all";
+  const selectedCategory = firstParam(params.category) || "all";
+  const {
+    dynamicCategoryFilters,
+    aspect,
+    element,
+    category,
+    activeCategoryValue,
+    selectedFilterSummary,
+    products,
+    canonicalPath,
+  } = await resolveLuckyItemsData(selectedAspect, selectedElement, selectedCategory);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: buildLuckyItemsTitle(selectedFilterSummary),
+    description: buildLuckyItemsDescription(selectedFilterSummary, products.length),
+    url: `${siteUrl}${canonicalPath}`,
+    inLanguage: "th-TH",
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: products.length,
+      itemListElement: products.slice(0, 10).map((product, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: product.name,
+        url: product.productSlug ? `${siteUrl}/go/${product.platform.toLowerCase().replaceAll(" ", "-")}/${product.productSlug}` : product.url,
+      })),
+    },
+  };
 
   return (
     <Box sx={{ bgcolor: "#FFFDF9", minHeight: "100vh", color: "#2D2520" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <Header />
 
       <Box component="main" sx={{ pt: { xs: 10, md: 11.5 }, pb: { xs: 6, md: 8 } }}>
