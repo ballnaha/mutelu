@@ -86,7 +86,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Logo Area */}
       <Box sx={{ p: 3, display: "flex", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
         <Typography sx={{ fontFamily: "var(--font-serif), serif", fontSize: "1.5rem", letterSpacing: "0.1em", fontWeight: 700, color: "var(--primary)" }}>
-          MUTELU
+          mulamoon
         </Typography>
         <Typography sx={{ ml: 1, fontSize: "0.8rem", opacity: 0.5, letterSpacing: "0.1em" }}>ADMIN</Typography>
       </Box>
@@ -237,7 +237,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <HambergerMenu size={24} color="currentColor" />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700, flexGrow: 1 }}>
-            Mutelu Admin
+            mulamoon Admin
           </Typography>
           <IconButton onClick={() => signOut({ callbackUrl: "/" })} color="error" size="small">
             <Logout size={20} variant="Outline" color="currentColor" />

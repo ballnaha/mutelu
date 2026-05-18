@@ -6,7 +6,7 @@ CREATE TABLE `BlogPost` (
     `category` VARCHAR(191) NOT NULL,
     `publishedAt` DATETIME(3) NULL,
     `readMinutes` INTEGER NOT NULL DEFAULT 5,
-    `authorName` VARCHAR(191) NOT NULL DEFAULT 'MUTELU Editorial',
+    `authorName` VARCHAR(191) NOT NULL DEFAULT 'mulamoon Editorial',
     `authorRole` VARCHAR(191) NULL,
     `heroImage` VARCHAR(191) NULL,
     `tags` JSON NULL,

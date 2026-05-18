@@ -10,19 +10,19 @@ import sharp from "sharp";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export type BlogBlockInput = 
+export type BlogBlockInput =
   | { type: "section"; heading: string; paragraphs: string[]; sortOrder: number }
-  | { 
-      type: "product"; 
+  | {
+      type: "product";
       masterProductId?: string | null;
-      title: string; 
-      platform: string; 
-      productSlug: string; 
-      image?: string; 
-      priceLabel?: string; 
-      highlights: string[]; 
-      badge?: string; 
-      accent: string; 
+      title: string;
+      platform: string;
+      productSlug: string;
+      image?: string;
+      priceLabel?: string;
+      highlights: string[];
+      badge?: string;
+      accent: string;
       targetUrl: string;
       sortOrder: number;
     };
@@ -53,21 +53,21 @@ export async function getBlogPostById(id: string) {
 }
 
 export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
-  const { 
-    title, 
-    slug, 
-    excerpt, 
-    categoryId, 
-    heroImage, 
-    tags, 
-    seoTitle, 
-    seoDescription, 
+  const {
+    title,
+    slug,
+    excerpt,
+    categoryId,
+    heroImage,
+    tags,
+    seoTitle,
+    seoDescription,
     status,
     publishedAt
   } = data;
 
   const session = await getServerSession(authOptions);
-  const authorName = session?.user?.name || "MUTELU Admin";
+  const authorName = session?.user?.name || "mulamoon Admin";
   const authorRole = (session?.user as any)?.role === "admin" ? "ทีมบรรณาธิการ" : "นักเขียน";
   const authorImage = session?.user?.image || null;
 
@@ -128,21 +128,21 @@ export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
 }
 
 export async function updateBlogPost(id: string, data: any, blocks: BlogBlockInput[]) {
-  const { 
-    title, 
-    slug, 
-    excerpt, 
-    categoryId, 
-    heroImage, 
-    tags, 
-    seoTitle, 
-    seoDescription, 
+  const {
+    title,
+    slug,
+    excerpt,
+    categoryId,
+    heroImage,
+    tags,
+    seoTitle,
+    seoDescription,
     status,
     publishedAt
   } = data;
 
   const session = await getServerSession(authOptions);
-  const authorName = session?.user?.name || "MUTELU Admin";
+  const authorName = session?.user?.name || "mulamoon Admin";
   const authorRole = (session?.user as any)?.role === "admin" ? "ทีมบรรณาธิการ" : "นักเขียน";
   const authorImage = session?.user?.image || null;
 
@@ -212,11 +212,11 @@ export async function updateBlogPost(id: string, data: any, blocks: BlogBlockInp
 
 export async function deleteBlogPost(id: string) {
   // Find post and its products to get all image URLs before deletion
-  const post = await prisma.blogpost.findUnique({ 
-    where: { id }, 
-    include: { 
-      blogaffiliateproduct: true 
-    } 
+  const post = await prisma.blogpost.findUnique({
+    where: { id },
+    include: {
+      blogaffiliateproduct: true
+    }
   });
 
   if (!post) return;
@@ -236,7 +236,7 @@ export async function deleteBlogPost(id: string) {
   for (const imageUrl of imagesToDelete) {
     await deleteImage(imageUrl);
   }
-  
+
   revalidatePath("/admin/blog");
   revalidatePath("/blog");
   if (post?.slug) revalidatePath(`/blog/${post.slug}`);
@@ -253,9 +253,9 @@ async function uploadImageToFolder(formData: FormData, folder = "") {
   const hash = crypto.createHash("md5").update(buffer).digest("hex");
   const ext = ".jpg";
   const fileName = `${hash}${ext}`;
-  
+
   const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
-  
+
   // Ensure directory exists
   try {
     await fs.access(uploadDir);
@@ -264,7 +264,7 @@ async function uploadImageToFolder(formData: FormData, folder = "") {
   }
 
   const filePath = path.join(uploadDir, fileName);
-  
+
   // Process with sharp (resize/optimize)
   await sharp(buffer)
     .resize(1600, 1600, { fit: "inside", withoutEnlargement: true })

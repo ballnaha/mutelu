@@ -28,7 +28,7 @@ export async function generateMetadata(
   }
 
   return {
-    title: `${topic.title} | MUTELU.`,
+    title: `${topic.title} | mulamoon.`,
     description: topic.seoDescription,
   };
 }
@@ -59,7 +59,7 @@ export default async function TopicPage(props: PageProps) {
             {topic.overview}
           </Typography>
         </Box>
-        
+
         <Box className="pro-card" sx={{ p: 4, textAlign: "center", bgcolor: "var(--secondary)", border: "none", borderRadius: "12px" }}>
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 1.5, fontFamily: "var(--font-prompt)", fontSize: "1.2rem", color: "var(--foreground)" }}>Curated Selection for You</Typography>
           <Typography sx={{ mb: 3, opacity: 0.6, fontSize: "0.85rem" }}>เสริมความมั่นใจและเปิดรับพลังงานบวกด้วยเครื่องประดับมงคลที่คัดสรรมาเป็นพิเศษ</Typography>

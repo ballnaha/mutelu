@@ -7,7 +7,7 @@ import { LotteryClient } from "./lottery-client";
 
 function buildLotteryMetadata(drawDate?: string): Metadata {
   const drawText = drawDate ? ` งวด ${drawDate}` : "";
-  const title = `ตรวจลอตเตอรี่${drawText} ตรวจหวยล่าสุดและย้อนหลัง | MUTELU.`;
+  const title = `ตรวจลอตเตอรี่${drawText} ตรวจหวยล่าสุดและย้อนหลัง | mulamoon.`;
   const description = `ตรวจลอตเตอรี่${drawText} ตรวจหวยงวดล่าสุดและย้อนหลัง 10 งวด กรอกเลขสลาก 6 หลักเพื่อเช็กผลรางวัล เลขหน้า 3 ตัว เลขท้าย 3 ตัว และเลขท้าย 2 ตัว`;
 
   return {
@@ -23,7 +23,7 @@ function buildLotteryMetadata(drawDate?: string): Metadata {
       "ตรวจหวยย้อนหลัง",
       "เลขท้าย 2 ตัว",
       "เลขหน้า 3 ตัว",
-      "MUTELU",
+      "mulamoon",
     ],
     alternates: {
       canonical: "/lottery",
@@ -37,7 +37,7 @@ function buildLotteryMetadata(drawDate?: string): Metadata {
       description: `กรอกเลขสลาก 6 หลักเพื่อตรวจผลรางวัล${drawText || "ล่าสุด"}และย้อนหลัง พร้อมสรุปรางวัลสำคัญในรูปแบบอ่านง่าย`,
       type: "website",
       locale: "th_TH",
-      siteName: "MUTELU.",
+      siteName: "mulamoon.",
     },
     twitter: {
       card: "summary",
@@ -71,7 +71,7 @@ export default async function LotteryPage() {
     "@graph": [
       {
         "@type": "WebApplication",
-        name: `ตรวจลอตเตอรี่${drawText} MUTELU.`,
+        name: `ตรวจลอตเตอรี่${drawText} mulamoon.`,
         applicationCategory: "UtilityApplication",
         operatingSystem: "Web",
         inLanguage: "th-TH",

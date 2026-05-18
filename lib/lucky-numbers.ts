@@ -36,7 +36,7 @@ export async function getLuckyNumbersData(): Promise<LuckyNumbersData> {
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
 
-  let drawDay = day <= 1 ? 1 : (day <= 16 ? 16 : 1);
+  const drawDay = day <= 1 ? 1 : (day <= 16 ? 16 : 1);
   let drawMonth = month;
   if (day > 16) {
     drawMonth = month === 12 ? 1 : month + 1;
@@ -47,28 +47,9 @@ export async function getLuckyNumbersData(): Promise<LuckyNumbersData> {
   const drawDayOfWeek = drawDateObj.getDay();
   const powerNumbers = DAY_POWER[drawDayOfWeek] || [1, 5, 9];
 
-  let statisticalWeights = PRE_ANALYZED_WEIGHTS;
-  let isRealStats = true; // Always true now because we use real pre-analyzed data as fallback
+  const statisticalWeights = PRE_ANALYZED_WEIGHTS;
+  const isRealStats = true; // Uses stable pre-analyzed historical weights.
   const targetYears = 5;
-
-  try {
-    // Attempt to fetch fresh data, but don't fail if rate limited
-    const res = await fetch("https://lotto.api.rayriffy.com/latest", { 
-      next: { revalidate: 3600 }, // Cache for 1 hour
-      headers: { 'Accept': 'application/json' }
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.response) {
-        // Successfully fetched fresh data - we could merge it here
-        // For simplicity, we'll use the pre-analyzed weights + fresh data influence
-        isRealStats = true;
-      }
-    }
-  } catch (error) {
-    // Silently fall back to pre-analyzed weights
-  }
 
   // Generation Logic
   const seed = (year * 10000) + (drawMonth * 100) + drawDay;

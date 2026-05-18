@@ -15,6 +15,9 @@ export type BlogAffiliateItem = {
   slug: string;
   image: string;
   priceLabel: string;
+  rating?: number | null;
+  reviewCount?: number | null;
+  originalPrice?: string | null;
   highlights: string[];
   badge: string;
   accent: string;
@@ -68,6 +71,9 @@ type BlogAffiliateProductRow = {
   productSlug: string;
   image: string | null;
   priceLabel: string | null;
+  rating: number | null;
+  reviewCount: number | null;
+  originalPrice: string | null;
   highlights: unknown;
   badge: string | null;
   accent: string;
@@ -150,6 +156,9 @@ function mapBlogPost(
     slug: product.productSlug,
     image: product.image ?? "/images/bracelet.png",
     priceLabel: product.priceLabel ?? "ดูราคาล่าสุด",
+    rating: product.rating,
+    reviewCount: product.reviewCount,
+    originalPrice: product.originalPrice,
     highlights: stringArrayFromJson(product.highlights),
     badge: product.badge ?? getPlatformLabel(product.platform),
     accent: product.accent,
@@ -166,7 +175,7 @@ function mapBlogPost(
     category: post.category,
     date: formatThaiDate(post.publishedAt),
     author: post.authorName,
-    authorRole: post.authorRole ?? "ทีมบรรณาธิการ MUTELU",
+    authorRole: post.authorRole ?? "ทีมบรรณาธิการ mulamoon",
     authorImage: post.authorImage,
     heroImage: post.heroImage || "/images/hero-bg.png",
     content,
@@ -221,6 +230,9 @@ export async function getPublishedBlogPostBySlug(slug: string) {
           COALESCE(m.productSlug, b.productSlug) AS productSlug,
           COALESCE(m.image, b.image) AS image,
           COALESCE(b.priceLabel, m.price) AS priceLabel,
+          m.originalPrice AS originalPrice,
+          m.rating AS rating,
+          m.reviewCount AS reviewCount,
           b.highlights,
           b.badge,
           b.accent,

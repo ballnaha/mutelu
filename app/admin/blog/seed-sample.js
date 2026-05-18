@@ -19,7 +19,7 @@ async function main() {
       slug: slug,
       excerpt: "เปลี่ยนมุมทำงานให้น่าอยู่และเสริมดวงด้วยหลักฮวงจุ้ยปี 2569 พร้อมไอเทมแนะนำที่สายมูต้องมี!",
       heroImage: "/images/hero-bg.png",
-      authorName: "ทีมบรรณาธิการ MUTELU",
+      authorName: "ทีมบรรณาธิการ MULAMOON",
       authorRole: "ทีมบรรณาธิการ",
       status: "PUBLISHED",
       publishedAt: new Date(),

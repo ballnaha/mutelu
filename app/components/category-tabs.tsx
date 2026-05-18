@@ -15,10 +15,19 @@ const CATEGORIES = [
   { id: "timing", label: "ฤกษ์งาม", icon: "📅" },
 ];
 
+const tabColors = [
+  { bg: "#EBF3FF", border: "#2D2520", text: "#2D2520" }, // Sky
+  { bg: "#FFF0F2", border: "#2D2520", text: "#2D2520" }, // Sakura
+  { bg: "#EDF7EC", border: "#2D2520", text: "#2D2520" }, // Sage
+  { bg: "#FFF5E4", border: "#2D2520", text: "#2D2520" }, // Peach
+  { bg: "#F4EEFF", border: "#2D2520", text: "#2D2520" }, // Lavender
+  { bg: "#FFEFEF", border: "#2D2520", text: "#2D2520" }, // Coral
+] as const;
+
 const generateMockData = (category: string, count: number) => {
   return Array.from({ length: count }, (_, i) => ({
     id: i + 1,
-    title: `${category} ล่าสุด: เรื่องน่ารู้ลำดับที่ ${i + 1} เกี่ยวกับการมู และทดสอบการขึ้นบรรทัดใหม่`,
+    title: `${category}ล่าสุด: เคล็ดลับน่ารู้ลำดับที่ ${i + 1} เกี่ยวกับการมูวิถีใหม่เพื่อพลังชีวิตที่ดี`,
     date: `${14 - (i % 5)} พ.ค. 2569`,
     image: `https://images.unsplash.com/photo-${1515942400420 + i}-2b98fed1f515?q=80&w=400&auto=format&fit=crop`
   }));
@@ -57,19 +66,69 @@ export function CategoryTabs() {
   };
 
   return (
-    <Box sx={{ py: 4, bgcolor: "#f8fafc" }}>
+    <Box sx={{ 
+      py: 6, 
+      bgcolor: "#FAF8F2", // Cozy Ghibli cream background
+      borderBottom: "3px solid #2D2520", 
+      position: "relative",
+      overflow: "hidden"
+    }}>
+      
+      {/* Whimsical background flower / leaf decoration */}
+      <Box sx={{
+        position: "absolute",
+        top: "8%",
+        left: "3%",
+        fontSize: "1.2rem",
+        opacity: 0.5,
+        userSelect: "none",
+        pointerEvents: "none"
+      }}>🌸</Box>
+      <Box sx={{
+        position: "absolute",
+        bottom: "6%",
+        right: "4%",
+        fontSize: "1.2rem",
+        opacity: 0.5,
+        userSelect: "none",
+        pointerEvents: "none"
+      }}>🍀</Box>
+
       <Container maxWidth="xl">
         {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1, bgcolor: "#eef2ff", color: "#4f46e5", px: 1.5, py: 0.5, borderRadius: "99px", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", mb: 2 }}>
+        <Box sx={{ mb: 4.5 }}>
+          {/* Cute marker yellow postage stamp tag */}
+          <Box sx={{ 
+            display: "inline-flex", 
+            alignItems: "center", 
+            gap: 0.75, 
+            bgcolor: "#FFF066", 
+            color: "#2D2520", 
+            border: "2px solid #2D2520",
+            px: 2, 
+            py: 0.5, 
+            borderRadius: "12px", 
+            fontSize: "0.65rem", 
+            fontWeight: 900, 
+            letterSpacing: "0.08em", 
+            mb: 2,
+            boxShadow: "2px 2px 0px #2D2520",
+            fontFamily: "var(--font-prompt), sans-serif"
+          }}>
             ✦ EXPLORE TOPICS
           </Box>
-          <Typography sx={{ color: "#0f172a", fontWeight: 700, fontSize: { xs: "1.8rem", md: "2.4rem" }, lineHeight: 1.2 }}>
-            เจาะลึกทุกเรื่องมู
+          <Typography sx={{ 
+            color: "#2D2520", 
+            fontWeight: 950, 
+            fontSize: { xs: "1.85rem", md: "2.4rem" }, 
+            lineHeight: 1.2,
+            fontFamily: "var(--font-prompt), sans-serif"
+          }}>
+            เจาะลึกทุกเรื่องมู 🔮
           </Typography>
         </Box>
 
-        {/* Swipeable Tab Bar */}
+        {/* Swipeable Tab Bar (Cozy Planner Sticker tabs) */}
         <Box sx={{
           position: "relative",
           mb: 5,
@@ -82,8 +141,8 @@ export function CategoryTabs() {
             zIndex: 2,
             pointerEvents: "none",
           },
-          "&::before": { left: 0, background: "linear-gradient(to right, #f8fafc, transparent)" },
-          "&::after": { right: 0, background: "linear-gradient(to left, #f8fafc, transparent)" },
+          "&::before": { left: 0, background: "linear-gradient(to right, #FAF8F2, transparent)" },
+          "&::after": { right: 0, background: "linear-gradient(to left, #FAF8F2, transparent)" },
         }}>
           <Box
             ref={scrollRef}
@@ -94,17 +153,19 @@ export function CategoryTabs() {
             sx={{
               display: "flex",
               overflowX: "auto",
-              gap: 1,
+              gap: 1.5,
               width: "100%",
               cursor: draggingState ? "grabbing" : "grab",
               scrollbarWidth: "none",
               msOverflowStyle: "none",
               "&::-webkit-scrollbar": { display: "none" },
-              pb: 1,
+              pb: 1.5,
             }}
           >
-            {CATEGORIES.map((cat) => {
+            {CATEGORIES.map((cat, index) => {
               const isActive = activeTab === cat.id;
+              const pillTheme = tabColors[index % tabColors.length];
+              
               return (
                 <Box
                   key={cat.id}
@@ -113,29 +174,30 @@ export function CategoryTabs() {
                     display: "flex",
                     alignItems: "center",
                     gap: 1,
-                    px: 2,
+                    px: 2.25,
                     py: 1,
                     whiteSpace: "nowrap",
                     cursor: draggingState ? "grabbing" : "pointer",
                     userSelect: "none",
                     flexShrink: 0,
-                    fontSize: "0.9rem",
-                    fontWeight: isActive ? 700 : 500,
-                    color: isActive ? "#4f46e5" : "#64748b",
-                    bgcolor: isActive ? "#eef2ff" : "#fff",
-                    border: "1px solid",
-                    borderColor: isActive ? "#c7d2fe" : "#f1f5f9",
-                    borderRadius: "12px",
-                    boxShadow: isActive ? "0 2px 8px rgba(79,70,229,0.1)" : "0 1px 3px rgba(0,0,0,0.03)",
-                    transition: "all 0.2s ease",
+                    fontSize: "0.88rem",
+                    fontWeight: isActive ? 850 : 600,
+                    color: isActive ? "#2D2520" : "#5A4D43",
+                    bgcolor: isActive ? pillTheme.bg : "#ffffff",
+                    border: "2px solid #2D2520",
+                    borderRadius: "16px",
+                    boxShadow: isActive ? "3px 3px 0px #2D2520" : "1.5px 1.5px 0px #2D2520",
+                    transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                    fontFamily: "var(--font-prompt), sans-serif",
                     "&:hover": {
-                      bgcolor: isActive ? "#e0e7ff" : "#f8fafc",
-                      color: isActive ? "#4338ca" : "#0f172a",
-                      borderColor: isActive ? "#a5b4fc" : "#e2e8f0",
+                      bgcolor: isActive ? pillTheme.bg : "#FAFDF5",
+                      color: "#2D2520",
+                      transform: "translateY(-1px)",
+                      boxShadow: isActive ? "3.5px 3.5px 0px #2D2520" : "2.5px 2.5px 0px #2D2520",
                     },
                   }}
                 >
-                  <span>{cat.icon}</span>
+                  <span style={{ fontSize: "1.1rem" }}>{cat.icon}</span>
                   <span>{cat.label}</span>
                 </Box>
               );
@@ -143,42 +205,76 @@ export function CategoryTabs() {
           </Box>
         </Box>
 
-        {/* Tab Content Grid */}
+        {/* Tab Content Grid (Cozy Polaroid Cards) */}
         <Box sx={{
           display: "grid",
           gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(3, 1fr)", lg: "repeat(4, 1fr)" },
-          gap: { xs: 2, md: 3 }
+          gap: { xs: 2.5, md: 3.5 }
         }}>
           {MOCK_CONTENT[activeTab]?.map((item) => (
             <Box
               key={item.id}
               sx={{
                 cursor: "pointer",
-                "&:hover img": { transform: "scale(1.05)" },
+                display: "flex",
+                flexDirection: "column",
+                "&:hover img": { transform: "scale(1.035)" },
+                "&:hover h3": { color: "#7296F8" },
+                transition: "all 0.2s"
               }}
             >
+              {/* Polaroid Frame Container */}
               <Box sx={{
-                borderRadius: "18px",
+                borderRadius: "24px",
                 overflow: "hidden",
                 aspectRatio: "16/10",
-                mb: 1.5,
-                border: "1px solid #f1f5f9",
-                boxShadow: "0 4px 12px -4px rgba(0,0,0,0.06)",
+                mb: 2,
+                border: "2.5px solid #2D2520",
+                boxShadow: "4px 4px 0px #2D2520",
+                bgcolor: "#ffffff",
+                transition: "all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                "&:hover": {
+                  transform: "translate(-2px, -2px)",
+                  boxShadow: "6px 6px 0px #2D2520"
+                }
               }}>
                 <Box
                   component="img"
                   src={item.image}
-                  sx={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease" }}
+                  sx={{ 
+                    width: "100%", 
+                    height: "100%", 
+                    objectFit: "cover", 
+                    transition: "transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)" 
+                  }}
                 />
               </Box>
-              <Typography sx={{ color: "#94a3b8", fontSize: "0.75rem", mb: 0.5, fontWeight: 500 }}>
-                {item.date}
-              </Typography>
+
+              {/* Dashed mini date ticket stamp */}
+              <Box sx={{ 
+                bgcolor: "#FFFDF0", 
+                border: "1.5px dashed #2D2520", 
+                borderRadius: "8px", 
+                px: 1.25, 
+                py: 0.15,
+                width: "fit-content",
+                mb: 1
+              }}>
+                <Typography sx={{ 
+                  color: "#5A4D43", 
+                  fontSize: "0.68rem", 
+                  fontWeight: 800,
+                  fontFamily: "var(--font-prompt), sans-serif"
+                }}>
+                  📅 {item.date}
+                </Typography>
+              </Box>
+
               <Typography
                 component="h3"
                 sx={{
-                  color: "#0f172a",
-                  fontWeight: 600,
+                  color: "#2D2520",
+                  fontWeight: 800,
                   fontSize: "0.95rem",
                   lineHeight: 1.45,
                   transition: "color 0.2s",
@@ -187,7 +283,7 @@ export function CategoryTabs() {
                   WebkitBoxOrient: "vertical",
                   overflow: "hidden",
                   wordBreak: "break-word",
-                  "&:hover": { color: "#4f46e5" },
+                  fontFamily: "var(--font-prompt), sans-serif"
                 }}
               >
                 {item.title}
@@ -196,26 +292,42 @@ export function CategoryTabs() {
           ))}
         </Box>
 
-        {/* View All Button */}
-        <Box sx={{ textAlign: "center", mt: 6 }}>
+        {/* View All Button (Tactile Pop Planner Button) */}
+        <Box sx={{ textAlign: "center", mt: 6.5 }}>
           <Button
             variant="outlined"
+            disableElevation
             sx={{
-              borderColor: "#e2e8f0",
-              color: "#475569",
-              borderRadius: "14px",
-              px: 4,
-              py: 1.25,
+              borderColor: "#2D2520",
+              borderWidth: "2.5px",
+              color: "#2D2520",
+              borderRadius: "16px",
+              px: 4.5,
+              py: 1.35,
               textTransform: "none",
-              fontWeight: 600,
+              fontWeight: 900,
               fontSize: "0.9rem",
-              bgcolor: "#fff",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-              "&:hover": { borderColor: "#c7d2fe", bgcolor: "#eef2ff", color: "#4f46e5" },
-              transition: "all 0.2s"
+              bgcolor: "#FFFDF9",
+              boxShadow: "4px 4px 0px #2D2520",
+              fontFamily: "var(--font-prompt), sans-serif",
+              "&.MuiButton-root": {
+                borderWidth: "2.5px",
+              },
+              "&:hover": { 
+                borderColor: "#2D2520", 
+                borderWidth: "2.5px",
+                bgcolor: "#FAF6EE", 
+                transform: "translate(2px, 2px)", 
+                boxShadow: "2px 2px 0px #2D2520" 
+              },
+              "&:active": {
+                transform: "translate(4px, 4px)", 
+                boxShadow: "0px 0px 0px #2D2520" 
+              },
+              transition: "all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
             }}
           >
-            ดูทั้งหมดในหมวดหมู่นี้ →
+            ดูทั้งหมดในหมวดหมู่นี้ ✦
           </Button>
         </Box>
       </Container>

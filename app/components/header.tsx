@@ -27,39 +27,68 @@ import React, { useState } from "react";
 
 const navItems = [
   { label: "หน้าแรก", href: "/" },
-  { label: "ทำนายฝัน", href: "/#dreams" },
   { label: "ซาจู", href: "/saju" },
   { label: "ไพ่ยิปซีรายวัน", href: "/tarot" },
   { label: "สีมงคล", href: "/lucky-colors" },
   { label: "ตรวจลอตเตอรี่", href: "/lottery" },
+  { label: "ของมงคล", href: "/lucky-items" },
   { label: "บทความ", href: "/blog/lucky-work-desk-items-2026" },
   { label: "หมวดหมู่", href: "/#categories" },
 ];
+
+const activePillColors = [
+  { bg: "#EBF3FF", text: "#2D2520" }, // หน้าแรก - Sky
+  { bg: "#EDF7EC", text: "#2D2520" }, // ซาจู - Sage Green
+  { bg: "#FFF5E4", text: "#2D2520" }, // ไพ่ยิปซีรายวัน - Peach/Gold
+  { bg: "#F4EEFF", text: "#2D2520" }, // สีมงคล - Lavender
+  { bg: "#FFEFEF", text: "#2D2520" }, // ตรวจลอตเตอรี่ - Coral Danger
+  { bg: "#FFF0F2", text: "#2D2520" }, // ของมงคล - Sakura Rose
+  { bg: "#EBF3FF", text: "#2D2520" }, // บทความ - Blue
+  { bg: "#FFF5E4", text: "#2D2520" }, // หมวดหมู่ - Peach
+] as const;
 
 function isNavActive(pathname: string, href: string, index: number) {
   if (href === "/tarot") return pathname.startsWith("/tarot");
   if (href === "/saju") return pathname.startsWith("/saju");
   if (href === "/lucky-colors") return pathname.startsWith("/lucky-colors");
   if (href === "/lottery") return pathname.startsWith("/lottery");
+  if (href === "/lucky-items") return pathname.startsWith("/lucky-items");
   if (href.startsWith("/blog")) return pathname.startsWith("/blog");
   return pathname === "/" && index === 0;
 }
 
 function BrandMark() {
   return (
-    <Typography
-      sx={{
-        color: "#0f172a",
-        fontFamily: "var(--font-serif), serif",
-        fontSize: { xs: "1.08rem", md: "1.45rem" },
-        letterSpacing: "0.15em",
-        fontWeight: 700,
-        lineHeight: 1,
-        whiteSpace: "nowrap",
-      }}
-    >
-      MUTELU
-    </Typography>
+    <Box sx={{
+      bgcolor: "#FFF066", // Cute marker yellow highlight
+      border: "2px solid #2D2520",
+      px: 2,
+      py: 0.5,
+      borderRadius: "14px",
+      boxShadow: "2.5px 2.5px 0px #2D2520",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+      "&:hover": {
+        transform: "translate(-1px, -1px)",
+        boxShadow: "3.5px 3.5px 0px #2D2520"
+      }
+    }}>
+      <Typography
+        sx={{
+          color: "#2D2520",
+          fontFamily: "var(--font-serif), serif",
+          fontSize: { xs: "0.95rem", md: "1.25rem" },
+          letterSpacing: "0.12em",
+          fontWeight: 900,
+          lineHeight: 1,
+          whiteSpace: "nowrap",
+        }}
+      >
+        MULAMOON
+      </Typography>
+    </Box>
   );
 }
 
@@ -96,24 +125,6 @@ function GoogleMark() {
   );
 }
 
-const googleButtonSx = {
-  color: "#334155",
-  bgcolor: "#fff",
-  border: "1px solid #e2e8f0",
-  borderRadius: "12px",
-  fontWeight: 600,
-  textTransform: "none",
-  boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-  "& .MuiButton-startIcon": {
-    mr: 1,
-  },
-  "&:hover": {
-    bgcolor: "#f8fafc",
-    borderColor: "#cbd5e1",
-    boxShadow: "0 4px 6px rgba(0,0,0,0.04)",
-  },
-};
-
 export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -137,22 +148,22 @@ export function Header() {
       <AppBar
         position="fixed"
         sx={{
-          bgcolor: "rgba(255, 255, 255, 0.95)",
+          bgcolor: "rgba(255, 253, 249, 0.95)", // Ghibli watercolor cream sky glassmorphism
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
-          boxShadow: "0 4px 20px -10px rgba(0,0,0,0.05)",
-          color: "#0f172a",
+          boxShadow: "0 4px 15px -10px rgba(45,37,32,0.06)",
+          color: "#2D2520",
           zIndex: 1100,
-          borderBottom: "1px solid rgba(0,0,0,0.05)",
+          borderBottom: "3px solid #2D2520", // Solid comic boundary outline
         }}
       >
         <Container maxWidth="xl">
           <Toolbar
             sx={{
-              minHeight: { xs: "56px", md: "64px" },
+              minHeight: { xs: "60px", md: "72px" },
               px: { xs: 0, md: 0 },
               display: { xs: "flex", md: "grid" },
-              gridTemplateColumns: { md: "minmax(180px, 1fr) auto minmax(180px, 1fr)" },
+              gridTemplateColumns: { md: "minmax(180px, 1.1fr) auto minmax(180px, 1.1fr)" },
               justifyContent: "space-between",
               alignItems: "center",
             }}
@@ -163,13 +174,26 @@ export function Header() {
                 onClick={handleDrawerToggle}
                 sx={{
                   display: { md: "none" },
-                  color: "#0f172a",
-                  borderRadius: "8px",
-                  border: "1px solid #e2e8f0",
-                  bgcolor: "#f8fafc"
+                  color: "#2D2520",
+                  borderRadius: "12px",
+                  border: "2px solid #2D2520",
+                  bgcolor: "#FFFDF9",
+                  boxShadow: "2.5px 2.5px 0px #2D2520",
+                  width: 42,
+                  height: 42,
+                  transition: "all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  "&:hover": {
+                    bgcolor: "#FFFDF9",
+                    transform: "translate(-1px, -1px)",
+                    boxShadow: "3.5px 3.5px 0px #2D2520"
+                  },
+                  "&:active": {
+                    transform: "translate(1.5px, 1.5px)",
+                    boxShadow: "1px 1px 0px #2D2520"
+                  }
                 }}
               >
-                <HambergerMenu size={24} variant="Outline" color="currentColor" />
+                <HambergerMenu size={20} variant="Outline" color="currentColor" />
               </IconButton>
 
               <Link href="/" style={{ textDecoration: "none" }}>
@@ -177,38 +201,43 @@ export function Header() {
               </Link>
             </Stack>
 
+            {/* Desktop Navigation Bullet-Journal Tabs */}
             <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", justifySelf: "center" }}>
-              <Stack direction="row" spacing={0}>
+              <Stack direction="row" spacing={0.5}>
                 {navItems.map((item, index) => {
                   const isActive = isNavActive(pathname, item.href, index);
+                  const pillTheme = activePillColors[index % activePillColors.length];
+
                   return (
                     <Link key={index} href={item.href} style={{ textDecoration: "none" }}>
                       <Box
                         sx={{
                           px: 1.75,
-                          py: 1,
-                          position: "relative",
+                          py: 0.75,
+                          borderRadius: "14px",
+                          border: isActive ? "2px solid #2D2520" : "2px solid transparent",
+                          bgcolor: isActive ? pillTheme.bg : "transparent",
+                          boxShadow: isActive ? "2.5px 2.5px 0px #2D2520" : "none",
                           display: "flex",
-                          flexDirection: "column",
                           alignItems: "center",
-                          gap: 0.5,
-                          color: isActive ? "#0f172a" : "#94a3b8",
-                          transition: "color 0.2s ease",
-                          "&:hover": { color: "#0f172a" },
+                          justifyContent: "center",
+                          color: isActive ? "#2D2520" : "#5A4D43",
+                          transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                          "&:hover": {
+                            color: "#2D2520",
+                            bgcolor: isActive ? pillTheme.bg : "rgba(45, 37, 32, 0.05)",
+                            border: isActive ? "2px solid #2D2520" : "2px solid #EAE0D5",
+                            transform: isActive ? "none" : "translateY(-1px)"
+                          },
                         }}
                       >
-                        <Typography sx={{ fontSize: "0.9rem", fontWeight: isActive ? 700 : 500 }}>
+                        <Typography sx={{
+                          fontSize: "0.85rem",
+                          fontWeight: isActive ? 850 : 600,
+                          fontFamily: "var(--font-prompt), sans-serif"
+                        }}>
                           {item.label}
                         </Typography>
-                        {/* Dot indicator */}
-                        <Box sx={{
-                          width: isActive ? 5 : 0,
-                          height: 5,
-                          borderRadius: "50%",
-                          bgcolor: "#6366f1",
-                          transition: "opacity 0.2s ease",
-                          opacity: isActive ? 1 : 0,
-                        }} />
                       </Box>
                     </Link>
                   );
@@ -216,6 +245,7 @@ export function Header() {
               </Stack>
             </Box>
 
+            {/* Authenticated / Unauthenticated buttons in Webtoon tactile pop style */}
             <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center", justifyContent: "flex-end", justifySelf: { md: "end" }, minWidth: { sm: 132, md: 180 } }}>
               {status === "loading" ? (
                 <Box sx={{ width: 132, height: 42 }} />
@@ -223,28 +253,49 @@ export function Header() {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Button
                     onClick={handleMenuOpen}
+                    disableElevation
                     sx={{
-                      color: "#0f172a",
+                      color: "#2D2520",
                       textTransform: "none",
-                      gap: 1,
-                      borderRadius: "12px",
-                      px: 1.5,
+                      gap: 1.25,
+                      borderRadius: "14px",
+                      px: 2,
                       py: 0.75,
-                      border: "1px solid #e2e8f0",
-                      bgcolor: "#fff",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-                      "&:hover": { bgcolor: "#f8fafc", borderColor: "#cbd5e1", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" },
-                      transition: "all 0.2s",
+                      border: "2px solid #2D2520",
+                      bgcolor: "#FFFDF9",
+                      boxShadow: "3px 3px 0px #2D2520",
+                      fontFamily: "var(--font-prompt), sans-serif",
+                      "&:hover": {
+                        bgcolor: "#FFFDF9",
+                        transform: "translate(1.5px, 1.5px)",
+                        boxShadow: "1.5px 1.5px 0px #2D2520"
+                      },
+                      "&:active": {
+                        transform: "translate(3px, 3px)",
+                        boxShadow: "0px 0px 0px #2D2520"
+                      },
+                      transition: "all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                     }}
                   >
-                    <Avatar src={session.user.image || ""} sx={{ width: 28, height: 28, bgcolor: "#e0e7ff", color: "#4f46e5", fontWeight: 700, fontSize: "0.8rem" }}>
+                    <Avatar
+                      src={session.user.image || ""}
+                      sx={{
+                        width: 24,
+                        height: 24,
+                        bgcolor: "#FFF066",
+                        color: "#2D2520",
+                        fontWeight: 900,
+                        fontSize: "0.75rem",
+                        border: "1.5px solid #2D2520"
+                      }}
+                    >
                       {session.user.name?.[0] || "U"}
                     </Avatar>
-                    <Typography sx={{ fontWeight: 600, fontSize: "0.88rem", color: "#334155" }}>
+                    <Typography sx={{ fontWeight: 800, fontSize: "0.85rem", color: "#2D2520" }}>
                       {session.user.name?.split(" ")[0]}
                     </Typography>
-                    <Box sx={{ width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
-                      <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <Box sx={{ width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", color: "#2D2520" }}>
+                      <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </Box>
                   </Button>
                   <Menu
@@ -252,14 +303,46 @@ export function Header() {
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
                     disableScrollLock={true}
-                    sx={{ mt: 1, "& .MuiPaper-root": { bgcolor: "#fff", color: "#0f172a", border: "1px solid rgba(0,0,0,0.06)", borderRadius: "16px", minWidth: 180, boxShadow: "0 20px 60px -15px rgba(0,0,0,0.12)", p: 0.5 } }}
+                    sx={{
+                      mt: 1.5,
+                      "& .MuiPaper-root": {
+                        bgcolor: "#FFFDF5",
+                        color: "#2D2520",
+                        border: "2px solid #2D2520",
+                        borderRadius: "20px",
+                        minWidth: 190,
+                        boxShadow: "5px 5px 0px #2D2520",
+                        p: 0.75
+                      }
+                    }}
                   >
                     {session.user.role === "admin" && (
-                      <MenuItem component={Link} href="/admin" onClick={handleMenuClose} sx={{ borderRadius: "10px", fontWeight: 600, fontSize: "0.9rem", "&:hover": { bgcolor: "#f8fafc" } }}>
-                        ระบบหลังบ้าน
+                      <MenuItem
+                        component={Link}
+                        href="/admin"
+                        onClick={handleMenuClose}
+                        sx={{
+                          borderRadius: "12px",
+                          fontWeight: 800,
+                          fontSize: "0.85rem",
+                          py: 1,
+                          "&:hover": { bgcolor: "#EBF3FF" }
+                        }}
+                      >
+                        ระบบหลังบ้าน (Admin)
                       </MenuItem>
                     )}
-                    <MenuItem onClick={() => signOut()} sx={{ color: "#e11d48", fontWeight: 600, fontSize: "0.9rem", borderRadius: "10px", "&:hover": { bgcolor: "#fff1f2" } }}>
+                    <MenuItem
+                      onClick={() => signOut()}
+                      sx={{
+                        color: "#E76161",
+                        fontWeight: 800,
+                        fontSize: "0.85rem",
+                        borderRadius: "12px",
+                        py: 1,
+                        "&:hover": { bgcolor: "#FFEFEF" }
+                      }}
+                    >
                       ออกจากระบบ
                     </MenuItem>
                   </Menu>
@@ -268,11 +351,32 @@ export function Header() {
                 <Button
                   onClick={() => signIn("google")}
                   startIcon={<GoogleMark />}
+                  disableElevation
                   sx={{
-                    ...googleButtonSx,
+                    color: "#2D2520",
+                    bgcolor: "#FFFDF9",
+                    border: "2px solid #2D2520",
+                    borderRadius: "14px",
+                    fontWeight: 800,
+                    textTransform: "none",
+                    fontFamily: "var(--font-prompt), sans-serif",
+                    boxShadow: "3px 3px 0px #2D2520",
+                    "& .MuiButton-startIcon": {
+                      mr: 1,
+                    },
+                    "&:hover": {
+                      bgcolor: "#FFFDF9",
+                      transform: "translate(1.5px, 1.5px)",
+                      boxShadow: "1.5px 1.5px 0px #2D2520"
+                    },
+                    "&:active": {
+                      transform: "translate(3px, 3px)",
+                      boxShadow: "0px 0px 0px #2D2520"
+                    },
                     px: 2.5,
-                    py: 1,
-                    fontSize: "0.9rem",
+                    py: 0.9,
+                    fontSize: "0.85rem",
+                    transition: "all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                   }}
                 >
                   เข้าสู่ระบบ
@@ -283,6 +387,7 @@ export function Header() {
         </Container>
       </AppBar>
 
+      {/* Mobile Drawer Styled Like Cozy Planner */}
       <Drawer
         anchor="left"
         open={mobileOpen}
@@ -291,29 +396,48 @@ export function Header() {
         sx={{
           "& .MuiDrawer-paper": {
             width: "85%",
-            maxWidth: 360,
-            bgcolor: "#ffffff",
-            color: "#0f172a",
-            borderRight: "1px solid rgba(0,0,0,0.05)",
+            maxWidth: 320,
+            bgcolor: "#FFFDF9", // Warm cream watercolor paper
+            color: "#2D2520",
+            borderRight: "3px solid #2D2520", // Comic border outline
           },
         }}
       >
         <Box sx={{ p: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <BrandMark />
-          <IconButton onClick={handleDrawerToggle} sx={{ color: "#64748b" }}>
-            <CloseSquare size={28} variant="Outline" color="currentColor" />
+          <IconButton
+            onClick={handleDrawerToggle}
+            sx={{
+              color: "#2D2520",
+              border: "1.5px solid #2D2520",
+              borderRadius: "8px",
+              p: 0.5,
+              bgcolor: "#FFF0F2"
+            }}
+          >
+            <CloseSquare size={20} variant="Bold" color="currentColor" />
           </IconButton>
         </Box>
-        <Divider sx={{ borderColor: "rgba(0,0,0,0.05)" }} />
+        <Divider sx={{ borderColor: "#2D2520", borderWidth: "1px" }} />
 
         {status === "authenticated" && session?.user && (
-          <Box sx={{ p: 3, display: "flex", alignItems: "center", gap: 2, bgcolor: "#f8fafc", borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-            <Avatar src={session.user.image || ""} sx={{ width: 48, height: 48, bgcolor: "#e0e7ff", color: "#4f46e5", fontWeight: 600 }}>
+          <Box sx={{ p: 3, display: "flex", alignItems: "center", gap: 2, bgcolor: "#FAF6EE", borderBottom: "2px solid #2D2520" }}>
+            <Avatar
+              src={session.user.image || ""}
+              sx={{
+                width: 44,
+                height: 44,
+                bgcolor: "#FFF066",
+                color: "#2D2520",
+                fontWeight: 900,
+                border: "2px solid #2D2520"
+              }}
+            >
               {session.user.name?.[0] || "U"}
             </Avatar>
             <Box>
-              <Typography sx={{ fontWeight: 700, fontSize: "1.05rem", color: "#0f172a" }}>{session.user.name}</Typography>
-              <Typography sx={{ fontSize: "0.8rem", color: "#64748b" }}>{session.user.email}</Typography>
+              <Typography sx={{ fontWeight: 800, fontSize: "1rem", color: "#2D2520" }}>{session.user.name}</Typography>
+              <Typography sx={{ fontSize: "0.75rem", color: "#5A4D43", fontWeight: 500 }}>{session.user.email}</Typography>
             </Box>
           </Box>
         )}
@@ -321,25 +445,42 @@ export function Header() {
         <List sx={{ p: 2 }}>
           {navItems.map((item, index) => {
             const isActive = isNavActive(pathname, item.href, index);
+            const pillTheme = activePillColors[index % activePillColors.length];
+
             return (
-              <ListItem key={index} disablePadding sx={{ mb: 1 }}>
+              <ListItem key={index} disablePadding sx={{ mb: 1.25 }}>
                 <ListItemButton
                   component={Link}
                   href={item.href}
                   onClick={handleDrawerToggle}
                   sx={{
                     borderRadius: "14px",
-                    bgcolor: isActive ? "#eef2ff" : "transparent",
-                    color: isActive ? "#4f46e5" : "#475569",
-                    "&:hover": { bgcolor: "#f8fafc" }
+                    border: isActive ? "2px solid #2D2520" : "2px solid transparent",
+                    bgcolor: isActive ? pillTheme.bg : "transparent",
+                    color: isActive ? "#2D2520" : "#5A4D43",
+                    boxShadow: isActive ? "2.5px 2.5px 0px #2D2520" : "none",
+                    py: 1,
+                    px: 2,
+                    "&:hover": { bgcolor: isActive ? pillTheme.bg : "rgba(45, 37, 32, 0.04)" }
                   }}
                 >
-                  <ListItemText primary={<Typography sx={{ fontWeight: isActive ? 600 : 500, fontSize: "1.05rem" }}>{item.label}</Typography>} />
+                  <ListItemText
+                    primary={
+                      <Typography sx={{
+                        fontWeight: isActive ? 850 : 600,
+                        fontSize: "0.95rem",
+                        fontFamily: "var(--font-prompt), sans-serif"
+                      }}>
+                        {item.label}
+                      </Typography>
+                    }
+                  />
                 </ListItemButton>
               </ListItem>
             );
           })}
         </List>
+
         <Box sx={{ p: 3, mt: "auto", display: "flex", flexDirection: "column", gap: 1.5 }}>
           {status === "authenticated" && session?.user ? (
             <>
@@ -351,16 +492,41 @@ export function Header() {
                   onClick={handleDrawerToggle}
                   variant="contained"
                   disableElevation
-                  sx={{ bgcolor: "#0f172a", color: "#fff", py: 1.5, borderRadius: "14px", fontWeight: 600, "&:hover": { bgcolor: "#1e293b" } }}
+                  sx={{
+                    bgcolor: "#2D2520",
+                    color: "#FFFDF9",
+                    py: 1.25,
+                    border: "2px solid #2D2520",
+                    borderRadius: "14px",
+                    fontWeight: 800,
+                    fontSize: "0.85rem",
+                    fontFamily: "var(--font-prompt), sans-serif",
+                    "&:hover": { bgcolor: "#473E38" }
+                  }}
                 >
-                  ไปที่ระบบหลังบ้าน (Admin)
+                  ระบบหลังบ้าน (Admin)
                 </Button>
               )}
               <Button
                 fullWidth
                 onClick={() => signOut()}
                 variant="outlined"
-                sx={{ color: "#e11d48", borderColor: "#fda4af", py: 1.5, borderRadius: "14px", fontWeight: 600, "&:hover": { bgcolor: "#fff1f2", borderColor: "#f43f5e" } }}
+                disableElevation
+                sx={{
+                  color: "#E76161",
+                  borderColor: "#E76161",
+                  borderWidth: "2px",
+                  py: 1.25,
+                  borderRadius: "14px",
+                  fontWeight: 800,
+                  fontSize: "0.85rem",
+                  fontFamily: "var(--font-prompt), sans-serif",
+                  "&:hover": {
+                    bgcolor: "#FFEFEF",
+                    borderColor: "#E76161",
+                    borderWidth: "2px",
+                  }
+                }}
               >
                 ออกจากระบบ
               </Button>
@@ -370,7 +536,29 @@ export function Header() {
               fullWidth
               onClick={() => signIn("google")}
               startIcon={<GoogleMark />}
-              sx={{ ...googleButtonSx, py: 1.5 }}
+              disableElevation
+              sx={{
+                color: "#2D2520",
+                bgcolor: "#FFFDF9",
+                border: "2px solid #2D2520",
+                boxShadow: "3px 3px 0px #2D2520",
+                py: 1.25,
+                borderRadius: "14px",
+                fontWeight: 800,
+                textTransform: "none",
+                fontSize: "0.85rem",
+                fontFamily: "var(--font-prompt), sans-serif",
+                "&:hover": {
+                  bgcolor: "#FFFDF9",
+                  transform: "translate(1.5px, 1.5px)",
+                  boxShadow: "1.5px 1.5px 0px #2D2520"
+                },
+                "&:active": {
+                  transform: "translate(3px, 3px)",
+                  boxShadow: "0px 0px 0px #2D2520"
+                },
+                transition: "all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+              }}
             >
               เข้าสู่ระบบด้วย Google
             </Button>

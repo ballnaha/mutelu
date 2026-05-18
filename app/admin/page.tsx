@@ -18,25 +18,25 @@ export default function AdminDashboard() {
           ภาพรวมระบบ (Dashboard)
         </Typography>
         <Typography sx={{ color: "text.secondary" }}>
-          ยินดีต้อนรับสู่ระบบจัดการหลังบ้าน Mutelu Affiliate
+          ยินดีต้อนรับสู่ระบบจัดการหลังบ้าน mulamoon Affiliate
         </Typography>
       </Box>
 
       {/* Stats Cards */}
-      <Box 
-        sx={{ 
-          display: "grid", 
-          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "repeat(4, 1fr)" }, 
-          gap: 3 
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "repeat(4, 1fr)" },
+          gap: 3
         }}
       >
         {STATS.map((stat, index) => (
           <Box key={index}>
-            <Paper 
-              elevation={0} 
-              sx={{ 
-                p: 3, 
-                borderRadius: "16px", 
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                borderRadius: "16px",
                 border: "1px solid rgba(0,0,0,0.05)",
                 display: "flex",
                 flexDirection: "column",
@@ -45,8 +45,8 @@ export default function AdminDashboard() {
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <Box sx={{ 
-                  width: 56, height: 56, borderRadius: "12px", 
+                <Box sx={{
+                  width: 56, height: 56, borderRadius: "12px",
                   bgcolor: `${stat.color}15`, color: stat.color,
                   display: "flex", alignItems: "center", justifyContent: "center"
                 }}>

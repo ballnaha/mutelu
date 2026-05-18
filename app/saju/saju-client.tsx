@@ -44,10 +44,13 @@ type SajuAffiliateProduct = {
   name: string;
   description: string;
   price: string;
+  originalPrice?: string | null;
   image: string;
   url: string;
   platform?: string;
   productSlug?: string | null;
+  rating?: number | null;
+  reviewCount?: number | null;
 };
 
 const elementMeta: Record<ElementKey, { label: string; color: string; desc: string; bg: string }> = {
@@ -993,44 +996,16 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
       sx={{
         mb: 5,
         p: { xs: 2.5, sm: 3.5, md: 4.5 },
-        borderRadius: "32px",
-        bgcolor: "#090d16",
-        color: "#fff",
-        boxShadow: "0 30px 70px -20px rgba(15,23,42,0.8), inset 0 1px 0px rgba(255,255,255,0.1)",
-        border: "1px solid rgba(255, 255, 255, 0.08)",
+        borderRadius: "24px",
+        background: "linear-gradient(135deg, #FFEBEF 0%, #FFFDF9 50%, #EAF0FF 100%)",
+        color: "#2D2520",
+        boxShadow: "8px 8px 0px #2D2520",
+        border: "3.5px solid #2D2520",
         overflow: "hidden",
         position: "relative",
       }}
     >
-      {/* Premium ambient glows */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: "-20%",
-          left: "-10%",
-          width: "50%",
-          height: "60%",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(9, 13, 22, 0) 70%)",
-          filter: "blur(60px)",
-          pointerEvents: "none",
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: "-20%",
-          right: "-10%",
-          width: "50%",
-          height: "60%",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, rgba(9, 13, 22, 0) 70%)",
-          filter: "blur(60px)",
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* Header section with modern badges */}
+      {/* Header section with Ghibli badges */}
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
@@ -1041,7 +1016,7 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
           position: "relative",
           zIndex: 2,
           pb: 3,
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: "2.5px solid #2D2520",
         }}
       >
         <Box>
@@ -1054,13 +1029,13 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
                 px: 1.5,
                 py: 0.6,
                 borderRadius: "99px",
-                bgcolor: "rgba(139, 92, 246, 0.15)",
-                border: "1px solid rgba(139, 92, 246, 0.3)",
-                color: "#c084fc",
+                bgcolor: "rgba(255, 142, 158, 0.15)",
+                border: "2px solid #2D2520",
+                color: "#FF8E9E",
               }}
             >
-              <MagicStar size={14} color="#c084fc" variant="Bulk" className="pulse-slow" />
-              <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, letterSpacing: "0.08em", lineHeight: 1 }}>
+              <MagicStar size={14} color="#FF8E9E" variant="Bulk" className="pulse-slow" />
+              <Typography sx={{ fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.08em", lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
                 QUICK SUMMARY
               </Typography>
             </Box>
@@ -1068,26 +1043,27 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
               label="สรุปดวง 30 วินาที"
               size="small"
               sx={{
-                bgcolor: "rgba(16, 185, 129, 0.12)",
-                color: "#34d399",
-                border: "1px solid rgba(16, 185, 129, 0.2)",
-                fontWeight: 900,
+                bgcolor: "#FAF8F2",
+                color: "#2D2520",
+                border: "2px solid #2D2520",
+                fontWeight: 800,
                 fontSize: "0.68rem",
+                fontFamily: "var(--font-prompt), sans-serif"
               }}
             />
           </Stack>
           <Typography
             sx={{
-              color: "#fff",
+              color: "#2D2520",
               fontSize: { xs: "1.4rem", md: "1.75rem" },
-              fontWeight: 900,
+              fontWeight: 800,
               fontFamily: "var(--font-prompt), sans-serif",
               letterSpacing: "-0.01em",
             }}
           >
             สรุปชะตาชีวิตด่วน 30 วินาที
           </Typography>
-          <Typography sx={{ color: "#94a3b8", fontSize: "0.85rem", lineHeight: 1.6, fontWeight: 500, mt: 0.5 }}>
+          <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", lineHeight: 1.6, fontWeight: 500, mt: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>
             ถอดรหัสและสรุปหัวข้อที่สำคัญที่สุดของดวงชะตาคุณเพื่อให้พร้อมประยุกต์ใช้งานได้ทันที
           </Typography>
         </Box>
@@ -1104,63 +1080,47 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
             <Box
               sx={{
                 p: 3,
-                borderRadius: "24px",
-                background: "linear-gradient(135deg, rgba(99, 102, 241, 0.16) 0%, rgba(139, 92, 246, 0.04) 100%)",
-                border: "1.5px solid rgba(139, 92, 246, 0.25)",
-                boxShadow: "0 10px 30px rgba(99, 102, 241, 0.08)",
+                borderRadius: "16px",
+                bgcolor: "#FFFDF9",
+                border: "2.5px solid #2D2520",
+                boxShadow: "3px 3px 0px #2D2520",
                 position: "relative",
                 overflow: "hidden",
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                transition: "all 0.2s ease",
                 display: "flex",
                 flexDirection: "column",
                 flexGrow: 1,
                 "&:hover": {
-                  transform: "translateY(-4px)",
-                  borderColor: "rgba(139, 92, 246, 0.45)",
-                  boxShadow: "0 15px 40px rgba(99, 102, 241, 0.18)",
+                  transform: "translateY(-2px)",
+                  boxShadow: "4px 4px 0px #2D2520",
                 },
               }}
             >
-              {/* Card Glow Icon Background */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  right: -20,
-                  top: -20,
-                  opacity: 0.1,
-                  transform: "scale(1.8)",
-                  color: "#a78bfa",
-                  pointerEvents: "none",
-                }}
-              >
-                <MagicStar size={100} variant="Bulk" color="currentColor" />
-              </Box>
-
               <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2 }}>
                 <Box
                   sx={{
                     width: 42,
                     height: 42,
                     borderRadius: "12px",
-                    bgcolor: "rgba(139, 92, 246, 0.15)",
-                    border: "1px solid rgba(139, 92, 246, 0.3)",
+                    bgcolor: "rgba(255, 142, 158, 0.15)",
+                    border: "2px solid #2D2520",
                     display: "grid",
                     placeItems: "center",
-                    color: "#a78bfa",
+                    color: "#FF8E9E",
                   }}
                 >
                   <MagicStar size={22} variant="Bulk" color="currentColor" />
                 </Box>
                 <Box>
-                  <Typography sx={{ color: "#a78bfa", fontSize: "0.7rem", fontWeight: 950, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
                     CORE FOCUS
                   </Typography>
-                  <Typography sx={{ color: "#fff", fontSize: "1.05rem", fontWeight: 800 }}>
+                  <Typography sx={{ color: "#2D2520", fontSize: "1.05rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
                     {heroItem.label}
                   </Typography>
                 </Box>
               </Stack>
-              <Typography sx={{ color: "#e2e8f0", fontSize: "0.92rem", lineHeight: 1.7, fontWeight: 600 }}>
+              <Typography sx={{ color: "#2D2520", fontSize: "0.92rem", lineHeight: 1.7, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
                 {heroItem.text}
               </Typography>
             </Box>
@@ -1171,44 +1131,30 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
             <Box
               sx={{
                 p: 3,
-                borderRadius: "24px",
-                bgcolor: "rgba(255, 255, 255, 0.03)",
-                border: `1.5px solid ${luckyItem.color}35`,
-                boxShadow: `0 10px 30px ${luckyItem.color}08`,
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                borderRadius: "16px",
+                bgcolor: "#FFFDF9",
+                border: "2.5px solid #2D2520",
+                borderLeft: `8px solid ${luckyItem.color}`,
+                boxShadow: "3px 3px 0px #2D2520",
+                transition: "all 0.2s ease",
                 display: "flex",
                 flexDirection: "column",
                 position: "relative",
                 overflow: "hidden",
                 "&:hover": {
-                  transform: "translateY(-4px)",
-                  borderColor: `${luckyItem.color}65`,
-                  boxShadow: `0 15px 40px ${luckyItem.color}15`,
+                  transform: "translateY(-2px)",
+                  boxShadow: "4px 4px 0px #2D2520",
                 },
               }}
             >
-              <Box
-                sx={{
-                  position: "absolute",
-                  right: -20,
-                  top: -20,
-                  opacity: 0.08,
-                  transform: "scale(1.8)",
-                  color: luckyItem.color,
-                  pointerEvents: "none",
-                }}
-              >
-                <Element4 size={100} variant="Bulk" color="currentColor" />
-              </Box>
-
               <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2 }}>
                 <Box
                   sx={{
                     width: 42,
                     height: 42,
                     borderRadius: "12px",
-                    bgcolor: `${luckyItem.color}15`,
-                    border: `1px solid ${luckyItem.color}30`,
+                    bgcolor: "#FFFDF9",
+                    border: "2px solid #2D2520",
                     display: "grid",
                     placeItems: "center",
                     color: luckyItem.color,
@@ -1217,15 +1163,15 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
                   <Element4 size={22} variant="Bulk" color="currentColor" />
                 </Box>
                 <Box>
-                  <Typography sx={{ color: luckyItem.color, fontSize: "0.7rem", fontWeight: 950, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
                     LUCKY ELEMENT
                   </Typography>
-                  <Typography sx={{ color: "#fff", fontSize: "1.05rem", fontWeight: 800 }}>
+                  <Typography sx={{ color: "#2D2520", fontSize: "1.05rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
                     {luckyItem.label}
                   </Typography>
                 </Box>
               </Stack>
-              <Typography sx={{ color: "#e2e8f0", fontSize: "0.9rem", lineHeight: 1.7, fontWeight: 600 }}>
+              <Typography sx={{ color: "#2D2520", fontSize: "0.9rem", lineHeight: 1.7, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
                 {luckyItem.text}
               </Typography>
             </Box>
@@ -1251,20 +1197,18 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
                   key={item.label}
                   sx={{
                     p: 2.6,
-                    borderRadius: "20px",
-                    bgcolor: "rgba(255, 255, 255, 0.03)",
-                    border: `1px solid rgba(255,255,255,0.06)`,
-                    borderTop: `4px solid ${item.color}`,
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    borderRadius: "16px",
+                    bgcolor: "#FFFDF9",
+                    border: `2px solid #2D2520`,
+                    borderTop: `6px solid ${item.color}`,
+                    boxShadow: "3px 3px 0px #2D2520",
+                    transition: "all 0.2s ease",
                     display: "flex",
                     flexDirection: "column",
                     minHeight: 160,
                     "&:hover": {
-                      transform: "translateY(-4px)",
-                      bgcolor: "rgba(255, 255, 255, 0.05)",
-                      borderColor: `${item.color}40`,
-                      boxShadow: `0 12px 30px ${item.color}15`,
+                      transform: "translateY(-2px)",
+                      boxShadow: "4px 4px 0px #2D2520",
                     },
                   }}
                 >
@@ -1274,7 +1218,8 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
                         width: 32,
                         height: 32,
                         borderRadius: "8px",
-                        bgcolor: `${item.color}15`,
+                        bgcolor: "#FFFDF9",
+                        border: "2px solid #2D2520",
                         display: "grid",
                         placeItems: "center",
                         color: item.color,
@@ -1283,11 +1228,11 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
                     >
                       <IconComp size={18} variant="Bulk" color="currentColor" />
                     </Box>
-                    <Typography sx={{ color: "#fff", fontSize: "0.95rem", fontWeight: 800 }}>
+                    <Typography sx={{ color: "#2D2520", fontSize: "0.95rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
                       {item.label}
                     </Typography>
                   </Stack>
-                  <Typography sx={{ color: "#cbd5e1", fontSize: "0.86rem", lineHeight: 1.6, fontWeight: 550 }}>
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.86rem", lineHeight: 1.6, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
                     {item.text}
                   </Typography>
                 </Box>
@@ -1311,15 +1256,15 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
                   key={item.label}
                   sx={{
                     p: 2.8,
-                    borderRadius: "22px",
-                    bgcolor: isCaution ? "rgba(244, 63, 94, 0.03)" : "rgba(6, 182, 212, 0.03)",
-                    border: isCaution ? "1.5px solid rgba(244, 63, 94, 0.2)" : "1.5px solid rgba(6, 182, 212, 0.2)",
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    borderRadius: "16px",
+                    bgcolor: "#FFFDF9",
+                    border: "2.5px solid #2D2520",
+                    borderLeft: isCaution ? "8px solid #FF8E9E" : "8px solid #7296F8",
+                    boxShadow: "3px 3px 0px #2D2520",
+                    transition: "all 0.2s ease",
                     "&:hover": {
-                      transform: "translateY(-4px)",
-                      borderColor: isCaution ? "rgba(244, 63, 94, 0.4)" : "rgba(6, 182, 212, 0.4)",
-                      boxShadow: isCaution ? "0 10px 30px rgba(244, 63, 94, 0.1)" : "0 10px 30px rgba(6, 182, 212, 0.1)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "4px 4px 0px #2D2520",
                     },
                   }}
                 >
@@ -1329,7 +1274,8 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
                         width: 36,
                         height: 36,
                         borderRadius: "10px",
-                        bgcolor: isCaution ? "rgba(244, 63, 94, 0.1)" : "rgba(6, 182, 212, 0.1)",
+                        bgcolor: "#FFFDF9",
+                        border: "2px solid #2D2520",
                         display: "grid",
                         placeItems: "center",
                         color: item.color,
@@ -1337,11 +1283,11 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
                     >
                       <IconComp size={20} variant="Bulk" color="currentColor" />
                     </Box>
-                    <Typography sx={{ color: isCaution ? "#ffa1b2" : "#9ce7f8", fontSize: "0.95rem", fontWeight: 800 }}>
+                    <Typography sx={{ color: "#2D2520", fontSize: "0.95rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
                       {item.label}
                     </Typography>
                   </Stack>
-                  <Typography sx={{ color: "#e2e8f0", fontSize: "0.85rem", lineHeight: 1.65, fontWeight: 550 }}>
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", lineHeight: 1.65, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
                     {item.text}
                   </Typography>
                 </Box>
@@ -1413,18 +1359,18 @@ function SajuLoaderOverlay({ step }: { step: number }) {
       open={true}
       sx={{
         zIndex: 99999,
-        bgcolor: "rgba(9, 9, 11, 0.96)",
-        backdropFilter: "blur(12px)",
+        bgcolor: "rgba(250, 248, 242, 0.96)",
+        backdropFilter: "blur(8px)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        color: "#fff",
+        color: "#2D2520",
         p: 3,
         overflow: "hidden",
       }}
     >
-      {/* Cosmic background particles */}
+      {/* Cozy watercolor particles */}
       {cosmicParticles.map((particle) => (
         <Box
           key={particle.id}
@@ -1433,11 +1379,11 @@ function SajuLoaderOverlay({ step }: { step: number }) {
             position: "absolute",
             width: particle.size,
             height: particle.size,
-            bgcolor: particle.id % 3 === 0 ? "#fbbf24" : particle.id % 3 === 1 ? "#a78bfa" : "#3b82f6",
+            bgcolor: particle.id % 3 === 0 ? "#FF8E9E" : particle.id % 3 === 1 ? "#7296F8" : "#fbbf24",
             borderRadius: "50%",
             top: particle.top,
             left: particle.left,
-            opacity: particle.opacity,
+            opacity: particle.opacity * 0.7,
             animation: `cosmicFloat ${particle.animationDuration} ease-in-out infinite`,
             animationDelay: particle.animationDelay,
             pointerEvents: "none",
@@ -1457,14 +1403,14 @@ function SajuLoaderOverlay({ step }: { step: number }) {
           mb: 4,
         }}
       >
-        {/* Outer glowing halo */}
+        {/* Outer pastel watercolor glow */}
         <Box
           sx={{
             position: "absolute",
             inset: 0,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(9, 9, 11, 0) 70%)",
-            filter: "blur(20px)",
+            background: "radial-gradient(circle, rgba(255, 142, 158, 0.15) 0%, rgba(250, 248, 242, 0) 70%)",
+            filter: "blur(15px)",
             animation: "pulseGlow 3s ease-in-out infinite",
           }}
         />
@@ -1475,8 +1421,8 @@ function SajuLoaderOverlay({ step }: { step: number }) {
             position: "absolute",
             inset: 15,
             borderRadius: "50%",
-            border: "1.5px dashed rgba(251, 191, 36, 0.35)",
-            animation: "spin 15s linear infinite",
+            border: "2px dashed #2D2520",
+            animation: "spin 20s linear infinite",
           }}
         />
 
@@ -1486,24 +1432,24 @@ function SajuLoaderOverlay({ step }: { step: number }) {
             position: "absolute",
             inset: 45,
             borderRadius: "50%",
-            border: "1px solid rgba(167, 139, 250, 0.25)",
-            animation: "spin-reverse 20s linear infinite",
+            border: "2px solid rgba(45, 37, 32, 0.2)",
+            animation: "spin-reverse 25s linear infinite",
             "&::before": {
               content: '""',
               position: "absolute",
               top: 0,
               left: "50%",
-              width: 8,
-              height: 8,
+              width: 10,
+              height: 10,
               borderRadius: "50%",
-              bgcolor: "#fbbf24",
+              bgcolor: "#FF8E9E",
+              border: "2px solid #2D2520",
               transform: "translateX(-50%)",
-              boxShadow: "0 0 10px #fbbf24",
             }
           }}
         />
 
-        {/* Center glowing Yin-Yang */}
+        {/* Center organic Yin-Yang */}
         <Box
           sx={{
             position: "relative",
@@ -1511,20 +1457,20 @@ function SajuLoaderOverlay({ step }: { step: number }) {
             width: 80,
             height: 80,
             borderRadius: "50%",
-            bgcolor: "#09090b",
-            boxShadow: "0 0 30px rgba(139, 92, 246, 0.4)",
+            bgcolor: "#FFFDF9",
+            border: "2.5px solid #2D2520",
+            boxShadow: "4px 4px 0px #2D2520",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            animation: "pulseGlow 2s ease-in-out infinite",
           }}
         >
-          <svg width="56" height="56" viewBox="0 0 100 100" style={{ animation: "spin 8s linear infinite" }}>
-            <path d="M 50 0 A 50 50 0 0 0 50 100 A 25 25 0 0 0 50 50 A 25 25 0 0 1 50 0 Z" fill="#fbbf24" />
-            <path d="M 50 0 A 50 50 0 0 1 50 100 A 25 25 0 0 1 50 50 A 25 25 0 0 0 50 0 Z" fill="#4338ca" />
-            <circle cx="50" cy="25" r="8" fill="#4338ca" />
-            <circle cx="50" cy="75" r="8" fill="#fbbf24" />
-            <circle cx="50" cy="50" r="49" fill="none" stroke="rgba(251, 191, 36, 0.3)" strokeWidth="1.5" />
+          <svg width="56" height="56" viewBox="0 0 100 100" style={{ animation: "spin 12s linear infinite" }}>
+            <path d="M 50 0 A 50 50 0 0 0 50 100 A 25 25 0 0 0 50 50 A 25 25 0 0 1 50 0 Z" fill="#FF8E9E" />
+            <path d="M 50 0 A 50 50 0 0 1 50 100 A 25 25 0 0 1 50 50 A 25 25 0 0 0 50 0 Z" fill="#7296F8" />
+            <circle cx="50" cy="25" r="8" fill="#7296F8" />
+            <circle cx="50" cy="75" r="8" fill="#FF8E9E" />
+            <circle cx="50" cy="50" r="49" fill="none" stroke="#2D2520" strokeWidth="2" />
           </svg>
         </Box>
 
@@ -1543,23 +1489,21 @@ function SajuLoaderOverlay({ step }: { step: number }) {
                 width: 44,
                 height: 44,
                 borderRadius: "50%",
-                bgcolor: "#09090b",
-                border: `1.5px solid ${isGlowing ? el.color : "rgba(255,255,255,0.15)"}`,
-                boxShadow: isGlowing ? `0 0 15px ${el.color}` : "none",
+                bgcolor: "#FFFDF9",
+                border: "2px solid #2D2520",
+                boxShadow: isGlowing ? `3px 3px 0px #2D2520` : "none",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 zIndex: 3,
-                animation: isGlowing ? "elementGlow 2.5s ease-in-out infinite" : "none",
-                animationDelay: `${idx * 0.4}s`,
                 transition: "all 0.5s ease",
               }}
             >
-              <Typography sx={{ color: isGlowing ? el.color : "rgba(255,255,255,0.4)", fontSize: "0.95rem", fontWeight: 900, lineHeight: 1 }}>
+              <Typography sx={{ color: isGlowing ? el.color : "#94a3b8", fontSize: "0.95rem", fontWeight: 800, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
                 {el.label}
               </Typography>
-              <Typography sx={{ color: isGlowing ? "#fff" : "rgba(255,255,255,0.3)", fontSize: "0.55rem", fontWeight: 700, mt: 0.1 }}>
+              <Typography sx={{ color: isGlowing ? "#2D2520" : "#94a3b8", fontSize: "0.55rem", fontWeight: 700, mt: 0.1, fontFamily: "var(--font-prompt), sans-serif" }}>
                 {el.name}
               </Typography>
             </Box>
@@ -1567,27 +1511,26 @@ function SajuLoaderOverlay({ step }: { step: number }) {
         })}
       </Box>
 
-      {/* Main glassmorphic progress card */}
+      {/* Main Ghibli progress card */}
       <Box
         sx={{
           width: "100%",
           maxWidth: 460,
-          bgcolor: "rgba(15, 23, 42, 0.55)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
-          borderRadius: "28px",
+          bgcolor: "#FFFDF9",
+          border: "3px solid #2D2520",
+          borderRadius: "20px",
           p: { xs: 3, sm: 3.5 },
-          boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.05)",
+          boxShadow: "6px 6px 0px #2D2520",
           textAlign: "left",
           position: "relative",
           zIndex: 10,
         }}
       >
-        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3.5, justifyContent: "center" }}>
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3, justifyContent: "center" }}>
           <Box className="pulse-slow" sx={{ display: "flex", alignItems: "center" }}>
-            <MagicStar size={22} color="#fbbf24" variant="Bulk" />
+            <MagicStar size={22} color="#FF8E9E" variant="Bulk" />
           </Box>
-          <Typography sx={{ color: "#fbbf24", fontSize: "0.95rem", fontWeight: 900, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          <Typography sx={{ color: "#2D2520", fontSize: "0.95rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
             กำลังเปิดมิติทำนายดวงซาจู
           </Typography>
         </Stack>
@@ -1617,14 +1560,13 @@ function SajuLoaderOverlay({ step }: { step: number }) {
                       height: 22,
                       borderRadius: "50%",
                       bgcolor: "rgba(16, 185, 129, 0.15)",
-                      border: "1.5px solid #10b981",
+                      border: "2px solid #2D2520",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       color: "#10b981",
                       fontSize: "0.75rem",
-                      fontWeight: 900,
-                      boxShadow: "0 0 10px rgba(16, 185, 129, 0.3)"
+                      fontWeight: 800,
                     }}>
                       ✓
                     </Box>
@@ -1633,19 +1575,18 @@ function SajuLoaderOverlay({ step }: { step: number }) {
                       width: 22,
                       height: 22,
                       borderRadius: "50%",
-                      bgcolor: "rgba(251, 191, 36, 0.12)",
-                      border: "1.8px solid #fbbf24",
+                      bgcolor: "rgba(255, 142, 158, 0.15)",
+                      border: "2px solid #2D2520",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      boxShadow: "0 0 12px rgba(251, 191, 36, 0.5)",
                       animation: "pulse 1.4s infinite"
                     }}>
                       <Box sx={{
                         width: 7,
                         height: 7,
                         borderRadius: "50%",
-                        bgcolor: "#fbbf24",
+                        bgcolor: "#FF8E9E",
                       }} />
                     </Box>
                   ) : (
@@ -1654,12 +1595,12 @@ function SajuLoaderOverlay({ step }: { step: number }) {
                       height: 22,
                       borderRadius: "50%",
                       bgcolor: "transparent",
-                      border: "1px solid rgba(255,255,255,0.2)",
+                      border: "2px solid #cbd5e1",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                     }}>
-                      <Box sx={{ width: 5, height: 5, borderRadius: "50%", bgcolor: "rgba(255,255,255,0.2)" }} />
+                      <Box sx={{ width: 5, height: 5, borderRadius: "50%", bgcolor: "#cbd5e1" }} />
                     </Box>
                   )}
                 </Box>
@@ -1668,11 +1609,11 @@ function SajuLoaderOverlay({ step }: { step: number }) {
                 <Box>
                   <Typography
                     sx={{
-                      color: isActive ? "#fbbf24" : isCompleted ? "#fff" : "rgba(255,255,255,0.5)",
+                      color: isActive ? "#FF8E9E" : isCompleted ? "#2D2520" : "#94a3b8",
                       fontSize: "0.92rem",
                       fontWeight: 800,
                       lineHeight: 1.25,
-                      textShadow: isActive ? "0 0 8px rgba(251,191,36,0.3)" : "none",
+                      fontFamily: "var(--font-prompt), sans-serif",
                       transition: "color 0.3s ease",
                     }}
                   >
@@ -1680,11 +1621,12 @@ function SajuLoaderOverlay({ step }: { step: number }) {
                   </Typography>
                   <Typography
                     sx={{
-                      color: isActive ? "#e2e8f0" : isCompleted ? "#94a3b8" : "rgba(255,255,255,0.3)",
+                      color: isActive ? "#5A4D43" : isCompleted ? "#5A4D43" : "#94a3b8",
                       fontSize: "0.78rem",
                       lineHeight: 1.4,
                       fontWeight: 500,
                       mt: 0.4,
+                      fontFamily: "var(--font-prompt), sans-serif",
                     }}
                   >
                     {s.desc}
@@ -1698,22 +1640,21 @@ function SajuLoaderOverlay({ step }: { step: number }) {
         {/* Progress Bar */}
         <Box>
           <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-            <Typography sx={{ color: "#a78bfa", fontSize: "0.75rem", fontWeight: 800 }}>
+            <Typography sx={{ color: "#7296F8", fontSize: "0.75rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
               {step === 4 ? "วิเคราะห์ลุล่วง 98%" : "กำลังประมวลผล..."}
             </Typography>
-            <Typography sx={{ color: "#fbbf24", fontSize: "0.78rem", fontWeight: 900 }}>
+            <Typography sx={{ color: "#FF8E9E", fontSize: "0.78rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
               {percentComplete}%
             </Typography>
           </Stack>
-          <Box sx={{ height: 6, borderRadius: "999px", bgcolor: "rgba(255,255,255,0.06)", overflow: "hidden", border: "1px solid rgba(255,255,255,0.04)" }}>
+          <Box sx={{ height: 10, borderRadius: "999px", bgcolor: "#FAF8F2", border: "2px solid #2D2520", overflow: "hidden" }}>
             <Box
               sx={{
                 height: "100%",
                 width: `${percentComplete}%`,
-                background: "linear-gradient(90deg, #8b5cf6 0%, #fbbf24 100%)",
+                background: "linear-gradient(90deg, #7296F8 0%, #FF8E9E 100%)",
                 borderRadius: "999px",
                 transition: "width 0.9s cubic-bezier(0.4, 0, 0.2, 1)",
-                boxShadow: "0 0 10px rgba(251, 191, 36, 0.4)",
               }}
             />
           </Box>
@@ -1824,10 +1765,11 @@ return (
       sx={{ 
         pt: { xs: 11, md: 13 }, 
         pb: 8, 
-        bgcolor: "#f8fafc",
-        backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.05) 1.5px, transparent 1.5px), radial-gradient(rgba(244, 63, 94, 0.03) 1.5px, transparent 1.5px)',
+        bgcolor: "#FAF8F2",
+        backgroundImage: 'radial-gradient(rgba(45, 37, 32, 0.04) 1.5px, transparent 1.5px), radial-gradient(rgba(255, 142, 158, 0.05) 1.5px, transparent 1.5px)',
         backgroundSize: "48px 48px",
-        backgroundPosition: "0 0, 24px 24px"
+        backgroundPosition: "0 0, 24px 24px",
+        fontFamily: "var(--font-prompt), sans-serif"
       }}
     >
       {isCalculating && <SajuLoaderOverlay step={calculationStep} />}
@@ -1837,11 +1779,13 @@ return (
         <Box 
           sx={{ 
             mb: 4, 
-            p: { xs: 3.5, sm: 4, md: 5 }, 
-            borderRadius: "28px", 
-            border: "1px solid #edf2f7", 
-            bgcolor: "#fff", 
-            boxShadow: "0 12px 40px -12px rgba(0,0,0,0.06)",
+            p: { xs: 3, sm: 4, md: 4.5 }, 
+            borderRadius: "24px", 
+            border: "2.5px solid #2D2520", 
+            bgcolor: "#FFFDF9", 
+            boxShadow: "4px 4px 0px #2D2520",
+            position: "relative",
+            overflow: "hidden"
           }}
         >
           <Box
@@ -1849,31 +1793,32 @@ return (
               display: "inline-flex",
               alignItems: "center",
               gap: 0.75,
-              px: 1.5,
-              py: 0.65,
-              borderRadius: "99px",
-              bgcolor: "#f5f3ff",
-              color: "#4f46e5",
+              px: 1.8,
+              py: 0.75,
+              borderRadius: "12px",
+              bgcolor: "rgba(255, 142, 158, 0.15)",
+              color: "#FF8E9E",
+              border: "2px solid #2D2520",
               fontWeight: 800,
               mb: 2.5,
             }}
           >
-            <MagicStar size={16} color="#4f46e5" variant="Bulk" className="pulse-slow" />
-            <Typography component="span" sx={{ color: "inherit", fontSize: "0.82rem", fontWeight: 800, lineHeight: 1 }}>
+            <MagicStar size={16} color="#FF8E9E" variant="Bulk" className="pulse-slow" />
+            <Typography component="span" sx={{ color: "#2D2520", fontSize: "0.82rem", fontWeight: 800, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
               KOREAN DESTINY ANALYSIS
             </Typography>
           </Box>
           
-          <Typography sx={{ color: "#4f46e5", fontSize: "0.76rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", mb: 1 }}>
+          <Typography sx={{ color: "#FF8E9E", fontSize: "0.76rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", mb: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
             ซาจูเกาหลี
           </Typography>
           <Typography 
             component="h1" 
             sx={{ 
-              color: "#0f172a", 
+              color: "#2D2520", 
               fontSize: { xs: "2rem", sm: "2.35rem", md: "3rem" }, 
               lineHeight: 1.08, 
-              fontWeight: 900, 
+              fontWeight: 800, 
               mb: 2, 
               fontFamily: "var(--font-prompt), sans-serif", 
               letterSpacing: "-0.02em",
@@ -1881,33 +1826,30 @@ return (
           >
             วิเคราะห์พื้นดวงชะตา Saju
           </Typography>
-          <Typography sx={{ color: "#64748b", fontSize: { xs: "0.96rem", md: "1rem" }, maxWidth: 720, lineHeight: 1.7, fontWeight: 500 }}>
+          <Typography sx={{ color: "#5A4D43", fontSize: { xs: "0.96rem", md: "1rem" }, maxWidth: 720, lineHeight: 1.7, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
             ถอดรหัสความลับ 4 เสาหลักชีวิต (ปี เดือน วัน เวลาเกิด) ตามศาสตร์แห่งพลังงานเกาหลีโบราณ ค้นพบความสมดุลธาตุประจำกาย และแนวโน้มชีวิตรอบตัวคุณ
           </Typography>
         </Box>
 {/* Input Card */}
         <Box 
           sx={{ 
-            bgcolor: "rgba(255, 255, 255, 0.78)", 
-            backdropFilter: "blur(20px)",
-            borderRadius: "32px", 
-            p: { xs: 3.5, md: 5 }, 
-            boxShadow: "0 40px 100px -20px rgba(15,23,42,0.05), inset 0 1px 1px rgba(255,255,255,0.8)", 
-            border: "1.5px solid rgba(255,255,255,0.7)", 
+            bgcolor: "#FFFDF9", 
+            borderRadius: "24px", 
+            p: { xs: 3, sm: 4, md: 4.5 }, 
+            boxShadow: "6px 6px 0px #2D2520", 
+            border: "2.5px solid #2D2520", 
             mb: 5, 
             position: "relative", 
             overflow: "hidden" 
           }}
         >
-          {/* Ambient glowing background orbs inside the input card */}
-          <Box sx={{ position: "absolute", top: -80, right: -80, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, rgba(255,255,255,0) 70%)", filter: "blur(20px)", pointerEvents: "none" }} />
-          <Box sx={{ position: "absolute", bottom: -80, left: -80, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(219, 39, 119, 0.08) 0%, rgba(255,255,255,0) 70%)", filter: "blur(20px)", pointerEvents: "none" }} />
-
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" }, gap: { xs: 4, lg: 6 }, mb: 4, position: "relative", zIndex: 1 }}>
             <Box>
               <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
-                <Box sx={{ width: 36, height: 36, borderRadius: "10px", bgcolor: "#f5f3ff", display: "grid", placeItems: "center" }}><Calendar size={20} color="#4f46e5" variant="Bulk" /></Box>
-                <Typography sx={{ color: "#0f172a", fontSize: "1.2rem", fontWeight: 700 }}>วันและเวลาเกิด</Typography>
+                <Box sx={{ width: 36, height: 36, borderRadius: "10px", bgcolor: "rgba(114, 150, 248, 0.15)", border: "2.5px solid #2D2520", display: "grid", placeItems: "center" }}>
+                  <Calendar size={20} color="#7296F8" variant="Bulk" />
+                </Box>
+                <Typography sx={{ color: "#2D2520", fontSize: "1.2rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>วันและเวลาเกิด</Typography>
               </Stack>
               <Stack spacing={3}>
                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
@@ -1920,15 +1862,15 @@ return (
                       textField: { 
                         fullWidth: true, 
                         sx: { 
-                          "& .MuiOutlinedInput-root": { borderRadius: "16px", bgcolor: "#f8fafc", border: "none" }, 
-                          "& .MuiOutlinedInput-notchedOutline": { border: "1px solid #e2e8f0" } 
+                          "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#FFFDF9", border: "2.5px solid #2D2520", fontFamily: "var(--font-prompt), sans-serif", fontWeight: 600, "&.Mui-focused": { borderColor: "#7296F8" } }, 
+                          "& .MuiOutlinedInput-notchedOutline": { border: "none" } 
                         } 
                       } 
                     }} 
                   />
                 </LocalizationProvider>
                 <Box>
-                  <Typography sx={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 600, mb: 1.5, ml: 0.5 }}>ระบุเวลาเกิด (Yam)</Typography>
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 800, mb: 1.5, ml: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>ระบุเวลาเกิด (Yam)</Typography>
                   <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)" }, gap: 1 }}>
                     {timeOptions.map((opt) => (
                       <Button 
@@ -1936,190 +1878,205 @@ return (
                         onClick={() => { setUsesCustomTime(false); setBirthTime(opt.value); }} 
                         sx={{ 
                           borderRadius: "12px", 
-                          border: (!usesCustomTime && birthTime === opt.value) ? "1.5px solid #4f46e5" : "1.5px solid #f1f5f9", 
-                          bgcolor: (!usesCustomTime && birthTime === opt.value) ? "#f5f3ff" : "transparent", 
-                          color: (!usesCustomTime && birthTime === opt.value) ? "#4f46e5" : "#64748b", 
+                          border: "2.5px solid #2D2520", 
+                          bgcolor: (!usesCustomTime && birthTime === opt.value) ? "#FF8E9E" : "#FFFDF9", 
+                          color: (!usesCustomTime && birthTime === opt.value) ? "#FFFDF9" : "#2D2520", 
                           p: 1.2, 
                           minHeight: 56, 
                           flexDirection: "column", 
                           textTransform: "none", 
                           fontSize: "0.8rem", 
-                          fontWeight: 700, 
+                          fontWeight: 800, 
                           lineHeight: 1.2, 
+                          fontFamily: "var(--font-prompt), sans-serif",
+                          boxShadow: (!usesCustomTime && birthTime === opt.value) ? "2px 2px 0px #2D2520" : "none",
                           transition: "all 0.2s", 
-                          "&:hover": { bgcolor: "#f8fafc", borderColor: "#cbd5e1" } 
+                          "&:hover": { 
+                            bgcolor: (!usesCustomTime && birthTime === opt.value) ? "#FF8E9E" : "#FAF8F2", 
+                            borderColor: "#2D2520",
+                            transform: "translateY(-1px)"
+                          } 
                         }}
                       >
                         <Box>{opt.label.split(" (")[0]}</Box>
-                        <Box sx={{ fontSize: "0.6rem", opacity: 0.7, fontWeight: 600 }}>{opt.helper}</Box>
+                        <Box sx={{ fontSize: "0.6rem", opacity: 0.8, fontWeight: 700 }}>{opt.helper}</Box>
                       </Button>
                     ))}
                   </Box>
                 </Box>
                 <Box>
-                                  <Typography sx={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 600, mb: 1.5, ml: 0.5 }}>เพศสำหรับการคำนวณซาจู</Typography>
-                                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1.5 }}>
-                                    {genderOptions.map((opt) => {
-                                      const isActive = birthGender === opt.value;
-                                      const activeColor = opt.value === "male" ? "#3b82f6" : "#f43f5e";
-                                      return (
-                                        <Button
-                                          key={opt.value}
-                                          onClick={() => setBirthGender(opt.value)}
-                                          sx={{
-                                            borderRadius: "16px",
-                                            border: isActive ? '2px solid ' + activeColor : "1.5px solid #e2e8f0",
-                                            bgcolor: isActive ? activeColor + '0c' : "#fff",
-                                            color: isActive ? activeColor : "#475569",
-                                            boxShadow: isActive ? '0 12px 25px -10px ' + activeColor + '50' : "0 4px 10px -8px rgba(15,23,42,0.05)",
-                                            p: 1.6,
-                                            minHeight: 68,
-                                            flexDirection: "column",
-                                            textTransform: "none",
-                                            fontSize: "0.92rem",
-                                            fontWeight: 800,
-                                            lineHeight: 1.25,
-                                            transform: isActive ? "scale(1.02)" : "scale(1)",
-                                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                            "&:hover": { 
-                                              bgcolor: isActive ? activeColor + '08' : "#f8fafc", 
-                                              borderColor: activeColor,
-                                              transform: "translateY(-2px) scale(1.02)",
-                                              boxShadow: '0 12px 30px -10px ' + activeColor + '30'
-                                            },
-                                          }}
-                                        >
-                                          <Stack direction="row" spacing={0.8} sx={{ alignItems: "center" }}>
-                                            <Box sx={{ fontSize: "1.25rem", lineHeight: 1, color: isActive ? activeColor : "#94a3b8" }}>{opt.symbol}</Box>
-                                            <Box>{opt.label}</Box>
-                                          </Stack>
-                                          <Box sx={{ fontSize: "0.66rem", opacity: 0.72, fontWeight: 600 }}>{opt.helper}</Box>
-                                        </Button>
-                                      );
-                                    })}
-                                  </Box>
-                                </Box>
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 800, mb: 1.5, ml: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>เพศสำหรับการคำนวณซาจู</Typography>
+                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1.5 }}>
+                    {genderOptions.map((opt) => {
+                      const isActive = birthGender === opt.value;
+                      const activeBg = opt.value === "male" ? "#7296F8" : "#FF8E9E";
+                      return (
+                        <Button
+                          key={opt.value}
+                          onClick={() => setBirthGender(opt.value)}
+                          sx={{
+                            borderRadius: "12px",
+                            border: "2.5px solid #2D2520",
+                            bgcolor: isActive ? activeBg : "#FFFDF9",
+                            color: isActive ? "#FFFDF9" : "#2D2520",
+                            boxShadow: isActive ? "3px 3px 0px #2D2520" : "none",
+                            p: 1.6,
+                            minHeight: 68,
+                            flexDirection: "column",
+                            textTransform: "none",
+                            fontSize: "0.92rem",
+                            fontWeight: 800,
+                            lineHeight: 1.25,
+                            fontFamily: "var(--font-prompt), sans-serif",
+                            transition: "all 0.2s ease-in-out",
+                            "&:hover": { 
+                              bgcolor: isActive ? activeBg : "#FAF8F2", 
+                              borderColor: "#2D2520",
+                              transform: "translateY(-2px)"
+                            },
+                          }}
+                        >
+                          <Stack direction="row" spacing={0.8} sx={{ alignItems: "center" }}>
+                            <Box sx={{ fontSize: "1.25rem", lineHeight: 1, color: isActive ? "#FFFDF9" : "#5A4D43" }}>{opt.symbol}</Box>
+                            <Box>{opt.label}</Box>
+                          </Stack>
+                          <Box sx={{ fontSize: "0.66rem", opacity: 0.8, fontWeight: 700 }}>{opt.helper}</Box>
+                        </Button>
+                      );
+                    })}
+                  </Box>
+                </Box>
               </Stack>
             </Box>
             <Box>
               <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
-                <Box sx={{ width: 36, height: 36, borderRadius: "10px", bgcolor: "#fff7ed", display: "grid", placeItems: "center" }}><Flash size={20} color="#f59e0b" variant="Bulk" /></Box>
-                <Typography sx={{ color: "#0f172a", fontSize: "1.2rem", fontWeight: 700 }}>วิเคราะห์เรื่องที่ต้องการเน้น</Typography>
+                <Box sx={{ width: 36, height: 36, borderRadius: "10px", bgcolor: "rgba(245, 158, 11, 0.15)", border: "2.5px solid #2D2520", display: "grid", placeItems: "center" }}>
+                  <Flash size={20} color="#f59e0b" variant="Bulk" />
+                </Box>
+                <Typography sx={{ color: "#2D2520", fontSize: "1.2rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>วิเคราะห์เรื่องที่ต้องการเน้น</Typography>
               </Stack>
               <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1.5 }}>
-                              {focusOptions.map((opt) => (
-                                <Button 
-                                  key={opt.label} 
-                                  onClick={() => setFocus(opt.label)} 
-                                  sx={{ 
-                                    display: "flex", 
-                                    flexDirection: "row", 
-                                    justifyContent: "flex-start", 
-                                    alignItems: "center", 
-                                    gap: 2, 
-                                    p: 2.2, 
-                                    borderRadius: "16px", 
-                                    border: focus === opt.label ? '2px solid ' + opt.color : "1.5px solid #e2e8f0", 
-                                    bgcolor: focus === opt.label ? opt.color + '0b' : "#fff", 
-                                    color: focus === opt.label ? opt.color : "#475569", 
-                                    boxShadow: focus === opt.label ? '0 10px 25px -12px ' + opt.color + '50' : "0 4px 10px -8px rgba(15,23,42,0.05)",
-                                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)", 
-                                    textAlign: "left", 
-                                    transform: focus === opt.label ? "scale(1.02)" : "scale(1)",
-                                    "&:hover": { 
-                                      borderColor: opt.color, 
-                                      bgcolor: opt.color + '05',
-                                      transform: "translateY(-2px) scale(1.02)",
-                                      boxShadow: '0 12px 30px -10px ' + opt.color + '35'
-                                    } 
-                                  }}
-                                >
-                                  <opt.icon 
-                                    size={24} 
-                                    variant="Bulk" 
-                                    color={focus === opt.label ? opt.color : `${opt.color}88`} 
-                                    style={{ transition: "all 0.3s" }} 
-                                  />
-                                  <Box>
-                                    <Typography sx={{ fontSize: "0.94rem", fontWeight: 700, lineHeight: 1.2 }}>{opt.label}</Typography>
-                                    <Typography sx={{ fontSize: "0.68rem", opacity: 0.8, fontWeight: 600 }}>{opt.helper}</Typography>
-                                  </Box>
-                                </Button>
-                              ))}
-                            </Box>
-              <Box sx={{ mt: 3, p: 2.5, borderRadius: "16px", bgcolor: "#f0fdf4", border: "1px solid #bae6fd" }}>
+                {focusOptions.map((opt) => (
+                  <Button 
+                    key={opt.label} 
+                    onClick={() => setFocus(opt.label)} 
+                    sx={{ 
+                      display: "flex", 
+                      flexDirection: "row", 
+                      justifyContent: "flex-start", 
+                      alignItems: "center", 
+                      gap: 2, 
+                      p: 2.2, 
+                      borderRadius: "12px", 
+                      border: "2.5px solid #2D2520", 
+                      bgcolor: focus === opt.label ? "rgba(255, 142, 158, 0.15)" : "#FFFDF9", 
+                      color: "#2D2520", 
+                      boxShadow: focus === opt.label ? "3px 3px 0px #2D2520" : "none",
+                      transition: "all 0.2s ease-in-out", 
+                      textAlign: "left", 
+                      fontFamily: "var(--font-prompt), sans-serif",
+                      "&:hover": { 
+                        borderColor: "#2D2520", 
+                        bgcolor: "rgba(255, 142, 158, 0.08)",
+                        transform: "translateY(-2px)"
+                      } 
+                    }}
+                  >
+                    <opt.icon 
+                      size={24} 
+                      variant="Bulk" 
+                      color={focus === opt.label ? "#FF8E9E" : "#5A4D43"} 
+                      style={{ transition: "all 0.3s" }} 
+                    />
+                    <Box>
+                      <Typography sx={{ fontSize: "0.94rem", fontWeight: 800, lineHeight: 1.2 }}>{opt.label}</Typography>
+                      <Typography sx={{ fontSize: "0.68rem", opacity: 0.8, fontWeight: 700 }}>{opt.helper}</Typography>
+                    </Box>
+                  </Button>
+                ))}
+              </Box>
+              <Box sx={{ mt: 3, p: 2.5, borderRadius: "12px", bgcolor: "rgba(114, 150, 248, 0.1)", border: "2px solid #2D2520" }}>
                 <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-                  <InfoCircle size={20} color="#0284c7" />
-                  <Typography sx={{ color: "#0284c7", fontSize: "0.85rem", fontWeight: 700 }}>ระบบ Saju (Four Pillars of Destiny)</Typography>
+                  <InfoCircle size={20} color="#7296F8" />
+                  <Typography sx={{ color: "#2D2520", fontSize: "0.85rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>ระบบ Saju (Four Pillars of Destiny)</Typography>
                 </Stack>
-                <Typography sx={{ color: "#0369a1", fontSize: "0.8rem", mt: 1, lineHeight: 1.5 }}>เป็นการทำนาย &quot;พื้นดวงชะตาชีวิต&quot; ที่ติดตัวมาแต่เกิด เพื่อใช้วางแผนชีวิตในระยะยาวครับ</Typography>
+                <Typography sx={{ color: "#5A4D43", fontSize: "0.8rem", mt: 1, lineHeight: 1.5, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>เป็นการทำนาย &quot;พื้นดวงชะตาชีวิต&quot; ที่ติดตัวมาแต่เกิด เพื่อใช้วางแผนชีวิตในระยะยาวครับ</Typography>
               </Box>
             </Box>
           </Box>
           <Button
-                      fullWidth 
-                      onClick={handlePredict} 
-                      disabled={isCalculating || !birthDate} 
-                      sx={{ 
-                        height: 72, 
-                        borderRadius: "20px", 
-                        background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%)", 
-                        color: "#fff", 
-                        fontSize: "1.2rem", 
-                        fontWeight: 900, 
-                        textTransform: "none", 
-                        boxShadow: "0 20px 40px -10px rgba(124,58,237,0.3)", 
-                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s ease-out, box-shadow 0.15s ease-out", 
-                        "&:hover": { 
-                          background: "linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #be185d 100%)", 
-                          transform: "translateY(-3px)", 
-                          boxShadow: "0 25px 45px -8px rgba(124,58,237,0.45)" 
-                        }, 
-                        "&.Mui-disabled": { 
-                          background: "linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%)", 
-                          color: "rgba(255,255,255,0.7)", 
-                          opacity: 0.8 
-                        }, 
-                        "&:active": { 
-                          transform: "translateY(-1px)" 
-                        } 
-                      }}
-                    >
-                      {isCalculating ? (
-                        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", justifyContent: "center", width: "100%" }}>
-                          <Box sx={{ width: 22, height: 22, border: "3px solid rgba(255,255,255,0.2)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                          <Typography sx={{ fontWeight: 800, fontSize: "inherit", letterSpacing: "0.02em" }}>กำลังวิเคราะห์พื้นดวงชะตา...</Typography>
-                        </Stack>
-                      ) : (
-                        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", justifyContent: "center", width: "100%" }}>
-                          <Gemini size={24} variant="Bulk" color="#fbbf24" />
-                          <Typography sx={{ fontWeight: 800, fontSize: "inherit", letterSpacing: "0.02em" }}>ทำนายดวงชะตาชีวิต (Read My Destiny)</Typography>
-                        </Stack>
-                      )}
-                    </Button>
+            fullWidth 
+            onClick={handlePredict} 
+            disabled={isCalculating || !birthDate} 
+            sx={{ 
+              height: 72, 
+              borderRadius: "16px", 
+              background: "linear-gradient(135deg, #2D2520 0%, #FF8E9E 50%, #7296F8 100%)", 
+              color: "#FFFDF9", 
+              fontSize: "1.2rem", 
+              fontWeight: 800, 
+              textTransform: "none", 
+              boxShadow: "4px 4px 0px #2D2520", 
+              border: "2.5px solid #2D2520",
+              fontFamily: "var(--font-prompt), sans-serif",
+              transition: "all 0.2s ease-in-out", 
+              "&:hover": { 
+                background: "linear-gradient(135deg, #1A1513 0%, #E07D8B 50%, #5E7ECC 100%)", 
+                transform: "translateY(-3px)", 
+                boxShadow: "6px 6px 0px #2D2520" 
+              }, 
+              "&.Mui-disabled": { 
+                background: "#cbd5e1", 
+                color: "#94a3b8", 
+                boxShadow: "none",
+                borderColor: "#94a3b8",
+                opacity: 0.8 
+              }, 
+              "&:active": { 
+                transform: "translateY(-1px)" 
+              } 
+            }}
+          >
+            {isCalculating ? (
+              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", justifyContent: "center", width: "100%" }}>
+                <Box sx={{ width: 22, height: 22, border: "3px solid rgba(255,255,255,0.2)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                <Typography sx={{ fontWeight: 800, fontSize: "inherit", letterSpacing: "0.02em", fontFamily: "var(--font-prompt), sans-serif" }}>กำลังวิเคราะห์พื้นดวงชะตา...</Typography>
+              </Stack>
+            ) : (
+              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", justifyContent: "center", width: "100%" }}>
+                <Gemini size={24} variant="Bulk" color="#FFFDF9" />
+                <Typography sx={{ fontWeight: 800, fontSize: "inherit", letterSpacing: "0.02em", fontFamily: "var(--font-prompt), sans-serif" }}>ทำนายดวงชะตาชีวิต (Read My Destiny)</Typography>
+              </Stack>
+            )}
+          </Button>
         </Box>
         {/* Results */}
         {showResults && reading ? (
-          <Box id="saju-reveal" sx={{ animation: "resultFadeIn 1s cubic-bezier(0.2, 0, 0.2, 1)" }}>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ alignItems: { xs: "stretch", sm: "center" }, justifyContent: "space-between", mb: 2 }}>
+          <Box id="saju-reveal" sx={{ animation: "resultFadeIn 1s cubic-bezier(0.2, 0, 0.2, 1)", fontFamily: "var(--font-prompt), sans-serif" }}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ alignItems: { xs: "stretch", sm: "center" }, justifyContent: "space-between", mb: 3 }}>
               <Box>
-                <Typography sx={{ color: "#0f172a", fontSize: { xs: "1.2rem", md: "1.45rem" }, fontWeight: 900 }}>คำทำนายของคุณ</Typography>
-                <Typography sx={{ color: "#64748b", fontSize: "0.86rem", fontWeight: 600 }}>เริ่มจากสรุปสั้น ๆ หรือเลื่อนอ่านรายละเอียดเต็มได้เลย</Typography>
+                <Typography sx={{ color: "#2D2520", fontSize: { xs: "1.2rem", md: "1.45rem" }, fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>คำทำนายของคุณ</Typography>
+                <Typography sx={{ color: "#5A4D43", fontSize: "0.86rem", fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>เริ่มจากสรุปสั้น ๆ หรือเลื่อนอ่านรายละเอียดเต็มได้เลย</Typography>
               </Box>
               <Button
                 onClick={() => setShowQuickSummary((value) => !value)}
                 startIcon={<MagicStar size={18} variant="Bulk" color="currentColor" />}
                 sx={{
-                  borderRadius: "14px",
+                  borderRadius: "12px",
                   px: 2.2,
                   py: 1.2,
-                  bgcolor: showQuickSummary ? "#0f172a" : "#fff",
-                  color: showQuickSummary ? "#fff" : "#0f172a",
-                  border: "1px solid #cbd5e1",
-                  boxShadow: showQuickSummary ? "0 14px 30px -20px rgba(15,23,42,0.55)" : "0 10px 22px -18px rgba(15,23,42,0.3)",
-                  fontWeight: 900,
+                  bgcolor: showQuickSummary ? "#2D2520" : "#FFFDF9",
+                  color: showQuickSummary ? "#FFFDF9" : "#2D2520",
+                  border: "2.5px solid #2D2520",
+                  boxShadow: showQuickSummary ? "2px 2px 0px #2D2520" : "none",
+                  fontWeight: 800,
                   textTransform: "none",
-                  "&:hover": { bgcolor: showQuickSummary ? "#1e293b" : "#f8fafc" },
+                  fontFamily: "var(--font-prompt), sans-serif",
+                  transition: "all 0.2s ease-in-out",
+                  "&:hover": { 
+                    bgcolor: showQuickSummary ? "#1A1513" : "#FAF8F2",
+                    borderColor: "#2D2520"
+                  },
                 }}
               >
                 {showQuickSummary ? "ซ่อนสรุปดวง 30 วินาที" : "สรุปดวง 30 วินาที"}
@@ -2134,28 +2091,24 @@ return (
             <Box 
               sx={{ 
                 mb: 4, 
-                bgcolor: "#fff", 
-                borderRadius: "32px", 
-                border: "1.5px solid #edf2f7", 
-                boxShadow: "0 20px 50px -20px rgba(15,23,42,0.06)",
-                p: { xs: 3.5, md: 5 },
+                bgcolor: "#FFFDF9", 
+                borderRadius: "24px", 
+                border: "2.5px solid #2D2520", 
+                boxShadow: "5px 5px 0px #2D2520",
+                p: { xs: 3, sm: 4, md: 4.5 },
                 position: "relative",
                 overflow: "hidden"
               }}
             >
-              {/* Decorative backgrounds */}
-              <Box sx={{ position: "absolute", top: -80, right: -80, width: 250, height: 250, borderRadius: "50%", background: `radial-gradient(circle, ${elementMeta[reading.dayMaster.element].color}15 0%, rgba(255,255,255,0) 70%)`, filter: "blur(20px)", pointerEvents: "none" }} />
-              <Box sx={{ position: "absolute", bottom: -80, left: -80, width: 250, height: 250, borderRadius: "50%", background: "radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(255,255,255,0) 70%)", filter: "blur(20px)", pointerEvents: "none" }} />
-
               <Stack direction={{ xs: "column", lg: "row" }} spacing={5} sx={{ alignItems: "stretch" }}>
                 
                 {/* Day Master (Identity Panel) */}
                 <Box sx={{ flex: { xs: "1", lg: "0.9" }, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                   <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2 }}>
-                    <Box sx={{ width: 34, height: 34, borderRadius: "10px", bgcolor: elementMeta[reading.dayMaster.element].bg, display: "grid", placeItems: "center", color: elementMeta[reading.dayMaster.element].color }}>
+                    <Box sx={{ width: 34, height: 34, borderRadius: "10px", bgcolor: elementMeta[reading.dayMaster.element].bg, display: "grid", placeItems: "center", color: elementMeta[reading.dayMaster.element].color, border: "2px solid #2D2520" }}>
                       <Personalcard size={18} variant="Bulk" color="currentColor" />
                     </Box>
-                    <Typography sx={{ color: elementMeta[reading.dayMaster.element].color, fontSize: "0.8rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" }}>ธาตุเจ้าเรือนประจำตัว (DAY MASTER)</Typography>
+                    <Typography sx={{ color: elementMeta[reading.dayMaster.element].color, fontSize: "0.8rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>ธาตุเจ้าเรือนประจำตัว (DAY MASTER)</Typography>
                   </Stack>
 
                   <Stack direction="row" spacing={2.5} sx={{ alignItems: "center", mb: 3 }}>
@@ -2163,60 +2116,61 @@ return (
                       sx={{ 
                         width: 80, 
                         height: 80, 
-                        borderRadius: "20px", 
+                        borderRadius: "16px", 
                         bgcolor: elementMeta[reading.dayMaster.element].color, 
                         display: "grid", 
                         placeItems: "center", 
-                        color: "#fff",
-                        boxShadow: `0 12px 25px -10px ${elementMeta[reading.dayMaster.element].color}70`,
+                        color: "#FFFDF9",
+                        border: "2.5px solid #2D2520",
+                        boxShadow: "3px 3px 0px #2D2520",
                         flexShrink: 0
                       }}
                     >
-                      <Typography sx={{ fontSize: "2.2rem", fontWeight: 900, lineHeight: 1 }}>
+                      <Typography sx={{ fontSize: "2.2rem", fontWeight: 800, lineHeight: 1 }}>
                         {reading.dayMaster.korean}
                       </Typography>
                     </Box>
                     <Box>
                       <Typography 
                         sx={{ 
-                          color: "#0f172a", 
+                          color: "#2D2520", 
                           fontSize: { xs: "1.4rem", md: "1.6rem" }, 
-                          fontWeight: 900, 
+                          fontWeight: 800, 
                           fontFamily: "var(--font-prompt), sans-serif",
                           mb: 0.5
                         }}
                       >
                         คุณคือ &quot;{reading.dayMaster.name}&quot; ({elementMeta[reading.dayMaster.element].label}{reading.dayMaster.polarity === "+" ? "หยาง" : "หยิน"})
                       </Typography>
-                      <Typography sx={{ color: "#64748b", fontSize: "0.82rem", fontWeight: 700 }}>
+                      <Typography sx={{ color: "#5A4D43", fontSize: "0.82rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
                         ผู้อารักขาด้วยพลัง {elementMeta[reading.dayMaster.element].desc}
                       </Typography>
                     </Box>
                   </Stack>
 
-                  <Typography sx={{ color: "#334155", fontSize: "0.92rem", lineHeight: 1.65, fontWeight: 550, mb: 3 }}>
+                  <Typography sx={{ color: "#2D2520", fontSize: "0.92rem", lineHeight: 1.65, fontWeight: 500, mb: 3, fontFamily: "var(--font-prompt), sans-serif" }}>
                     {DM_DETAILS[reading.dayMaster.korean] ? DM_DETAILS[reading.dayMaster.korean]["ภาพรวม"] : "พลังแห่งธาตุนี้แสดงถึงลักษณะนิสัยและศักยภาพหลักที่คอยขับเคลื่อนการตัดสินใจและความสำเร็จของตัวตนที่แท้จริงของคุณ"}
                   </Typography>
 
                   <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", rowGap: 1 }}>
-                    <Chip label={reading.isStrong ? "💪 พลังดวงแข็งแรง (Strong)" : "🌱 พลังดวงอ่อนกำลัง (Weak)"} color={reading.isStrong ? "success" : "warning"} variant="outlined" sx={{ fontWeight: 800, borderRadius: "10px" }} />
-                    <Chip label={`🧭 ทิศมงคลหลัก: ${reading.majorLuckDirectionLabel}`} variant="outlined" sx={{ color: "#4f46e5", borderColor: "#c7d2fe", bgcolor: "#eef2ff", fontWeight: 800, borderRadius: "10px" }} />
+                    <Chip label={reading.isStrong ? "💪 พลังดวงแข็งแรง (Strong)" : "🌱 พลังดวงอ่อนกำลัง (Weak)"} color={reading.isStrong ? "success" : "warning"} variant="outlined" sx={{ fontWeight: 800, borderRadius: "10px", border: "2px solid #2D2520", color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }} />
+                    <Chip label={`🧭 ทิศมงคลหลัก: ${reading.majorLuckDirectionLabel}`} variant="outlined" sx={{ color: "#2D2520", borderColor: "#2D2520", bgcolor: "rgba(114, 150, 248, 0.15)", fontWeight: 800, borderRadius: "10px", border: "2px solid #2D2520", fontFamily: "var(--font-prompt), sans-serif" }} />
                   </Stack>
                 </Box>
 
                 {/* Vertical Divider for larger screens */}
-                <Box sx={{ display: { xs: "none", lg: "block" }, width: "1px", bgcolor: "#edf2f7" }} />
+                <Box sx={{ display: { xs: "none", lg: "block" }, width: "2px", bgcolor: "#2D2520" }} />
 
                 {/* The 4 Pillars (Four Pillars grid) */}
                 <Box sx={{ flex: { xs: "1", lg: "1.1" }, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                  <Typography sx={{ color: "#0f172a", fontSize: "1.05rem", fontWeight: 800, mb: 0.5 }}>แผนผังเสาหลักชะตาชีวิต (The 4 Pillars)</Typography>
-                  <Typography sx={{ color: "#64748b", fontSize: "0.82rem", fontWeight: 600, mb: 3.5 }}>ปูมหลังเสาหลักกาลเวลาลิขิตพลังงานกำเนิด</Typography>
+                  <Typography sx={{ color: "#2D2520", fontSize: "1.05rem", fontWeight: 800, mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>แผนผังเสาหลักชะตาชีวิต (The 4 Pillars)</Typography>
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.82rem", fontWeight: 500, mb: 3.5, fontFamily: "var(--font-prompt), sans-serif" }}>ปูมหลังเสาหลักกาลเวลาลิขิตพลังงานกำเนิด</Typography>
                   
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.8 }}>
                     {reading.pillars.map((p, i) => (<PillarItem key={p.label} pillar={p} isDayMaster={i === 2} />))}
                     {!reading.hasBirthTime && (
-                      <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "calc(50% - 16px)", md: "0" }, bgcolor: "#f8fafc", borderRadius: "16px", border: "1px dashed #cbd5e1", display: "grid", placeItems: "center", p: 2 }}>
-                        <Typography sx={{ color: "#94a3b8", fontSize: "0.75rem", fontWeight: 700 }}>ยามว่างเปล่า (Hour Pillar Empty)</Typography>
+                      <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "calc(50% - 16px)", md: "0" }, bgcolor: "#FAF8F2", borderRadius: "16px", border: "2.5px dashed #2D2520", display: "grid", placeItems: "center", p: 2 }}>
+                        <Typography sx={{ color: "#5A4D43", fontSize: "0.75rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>ยามว่างเปล่า (Hour Pillar Empty)</Typography>
                       </Box>
                     )}
                   </Box>
@@ -2233,11 +2187,11 @@ return (
               {/* Element Balance Panel */}
               <Box 
                 sx={{ 
-                  bgcolor: "#fff", 
-                  p: { xs: 3.5, md: 4 }, 
-                  borderRadius: "28px", 
-                  border: "1.5px solid #edf2f7", 
-                  boxShadow: "0 20px 45px -20px rgba(15,23,42,0.06)",
+                  bgcolor: "#FFFDF9", 
+                  p: { xs: 3, sm: 4 }, 
+                  borderRadius: "24px", 
+                  border: "2.5px solid #2D2520", 
+                  boxShadow: "4px 4px 0px #2D2520",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between"
@@ -2245,12 +2199,12 @@ return (
               >
                 <Box>
                   <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3.2 }}>
-                    <Box sx={{ width: 34, height: 34, borderRadius: "10px", bgcolor: "#ecfdf5", display: "grid", placeItems: "center", color: "#10b981" }}>
+                    <Box sx={{ width: 34, height: 34, borderRadius: "10px", bgcolor: "rgba(16, 185, 129, 0.15)", border: "2px solid #2D2520", display: "grid", placeItems: "center", color: "#10b981" }}>
                       <Element4 size={18} variant="Bulk" color="currentColor" />
                     </Box>
                     <Box>
-                      <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a" }}>สมดุลพลังงานเบญจธาตุ</Typography>
-                      <Typography sx={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 600 }}>อัตราส่วนกำลังของธาตุสะสมในเรือนชะตา</Typography>
+                      <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>สมดุลพลังงานเบญจธาตุ</Typography>
+                      <Typography sx={{ fontSize: "0.8rem", color: "#5A4D43", fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>อัตราส่วนกำลังของธาตุสะสมในเรือนชะตา</Typography>
                     </Box>
                   </Stack>
 
@@ -2271,11 +2225,11 @@ return (
                           <Stack direction="row" sx={{ justifyContent: "space-between", mb: 0.8 }}>
                             <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                               <ElementIcon element={el} size={13} />
-                              <Typography sx={{ fontSize: "0.84rem", fontWeight: 800, color: "#334155" }}>ธาตุ{meta.label} ({elementKorean[el]})</Typography>
+                              <Typography sx={{ fontSize: "0.84rem", fontWeight: 800, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>ธาตุ{meta.label} ({elementKorean[el]})</Typography>
                             </Stack>
-                            <Typography sx={{ fontSize: "0.82rem", fontWeight: 900, color: meta.color }}>{score}%</Typography>
+                            <Typography sx={{ fontSize: "0.82rem", fontWeight: 800, color: meta.color, fontFamily: "var(--font-prompt), sans-serif" }}>{score}%</Typography>
                           </Stack>
-                          <Box sx={{ height: 8, borderRadius: "999px", bgcolor: "#f1f5f9", overflow: "hidden", boxShadow: "inset 0 1px 2px rgba(15,23,42,0.05)" }}>
+                          <Box sx={{ height: 10, borderRadius: "999px", bgcolor: "#FAF8F2", border: "2px solid #2D2520", overflow: "hidden" }}>
                             <Box sx={{ height: "100%", width: `${(score / elementMaxScore) * 100}%`, bgcolor: meta.color, borderRadius: "999px", transition: "width 1s ease-out" }} />
                           </Box>
                         </Box>
@@ -2284,16 +2238,16 @@ return (
                   </Stack>
                 </Box>
 
-                <Box sx={{ mt: 3, pt: 2.2, borderTop: "1px solid #f1f5f9" }}>
+                <Box sx={{ mt: 3, pt: 2.2, borderTop: "2px solid #2D2520" }}>
                   <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", justifyContent: "space-between" }}>
                     <Box>
-                      <Typography sx={{ color: "#64748b", fontSize: "0.78rem", fontWeight: 700 }}>ธาตุปรับสมดุลพึ่งพิงตลอดชีพ</Typography>
-                      <Typography sx={{ color: elementMeta[reading.luckyElement].color, fontSize: "0.95rem", fontWeight: 900 }}>
+                      <Typography sx={{ color: "#5A4D43", fontSize: "0.78rem", fontWeight: 700, fontFamily: "var(--font-prompt), sans-serif" }}>ธาตุปรับสมดุลพึ่งพิงตลอดชีพ</Typography>
+                      <Typography sx={{ color: elementMeta[reading.luckyElement].color, fontSize: "0.95rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
                         ธาตุส่งเสริมหลัก: ธาตุ{elementMeta[reading.luckyElement].label}
                       </Typography>
                     </Box>
-                    <Box sx={{ display: "inline-flex", px: 1.5, py: 0.65, borderRadius: "10px", bgcolor: elementMeta[reading.luckyElement].bg, border: `1px solid ${elementMeta[reading.luckyElement].color}26` }}>
-                      <Typography sx={{ color: elementMeta[reading.luckyElement].color, fontSize: "0.82rem", fontWeight: 800 }}>ธาตุคู่บุญ</Typography>
+                    <Box sx={{ display: "inline-flex", px: 1.5, py: 0.65, borderRadius: "10px", bgcolor: elementMeta[reading.luckyElement].bg, border: `2px solid #2D2520` }}>
+                      <Typography sx={{ color: elementMeta[reading.luckyElement].color, fontSize: "0.82rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>ธาตุคู่บุญ</Typography>
                     </Box>
                   </Stack>
                 </Box>
@@ -2302,13 +2256,12 @@ return (
               {/* Daily Horoscope Panel */}
               <Box 
                 sx={{ 
-                  bgcolor: "#fff", 
-                  p: { xs: 3.5, md: 4 }, 
-                  borderRadius: "28px", 
-                  border: "1.5px solid #fed7aa", 
-                  borderTop: "6px solid #f59e0b",
-                  background: "linear-gradient(180deg, #fff 0%, #fffbf5 100%)", 
-                  boxShadow: "0 20px 40px -20px rgba(245,158,11,0.18)",
+                  bgcolor: "#FFFDF9", 
+                  p: { xs: 3, sm: 4 }, 
+                  borderRadius: "24px", 
+                  border: "2.5px solid #2D2520", 
+                  borderTop: "8px solid #f59e0b",
+                  boxShadow: "4px 4px 0px #2D2520",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between"
@@ -2316,26 +2269,26 @@ return (
               >
                 <Box>
                   <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
-                    <Box sx={{ width: 34, height: 34, borderRadius: "10px", bgcolor: "#fff7ed", display: "grid", placeItems: "center", color: "#f59e0b" }}><Sun1 size={20} color="#f59e0b" variant="Bulk" /></Box>
+                    <Box sx={{ width: 34, height: 34, borderRadius: "10px", bgcolor: "rgba(245, 158, 11, 0.15)", border: "2px solid #2D2520", display: "grid", placeItems: "center", color: "#f59e0b" }}><Sun1 size={20} color="#f59e0b" variant="Bulk" /></Box>
                     <Box>
-                      <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#431407" }}>ดวงรายวันเฉพาะตัวคุณ</Typography>
-                      <Typography sx={{ fontSize: "0.78rem", color: "#9a3412", fontWeight: 700 }}>อัปเดตคำนวณอิงดาวจร ณ วันที่ {dayjs().format("D MMMM YYYY")}</Typography>
+                      <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>ดวงรายวันเฉพาะตัวคุณ</Typography>
+                      <Typography sx={{ fontSize: "0.78rem", color: "#5A4D43", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>อัปเดตคำนวณอิงดาวจร ณ วันที่ {dayjs().format("D MMMM YYYY")}</Typography>
                     </Box>
                   </Stack>
 
-                  <Box sx={{ display: "inline-flex", px: 2, py: 0.8, borderRadius: "12px", mb: 2.2, bgcolor: reading.dailyLuckStatus === "ดีมาก" ? "#dcfce7" : reading.dailyLuckStatus === "ควรระวัง" ? "#fee2e2" : "#fef3c7", border: `1px solid ${reading.dailyLuckStatus === "ดีมาก" ? "#86efac" : reading.dailyLuckStatus === "ควรระวัง" ? "#fca5a5" : "#fde047"}` }}>
-                    <Typography sx={{ fontSize: "0.98rem", fontWeight: 900, color: reading.dailyLuckStatus === "ดีมาก" ? "#166534" : reading.dailyLuckStatus === "ควรระวัง" ? "#991b1b" : "#92400e" }}>
+                  <Box sx={{ display: "inline-flex", px: 2, py: 0.8, borderRadius: "12px", mb: 2.2, bgcolor: reading.dailyLuckStatus === "ดีมาก" ? "#dcfce7" : reading.dailyLuckStatus === "ควรระวัง" ? "#fee2e2" : "#fef3c7", border: `2px solid #2D2520` }}>
+                    <Typography sx={{ fontSize: "0.98rem", fontWeight: 800, color: reading.dailyLuckStatus === "ดีมาก" ? "#166534" : reading.dailyLuckStatus === "ควรระวัง" ? "#991b1b" : "#92400e", fontFamily: "var(--font-prompt), sans-serif" }}>
                       พลังงานดวงวันนี้: {reading.dailyLuckStatus}
                     </Typography>
                   </Box>
 
-                  <Typography sx={{ fontSize: "0.96rem", color: "#431407", lineHeight: 1.8, fontWeight: 550, mb: 3 }}>
+                  <Typography sx={{ fontSize: "0.96rem", color: "#2D2520", lineHeight: 1.8, fontWeight: 500, mb: 3, fontFamily: "var(--font-prompt), sans-serif" }}>
                     {reading.dailyAdvice}
                   </Typography>
                 </Box>
 
-                <Box sx={{ p: 2, borderRadius: "14px", bgcolor: "rgba(245,158,11,0.06)", border: "1px dashed rgba(245,158,11,0.2)" }}>
-                  <Typography sx={{ color: "#9a3412", fontSize: "0.75rem", fontWeight: 800, lineHeight: 1.5 }}>
+                <Box sx={{ p: 2, borderRadius: "12px", bgcolor: "rgba(245,158,11,0.06)", border: "2px dashed #2D2520" }}>
+                  <Typography sx={{ color: "#2D2520", fontSize: "0.75rem", fontWeight: 800, lineHeight: 1.5, fontFamily: "var(--font-prompt), sans-serif" }}>
                     💡 คำชี้แนะประจำวัน: คลื่นพลังงานชีวิตเกื้อหนุนตามจังหวะซาจูรายวัน ให้คุณใช้วางแผนการตัดสินใจสำคัญในชีวิตประจำวันเพื่อความราบรื่นสูงสุด
                   </Typography>
                 </Box>
@@ -2352,10 +2305,10 @@ return (
               sx={{ 
                 mb: 4, 
                 p: { xs: 3, md: 3.5 }, 
-                borderRadius: "24px", 
-                bgcolor: "#09090b", 
-                border: "1px solid #1e293b", 
-                boxShadow: "0 30px 60px -25px rgba(0,0,0,0.5)", 
+                borderRadius: "20px", 
+                bgcolor: "#2D2520", 
+                border: "2.5px solid #2D2520", 
+                boxShadow: "4px 4px 0px #2D2520", 
                 display: "flex", 
                 alignItems: "center", 
                 justifyContent: "space-between", 
@@ -2365,19 +2318,18 @@ return (
                 position: "relative" 
               }}
             >
-              <Box sx={{ position: "absolute", inset: 0, background: 'linear-gradient(135deg, ' + activeFocus.color + '20 0%, rgba(9,9,11,0) 50%, rgba(245,158,11,0.1) 100%)', pointerEvents: 'none' }} />
               <Stack direction="row" spacing={2} sx={{ alignItems: "center", position: "relative", zIndex: 1 }}>
-                <Box sx={{ width: 52, height: 52, borderRadius: "15px", bgcolor: activeFocus.color, display: "grid", placeItems: "center", boxShadow: '0 14px 28px -12px ' + activeFocus.color }}>
-                  <activeFocus.icon size={24} color="#fff" variant="Bulk" />
+                <Box sx={{ width: 52, height: 52, borderRadius: "15px", bgcolor: activeFocus.color, display: "grid", placeItems: "center", border: "2px solid #FFFDF9", boxShadow: '0 6px 12px rgba(0,0,0,0.2)' }}>
+                  <activeFocus.icon size={24} color="#FFFDF9" variant="Bulk" />
                 </Box>
                 <Box>
-                  <Typography sx={{ color: "#a1a1aa", fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.05em", textTransform: "uppercase" }}>หัวข้อหลักที่เจาะลึก</Typography>
-                  <Typography sx={{ color: "#fff", fontSize: { xs: "1.3rem", md: "1.52rem" }, fontWeight: 900, lineHeight: 1.25 }}>วิเคราะห์เรื่อง{focus}</Typography>
+                  <Typography sx={{ color: "#FAF8F2", opacity: 0.8, fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>หัวข้อหลักที่เจาะลึก</Typography>
+                  <Typography sx={{ color: "#FFFDF9", fontSize: { xs: "1.3rem", md: "1.52rem" }, fontWeight: 800, lineHeight: 1.25, fontFamily: "var(--font-prompt), sans-serif" }}>วิเคราะห์เรื่อง{focus}</Typography>
                 </Box>
               </Stack>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 2.2, py: 1, borderRadius: "12px", bgcolor: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)", position: "relative", zIndex: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 2.2, py: 1, borderRadius: "12px", bgcolor: "rgba(255,255,255,0.08)", border: "2px solid #FFFDF9", position: "relative", zIndex: 1 }}>
                 <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#10b981", animation: "pulse 2s infinite" }} />
-                <Typography sx={{ color: "#e2e8f0", fontSize: "0.85rem", fontWeight: 800 }}>สรุปผลแบบพร้อมใช้</Typography>
+                <Typography sx={{ color: "#FFFDF9", fontSize: "0.85rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>สรุปผลแบบพร้อมใช้</Typography>
               </Box>
             </Box>
 
@@ -2387,40 +2339,40 @@ return (
               <Box>
                 
                 {/* Main Tab Analysis */}
-                <Box sx={{ bgcolor: "#fff", borderRadius: "24px", border: "1px solid #edf2f7", mb: 4, overflow: "hidden", boxShadow: "0 30px 70px -30px rgba(15,23,42,0.08)" }}>
+                <Box sx={{ bgcolor: "#FFFDF9", borderRadius: "20px", border: "2.5px solid #2D2520", mb: 4, overflow: "hidden", boxShadow: "4px 4px 0px #2D2520" }}>
                   {focus !== "ภาพรวม" ? (
-                    <Box sx={{ borderBottom: "1px solid #e2e8f0", background: "linear-gradient(180deg, #f8fafc 0%, #fff 100%)" }}>
+                    <Box sx={{ borderBottom: "2.5px solid #2D2520", background: "#FAF8F2" }}>
                       <Tabs 
                         value={analysisTab} 
                         onChange={(_, v) => setAnalysisTab(v)} 
                         variant="fullWidth"
                         sx={{ 
-                          '& .MuiTab-root': { py: 2.5, fontWeight: 800, fontSize: '0.95rem' },
-                          '& .Mui-selected': { color: '#4f46e5 !important' },
-                          '& .MuiTabs-indicator': { height: 3, bgcolor: '#4f46e5', borderRadius: '3px 3px 0 0' }
+                          '& .MuiTab-root': { py: 2.5, fontWeight: 800, fontSize: '0.95rem', color: '#5A4D43', fontFamily: 'var(--font-prompt), sans-serif' },
+                          '& .Mui-selected': { color: '#FF8E9E !important' },
+                          '& .MuiTabs-indicator': { height: 4, bgcolor: '#FF8E9E', borderRadius: '4px 4px 0 0' }
                         }}
                       >
                         <Tab 
-                          icon={<activeFocus.icon size={20} color={analysisTab === 0 ? "#4f46e5" : "#64748b"} variant="Bulk" />} 
+                          icon={<activeFocus.icon size={20} color={analysisTab === 0 ? "#FF8E9E" : "#5A4D43"} variant="Bulk" />} 
                           iconPosition="start" 
                           label={`วิเคราะห์เรื่อง${focus}`} 
                         />
                         <Tab 
-                          icon={<Profile2User size={20} color={analysisTab === 1 ? "#4f46e5" : "#64748b"} variant="Bulk" />} 
+                          icon={<Profile2User size={20} color={analysisTab === 1 ? "#FF8E9E" : "#5A4D43"} variant="Bulk" />} 
                           iconPosition="start" 
                           label="ตัวตนพื้นฐาน (ถาวร)" 
                         />
                       </Tabs>
                     </Box>
                   ) : (
-                    <Box sx={{ p: 3, borderBottom: "1px solid #e2e8f0", background: "linear-gradient(180deg, #f8fafc 0%, #fff 100%)" }}>
+                    <Box sx={{ p: 3, borderBottom: "2.5px solid #2D2520", background: "#FAF8F2" }}>
                       <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-                        <Box sx={{ width: 44, height: 44, borderRadius: "12px", bgcolor: "#f5f3ff", display: "grid", placeItems: "center" }}>
-                          <MagicStar size={24} color="#4f46e5" variant="Bulk" />
+                        <Box sx={{ width: 44, height: 44, borderRadius: "12px", bgcolor: "rgba(255, 142, 158, 0.15)", border: "2px solid #2D2520", display: "grid", placeItems: "center" }}>
+                          <MagicStar size={24} color="#FF8E9E" variant="Bulk" />
                         </Box>
                         <Box>
-                          <Typography sx={{ fontSize: "1.3rem", fontWeight: 800, color: "#0f172a" }}>เจาะลึกคำทำนาย</Typography>
-                          <Typography sx={{ fontSize: "0.88rem", color: "#64748b", fontWeight: 600 }}>วิเคราะห์ภาพรวมพื้นดวงชะตาชีวิต</Typography>
+                          <Typography sx={{ fontSize: "1.3rem", fontWeight: 800, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>เจาะลึกคำทำนาย</Typography>
+                          <Typography sx={{ fontSize: "0.88rem", color: "#5A4D43", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>วิเคราะห์ภาพรวมพื้นดวงชะตาชีวิต</Typography>
                         </Box>
                       </Stack>
                     </Box>
@@ -2429,26 +2381,23 @@ return (
                   <Box sx={{ p: { xs: 3, md: 4 }, display: "flex", flexDirection: "column" }}>
                     {(analysisTab === 0 || focus === "ภาพรวม") ? (
                       <Box sx={{ animation: "resultFadeIn 0.5s ease" }}>
-                        <Box sx={{ p: { xs: 2.5, md: 3.2 }, borderRadius: "18px", bgcolor: "#fff", border: `1px solid ${activeFocus.color}30`, borderLeft: `6px solid ${activeFocus.color}`, position: "relative", overflow: "hidden", boxShadow: `0 18px 38px -30px ${activeFocus.color}` }}>
-                          <Box sx={{ position: "absolute", top: -10, right: -10, opacity: 0.04, transform: "rotate(-15deg)" }}>
-                            <activeFocus.icon size={120} color={activeFocus.color} variant="Bulk" />
-                          </Box>
+                        <Box sx={{ p: { xs: 2.5, md: 3.2 }, borderRadius: "16px", bgcolor: "#FFFDF9", border: "2px solid #2D2520", borderLeft: `8px solid ${activeFocus.color}`, position: "relative", overflow: "hidden", boxShadow: "2px 2px 0px rgba(0,0,0,0.05)" }}>
                           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2.5, position: "relative" }}>
-                            <Box sx={{ width: 42, height: 42, borderRadius: "12px", bgcolor: activeFocus.color, display: "grid", placeItems: "center", boxShadow: `0 10px 20px -12px ${activeFocus.color}` }}>
-                              <activeFocus.icon size={24} color="#fff" variant="Bulk" />
+                            <Box sx={{ width: 42, height: 42, borderRadius: "12px", bgcolor: activeFocus.color, display: "grid", placeItems: "center", border: "2px solid #2D2520", boxShadow: "2px 2px 0px #2D2520" }}>
+                              <activeFocus.icon size={24} color="#FFFDF9" variant="Bulk" />
                             </Box>
                             <Box>
-                              <Typography sx={{ fontSize: "1.25rem", fontWeight: 900, color: activeFocus.color }}>บทวิเคราะห์เรื่อง{focus}</Typography>
-                              <Typography sx={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 700 }}>{focus === "ภาพรวม" ? "ศักยภาพและพื้นฐานชีวิตในทุกด้าน" : "เจาะลึกตามหัวข้อที่คุณเลือกเน้นเป็นพิเศษ"}</Typography>
+                              <Typography sx={{ fontSize: "1.25rem", fontWeight: 800, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>บทวิเคราะห์เรื่อง{focus}</Typography>
+                              <Typography sx={{ fontSize: "0.8rem", color: "#5A4D43", fontWeight: 600, fontFamily: "var(--font-prompt), sans-serif" }}>{focus === "ภาพรวม" ? "ศักยภาพและพื้นฐานชีวิตในทุกด้าน" : "เจาะลึกตามหัวข้อที่คุณเลือกเน้นเป็นพิเศษ"}</Typography>
                             </Box>
                           </Stack>
                           {activeSajuAnalysis && (
-                            <Box sx={{ mb: 2, px: 2, py: 1.4, borderRadius: "14px", bgcolor: `${activeFocus.color}10`, border: `1px solid ${activeFocus.color}24`, position: "relative" }}>
-                              <Typography sx={{ color: activeFocus.color, fontSize: "0.78rem", fontWeight: 900, mb: 0.5 }}>คำฟันธงจากดวง</Typography>
-                              <Typography sx={{ color: "#0f172a", fontSize: { xs: "0.98rem", md: "1.04rem" }, lineHeight: 1.65, fontWeight: 850 }}>{activeSajuAnalysis.verdict}</Typography>
+                            <Box sx={{ mb: 2, px: 2, py: 1.4, borderRadius: "12px", bgcolor: "#FAF8F2", border: "2px solid #2D2520", borderLeft: `6px solid ${activeFocus.color}`, position: "relative" }}>
+                              <Typography sx={{ color: activeFocus.color, fontSize: "0.78rem", fontWeight: 800, mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>คำฟันธงจากดวง</Typography>
+                              <Typography sx={{ color: "#2D2520", fontSize: { xs: "0.98rem", md: "1.04rem" }, lineHeight: 1.65, fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>{activeSajuAnalysis.verdict}</Typography>
                             </Box>
                           )}
-                          <Typography sx={{ color: "#1e293b", fontSize: { xs: "1rem", md: "1.08rem" }, lineHeight: 1.9, fontWeight: 550, position: "relative" }}>
+                          <Typography sx={{ color: "#2D2520", fontSize: { xs: "1rem", md: "1.08rem" }, lineHeight: 1.9, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif", position: "relative" }}>
                             {activeSajuAnalysis?.detail}
                           </Typography>
                           <Box sx={{ mt: 2.5 }}>
@@ -2458,23 +2407,23 @@ return (
                       </Box>
                     ) : (
                       <Box sx={{ animation: "resultFadeIn 0.5s ease" }}>
-                        <Box sx={{ p: { xs: 2.5, md: 3.2 }, borderRadius: "18px", bgcolor: "#fff", border: "1px solid #e2e8f0", borderLeft: "6px solid #64748b", boxShadow: "0 18px 38px -32px rgba(15,23,42,0.32)" }}>
+                        <Box sx={{ p: { xs: 2.5, md: 3.2 }, borderRadius: "16px", bgcolor: "#FFFDF9", border: "2px solid #2D2520", borderLeft: "8px solid #64748b" }}>
                           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2.5 }}>
-                            <Box sx={{ width: 40, height: 40, borderRadius: "12px", bgcolor: "#fff", border: "1px solid #e2e8f0", display: "grid", placeItems: "center" }}>
+                            <Box sx={{ width: 40, height: 40, borderRadius: "12px", bgcolor: "#FFFDF9", border: "2px solid #2D2520", display: "grid", placeItems: "center" }}>
                               <Profile2User size={24} color="#64748b" variant="Bulk" />
                             </Box>
                             <Box>
-                              <Typography sx={{ fontSize: "1.25rem", fontWeight: 900, color: "#334155" }}>ลักษณะนิสัยพื้นฐาน (ถาวร)</Typography>
-                              <Typography sx={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 700 }}>ตัวตนที่แท้จริงตามวันเกิดของคุณ</Typography>
+                              <Typography sx={{ fontSize: "1.25rem", fontWeight: 800, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>ลักษณะนิสัยพื้นฐาน (ถาวร)</Typography>
+                              <Typography sx={{ fontSize: "0.8rem", color: "#5A4D43", fontWeight: 600, fontFamily: "var(--font-prompt), sans-serif" }}>ตัวตนที่แท้จริงตามวันเกิดของคุณ</Typography>
                             </Box>
                           </Stack>
                           {baseSajuAnalysis && (
-                            <Box sx={{ mb: 2, px: 2, py: 1.4, borderRadius: "14px", bgcolor: "#f8fafc", border: "1px solid #e2e8f0" }}>
-                              <Typography sx={{ color: "#475569", fontSize: "0.78rem", fontWeight: 900, mb: 0.5 }}>คำฟันธงจากดวง</Typography>
-                              <Typography sx={{ color: "#0f172a", fontSize: { xs: "0.98rem", md: "1.04rem" }, lineHeight: 1.65, fontWeight: 850 }}>{baseSajuAnalysis.verdict}</Typography>
+                            <Box sx={{ mb: 2, px: 2, py: 1.4, borderRadius: "12px", bgcolor: "#FAF8F2", border: "2px solid #2D2520", borderLeft: "6px solid #64748b" }}>
+                              <Typography sx={{ color: "#64748b", fontSize: "0.78rem", fontWeight: 800, mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>คำฟันธงจากดวง</Typography>
+                              <Typography sx={{ color: "#2D2520", fontSize: { xs: "0.98rem", md: "1.04rem" }, lineHeight: 1.65, fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>{baseSajuAnalysis.verdict}</Typography>
                             </Box>
                           )}
-                          <Typography sx={{ color: "#334155", fontSize: "1.1rem", lineHeight: 2 }}>
+                          <Typography sx={{ color: "#2D2520", fontSize: "1.08rem", lineHeight: 2, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
                             {baseSajuAnalysis?.detail}
                           </Typography>
                           <Box sx={{ mt: 2.5 }}>
@@ -2485,15 +2434,15 @@ return (
                     )}
 
                     {/* Gender insight bar inside analysis card */}
-                    <Box sx={{ mt: 3, p: 2.5, borderRadius: "18px", bgcolor: "#f8fafc", border: "1px solid #e2e8f0" }}>
+                    <Box sx={{ mt: 3, p: 2.5, borderRadius: "14px", bgcolor: "#FAF8F2", border: "2.5px solid #2D2520" }}>
                       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: { xs: "flex-start", sm: "center" }, justifyContent: "space-between" }}>
                         <Box>
-                          <Typography sx={{ color: "#334155", fontSize: "0.92rem", fontWeight: 800, mb: 0.6 }}>มุมมองตามเพศในการอ่านดวง</Typography>
-                          <Typography sx={{ color: "#64748b", fontSize: "0.86rem", lineHeight: 1.65 }}>{reading.genderInsight}</Typography>
+                          <Typography sx={{ color: "#2D2520", fontSize: "0.92rem", fontWeight: 800, mb: 0.6, fontFamily: "var(--font-prompt), sans-serif" }}>มุมมองตามเพศในการอ่านดวง</Typography>
+                          <Typography sx={{ color: "#5A4D43", fontSize: "0.86rem", lineHeight: 1.65, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>{reading.genderInsight}</Typography>
                         </Box>
                         <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
-                          <Chip label={reading.gender === "male" ? "♂ เพศชาย" : "♀ เพศหญิง"} size="small" sx={{ bgcolor: "#fff", color: "#475569", fontWeight: 800, borderRadius: "8px" }} />
-                          <Chip label={elementMeta[reading.relationshipElement].label} size="small" sx={{ bgcolor: elementMeta[reading.relationshipElement].bg, color: elementMeta[reading.relationshipElement].color, fontWeight: 800, borderRadius: "8px" }} />
+                          <Chip label={reading.gender === "male" ? "♂ เพศชาย" : "♀ เพศหญิง"} size="small" sx={{ bgcolor: "#FFFDF9", color: "#2D2520", border: "1.5px solid #2D2520", fontWeight: 800, borderRadius: "8px", fontFamily: "var(--font-prompt), sans-serif" }} />
+                          <Chip label={elementMeta[reading.relationshipElement].label} size="small" sx={{ bgcolor: elementMeta[reading.relationshipElement].bg, color: elementMeta[reading.relationshipElement].color, border: `1.5px solid #2D2520`, fontWeight: 800, borderRadius: "8px", fontFamily: "var(--font-prompt), sans-serif" }} />
                         </Stack>
                       </Stack>
                     </Box>
@@ -2505,40 +2454,40 @@ return (
                 {reading.tenGodSummary.length > 0 && (
                   <Box sx={{ mb: 4 }}>
                     <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2 }}>
-                      <Box sx={{ width: 32, height: 32, borderRadius: "8px", bgcolor: "#f5f3ff", display: "grid", placeItems: "center" }}><Personalcard size={20} color="#4f46e5" variant="Bulk" /></Box>
-                      <Typography sx={{ fontSize: "1.1rem", fontWeight: 700, color: "#0f172a" }}>โครงสร้างพลังเด่นในชะตาชีวิต (Ten Gods)</Typography>
-                      <Chip label="พรสวรรค์หลัก" size="small" sx={{ bgcolor: "#f5f3ff", color: "#4338ca", fontWeight: 800, fontSize: "0.7rem" }} />
+                      <Box sx={{ width: 32, height: 32, borderRadius: "8px", bgcolor: "rgba(255, 142, 158, 0.15)", border: "2px solid #2D2520", display: "grid", placeItems: "center" }}><Personalcard size={20} color="#FF8E9E" variant="Bulk" /></Box>
+                      <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>โครงสร้างพลังเด่นในชะตาชีวิต (Ten Gods)</Typography>
+                      <Chip label="พรสวรรค์หลัก" size="small" sx={{ bgcolor: "rgba(255, 142, 158, 0.15)", color: "#FF8E9E", border: "1.5px solid #2D2520", fontWeight: 800, fontSize: "0.7rem", fontFamily: "var(--font-prompt), sans-serif" }} />
                     </Stack>
                     
-                    <Box sx={{ bgcolor: "#fff", p: { xs: 3.5, md: 4 }, borderRadius: "24px", border: "1px solid #edf2f7", boxShadow: "0 25px 60px -25px rgba(15,23,42,0.06)" }}>
+                    <Box sx={{ bgcolor: "#FFFDF9", p: { xs: 3, sm: 4 }, borderRadius: "20px", border: "2.5px solid #2D2520", boxShadow: "4px 4px 0px #2D2520" }}>
                       <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", md: "center" }, mb: 3 }}>
                         <Box sx={{ maxWidth: 520 }}>
-                          <Typography sx={{ fontSize: "1.15rem", fontWeight: 800, color: "#0f172a", mb: 0.6 }}>พลังดวงดาวสนับสนุนหลัก</Typography>
-                          <Typography sx={{ fontSize: "0.86rem", color: "#64748b", lineHeight: 1.6 }}>
+                          <Typography sx={{ fontSize: "1.15rem", fontWeight: 800, color: "#2D2520", mb: 0.6, fontFamily: "var(--font-prompt), sans-serif" }}>พลังดวงดาวสนับสนุนหลัก</Typography>
+                          <Typography sx={{ fontSize: "0.86rem", color: "#5A4D43", lineHeight: 1.6, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
                             สิบผู้ปกปักษ์สะท้อนถึงแรงขับเคลื่อน โอกาสการงาน และช่องทางดึงดูดทรัพย์ที่ง่ายที่สุดของดวงชะตาคุณ
                           </Typography>
                         </Box>
-                        <Chip label={`เด่นสุด: ${reading.tenGodSummary[0].thaiLabel}`} sx={{ bgcolor: "#4f46e5", color: "#fff", fontSize: "0.88rem", fontWeight: 800, borderRadius: "10px", height: 36, px: 2 }} />
+                        <Chip label={`เด่นสุด: ${reading.tenGodSummary[0].thaiLabel}`} sx={{ bgcolor: "#FF8E9E", color: "#FFFDF9", border: "2px solid #2D2520", fontSize: "0.88rem", fontWeight: 800, borderRadius: "10px", height: 36, px: 2, fontFamily: "var(--font-prompt), sans-serif" }} />
                       </Stack>
                       
-                      <Box sx={{ p: 2.8, mb: 3, borderRadius: "18px", bgcolor: "#f8fafc", border: "1.5px solid #c7d2fe", borderLeft: "6px solid #4f46e5", boxShadow: "0 10px 25px -15px rgba(79,70,229,0.15)" }}>
+                      <Box sx={{ p: 2.8, mb: 3, borderRadius: "16px", bgcolor: "#FAF8F2", border: "2.5px solid #2D2520", borderLeft: "8px solid #FF8E9E", boxShadow: "2px 2px 0px rgba(0,0,0,0.05)" }}>
                         <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: { xs: "flex-start", sm: "center" } }}>
                           <Box sx={{ minWidth: 140 }}>
-                            <Typography sx={{ color: "#4f46e5", fontSize: "1.24rem", fontWeight: 900 }}>{reading.tenGodSummary[0].thaiLabel}</Typography>
-                            <Typography sx={{ color: "#94a3b8", fontSize: "0.82rem", fontWeight: 700 }}>{reading.tenGodSummary[0].label}</Typography>
+                            <Typography sx={{ color: "#FF8E9E", fontSize: "1.24rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>{reading.tenGodSummary[0].thaiLabel}</Typography>
+                            <Typography sx={{ color: "#5A4D43", fontSize: "0.82rem", fontWeight: 700, fontFamily: "var(--font-prompt), sans-serif" }}>{reading.tenGodSummary[0].label}</Typography>
                           </Box>
-                          <Typography sx={{ color: "#334155", fontSize: "0.96rem", lineHeight: 1.8, fontWeight: 550 }}>{reading.tenGodSummary[0].description}</Typography>
+                          <Typography sx={{ color: "#2D2520", fontSize: "0.96rem", lineHeight: 1.8, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>{reading.tenGodSummary[0].description}</Typography>
                         </Stack>
                       </Box>
                       
                       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" }, gap: 2 }}>
                         {reading.tenGodSummary.slice(1, 5).map((god) => (
-                          <Box key={god.key} sx={{ p: 2, borderRadius: "16px", bgcolor: "#fff", border: "1px solid #edf2f7", transition: "all 0.2s ease", "&:hover": { borderColor: "#c7d2fe", transform: "translateY(-2px)", boxShadow: "0 10px 20px -10px rgba(0,0,0,0.05)" } }}>
+                          <Box key={god.key} sx={{ p: 2, borderRadius: "12px", bgcolor: "#FFFDF9", border: "2px solid #2D2520" }}>
                             <Stack direction="row" spacing={1} sx={{ alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-                              <Typography sx={{ color: "#0f172a", fontSize: "0.96rem", fontWeight: 800 }}>{god.thaiLabel}</Typography>
-                              <Chip label={getTenGodLevel(god.count)} size="small" sx={{ height: 24, bgcolor: "#f1f5f9", color: "#64748b", fontSize: "0.76rem", fontWeight: 800, borderRadius: "7px" }} />
+                              <Typography sx={{ color: "#2D2520", fontSize: "0.96rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>{god.thaiLabel}</Typography>
+                              <Chip label={getTenGodLevel(god.count)} size="small" sx={{ height: 24, bgcolor: "#FAF8F2", border: "1.5px solid #2D2520", color: "#2D2520", fontSize: "0.76rem", fontWeight: 800, borderRadius: "7px", fontFamily: "var(--font-prompt), sans-serif" }} />
                             </Stack>
-                            <Typography sx={{ color: "#64748b", fontSize: "0.85rem", lineHeight: 1.65, fontWeight: 550 }}>{god.description}</Typography>
+                            <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", lineHeight: 1.65, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>{god.description}</Typography>
                           </Box>
                         ))}
                       </Box>
@@ -2548,15 +2497,15 @@ return (
 
                 {/* Annual Influence Section */}
                 <Box sx={{ mb: 4 }}>
-                  <Box sx={{ p: 3, borderRadius: "18px", bgcolor: "#eef2ff", border: "1px solid #c7d2fe", borderLeft: "6px solid #4f46e5" }}>
+                  <Box sx={{ p: 3, borderRadius: "20px", bgcolor: "#FFFDF9", border: "2.5px solid #2D2520", borderLeft: "8px solid #7296F8", boxShadow: "3px 3px 0px #2D2520" }}>
                     <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: { xs: "flex-start", sm: "center" }, justifyContent: "space-between", mb: 2 }}>
                       <Stack direction="row" spacing={1.4} sx={{ alignItems: "center" }}>
-                        <Box sx={{ width: 40, height: 40, borderRadius: "12px", bgcolor: "#fff", display: "grid", placeItems: "center" }}>
-                          <Calendar size={22} color="#4f46e5" variant="Bulk" />
+                        <Box sx={{ width: 40, height: 40, borderRadius: "12px", bgcolor: "rgba(114, 150, 248, 0.15)", border: "2.5px solid #2D2520", display: "grid", placeItems: "center" }}>
+                          <Calendar size={22} color="#7296F8" variant="Bulk" />
                         </Box>
                         <Box>
-                          <Typography sx={{ color: "#312e81", fontSize: "1.06rem", fontWeight: 900 }}>จังหวะชีวิตภาพรวมปีนี้ของคุณ</Typography>
-                          <Typography sx={{ color: "#6366f1", fontSize: "0.78rem", fontWeight: 800 }}>
+                          <Typography sx={{ color: "#2D2520", fontSize: "1.06rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>จังหวะชีวิตภาพรวมปีนี้ของคุณ</Typography>
+                          <Typography sx={{ color: "#7296F8", fontSize: "0.78rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
                             ปีคำนวณ {reading.annualInfluence.year} · {reading.annualInfluence.tenGod.thaiLabel}
                           </Typography>
                         </Box>
@@ -2564,16 +2513,16 @@ return (
                       <Chip
                         label={`${reading.annualInfluence.stem.korean}${reading.annualInfluence.branch.korean} ${reading.annualInfluence.branch.animal}`}
                         size="small"
-                        sx={{ bgcolor: "#fff", color: "#4f46e5", fontWeight: 900, borderRadius: "8px" }}
+                        sx={{ bgcolor: "#FAF8F2", color: "#2D2520", border: "1.5px solid #2D2520", fontWeight: 800, borderRadius: "8px", fontFamily: "var(--font-prompt), sans-serif" }}
                       />
                     </Stack>
-                    <Typography sx={{ color: "#1e1b4b", fontSize: "1rem", fontWeight: 900, mb: 1 }}>
+                    <Typography sx={{ color: "#2D2520", fontSize: "1rem", fontWeight: 800, mb: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
                       {reading.annualInfluence.themeTitle}
                     </Typography>
-                    <Typography sx={{ color: "#3730a3", fontSize: "0.94rem", lineHeight: 1.75, fontWeight: 600, mb: 1.4 }}>
+                    <Typography sx={{ color: "#5A4D43", fontSize: "0.94rem", lineHeight: 1.75, fontWeight: 500, mb: 1.4, fontFamily: "var(--font-prompt), sans-serif" }}>
                       {reading.annualInfluence.themeSummary}
                     </Typography>
-                    <Typography sx={{ color: "#4338ca", fontSize: "0.88rem", lineHeight: 1.65, fontWeight: 700 }}>
+                    <Typography sx={{ color: "#7296F8", fontSize: "0.88rem", lineHeight: 1.65, fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
                       📌 ข้อแนะนำประจำปี: {reading.annualInfluence.themeAdvice}
                     </Typography>
                   </Box>
@@ -2585,111 +2534,44 @@ return (
               <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 
                 {/* Lifelong Lucky Element permanent card */}
-                <Box sx={{ p: 3, bgcolor: "#f0fdf4", borderRadius: "18px", border: "1px solid #bbf7d0", borderLeft: `6px solid ${elementMeta[reading.luckyElement].color}` }}>
+                <Box sx={{ p: 3, bgcolor: "#FFFDF9", borderRadius: "16px", border: "2.5px solid #2D2520", borderLeft: `8px solid ${elementMeta[reading.luckyElement].color}`, boxShadow: "3px 3px 0px #2D2520" }}>
                   <Stack direction="row" spacing={2} sx={{ alignItems: "flex-start" }}>
-                    <Box sx={{ width: 40, height: 40, borderRadius: "10px", bgcolor: "#fff", display: "grid", placeItems: "center", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)", color: "#10b981" }}>
+                    <Box sx={{ width: 40, height: 40, borderRadius: "10px", bgcolor: "#FFFDF9", border: "2px solid #2D2520", display: "grid", placeItems: "center", color: elementMeta[reading.luckyElement].color }}>
                       <Element4 size={24} variant="Bulk" color="currentColor" />
                     </Box>
                     <Box>
-                      <Typography sx={{ color: "#065f46", fontSize: "1.05rem", fontWeight: 800, mb: 0.5 }}>ธาตุเสริมดวงชะตาตลอดชีพ</Typography>
-                      <Typography sx={{ color: "#047857", fontSize: "0.92rem", lineHeight: 1.7, fontWeight: 550 }}>
+                      <Typography sx={{ color: "#2D2520", fontSize: "1.05rem", fontWeight: 800, mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>ธาตุเสริมดวงชะตาตลอดชีพ</Typography>
+                      <Typography sx={{ color: "#5A4D43", fontSize: "0.92rem", lineHeight: 1.7, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
                         ดวงนี้ควรเพิ่มพลังงาน **ธาตุ{elementMeta[reading.luckyElement].label}**: {luckyElementAdvice[reading.luckyElement]}
                       </Typography>
                     </Box>
                   </Stack>
                 </Box>
 
-                {/* Remedy Action Plan Card */}
-                {remedyPlan && (
-                  <Box sx={{ bgcolor: "#fff", borderRadius: "24px", border: "1px solid #c7d2fe", boxShadow: "0 26px 55px -34px rgba(79,70,229,0.25)", overflow: "hidden" }}>
-                    <Box sx={{ p: 3, bgcolor: "#eef2ff", borderBottom: "1px solid #c7d2fe" }}>
-                      <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-                        <Box sx={{ width: 38, height: 38, borderRadius: "10px", bgcolor: "#fff", display: "grid", placeItems: "center", boxShadow: "0 10px 20px -16px rgba(79,70,229,0.65)" }}>
-                          <MagicStar size={18} color="#4f46e5" variant="Bulk" />
-                        </Box>
-                        <Box>
-                          <Typography sx={{ color: "#0f172a", fontSize: "1.05rem", fontWeight: 900 }}>คัมภีร์แก้ชะตาชีวิต (Action Plan)</Typography>
-                          <Typography sx={{ color: "#64748b", fontSize: "0.78rem", fontWeight: 700 }}>คำแนะนำการปรับและแก้จุดติดขัดในชีวิต</Typography>
-                        </Box>
-                      </Stack>
-                    </Box>
-
-                    <Box sx={{ p: 3 }}>
-                      
-                      {/* Basis chips */}
-                      <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", rowGap: 1, mb: 2.5 }}>
-                        {remedyPlan.basis.map((item) => (
-                          <Chip key={item} label={item} size="small" sx={{ bgcolor: "#f8fafc", color: "#475569", border: "1px solid #e2e8f0", fontWeight: 800, fontSize: "0.7rem" }} />
-                        ))}
-                      </Stack>
-
-                      {/* Warning, Action, Avoid grids */}
-                      <Stack spacing={2} sx={{ mb: 3 }}>
-                        {[
-                          { label: "⚠️ สิ่งที่ควรระมัดระวัง (Caution)", text: remedyPlan.caution, color: "#d97706", bg: "#fffbeb", border: "#fde047" },
-                          { label: "✅ สิ่งที่ควรปฏิบัติ (Action)", text: remedyPlan.action, color: "#059669", bg: "#f0fdf4", border: "#6ee7b7" },
-                          { label: "❌ สิ่งที่ควรหลีกเลี่ยง (Avoid)", text: remedyPlan.avoid, color: "#e11d48", bg: "#fff1f2", border: "#fca5a5" },
-                        ].map((item) => (
-                          <Box 
-                            key={item.label} 
-                            sx={{ 
-                              p: 2.2, 
-                              borderRadius: "16px", 
-                              bgcolor: item.bg, 
-                              border: "1.2px solid " + item.border, 
-                              borderLeft: "5px solid " + item.color,
-                              boxShadow: "0 8px 20px -15px rgba(0,0,0,0.03)"
-                            }}
-                          >
-                            <Typography sx={{ color: item.color, fontSize: "0.78rem", fontWeight: 900, mb: 0.5 }}>{item.label}</Typography>
-                            <Typography sx={{ color: "#334155", fontSize: "0.85rem", lineHeight: 1.6, fontWeight: 600 }}>{item.text}</Typography>
-                          </Box>
-                        ))}
-                      </Stack>
-
-                      {/* Specific Element Remedy Bullets */}
-                      <Box sx={{ p: 2.2, borderRadius: "16px", bgcolor: elementMeta[reading.luckyElement].bg, border: `1px solid ${elementMeta[reading.luckyElement].color}26`, mb: 2.5 }}>
-                        <Typography sx={{ color: elementMeta[reading.luckyElement].color, fontSize: "0.88rem", fontWeight: 900, mb: 1 }}>{remedyPlan.elementTitle}</Typography>
-                        <Box component="ul" sx={{ m: 0, pl: 2, color: "#334155" }}>
-                          {remedyPlan.elementItems.map((item, index) => (
-                            <Typography key={`${item}-${index}`} component="li" sx={{ fontSize: "0.84rem", lineHeight: 1.7, fontWeight: 600, mb: 0.5 }}>
-                              {item}
-                            </Typography>
-                          ))}
-                        </Box>
-                      </Box>
-
-                      {/* Extra tips */}
-                      <Stack spacing={1.5} sx={{ p: 1, borderTop: "1px solid #f1f5f9", mt: 1 }}>
-                        <Typography sx={{ color: "#475569", fontSize: "0.82rem", lineHeight: 1.6, fontWeight: 550 }}>{remedyPlan.balanceTip}</Typography>
-                        <Typography sx={{ color: "#64748b", fontSize: "0.78rem", lineHeight: 1.55, fontWeight: 500 }}>{remedyPlan.dayMasterTip}</Typography>
-                      </Stack>
-
-                    </Box>
-                  </Box>
-                )}
-
-                {/* Affiliate Products Card */}
+                {/* Affiliate Products Card (Moved immediately below Lucky Element for higher CTR/conversion) */}
                 <Box 
                   sx={{ 
-                    bgcolor: "#fff", 
+                    bgcolor: "#FFFDF9", 
                     p: 3, 
-                    borderRadius: "24px", 
-                    border: "1.5px solid #a7f3d0", 
-                    borderTop: "5px solid #10b981", 
-                    background: "linear-gradient(180deg, #fff 0%, #f6fdfa 100%)",
-                    boxShadow: "0 20px 40px -20px rgba(16,185,129,0.12)" 
+                    borderRadius: "20px", 
+                    border: "2.5px solid #2D2520", 
+                    borderTop: `8px solid ${elementMeta[reading.luckyElement].color}`, 
+                    boxShadow: "4px 4px 0px #2D2520" 
                   }}
                 >
                   <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2.5 }}>
-                    <Box sx={{ width: 32, height: 32, borderRadius: "8px", bgcolor: "#ecfdf5", display: "grid", placeItems: "center", color: "#10b981" }}><Shop size={20} variant="Bulk" color="currentColor" /></Box>
-                    <Typography sx={{ fontSize: "1.02rem", fontWeight: 800, color: "#0f172a" }}>ของมงคลนำโชคแนะนำ</Typography>
+                    <Box sx={{ width: 32, height: 32, borderRadius: "8px", bgcolor: `${elementMeta[reading.luckyElement].color}22`, border: "2px solid #2D2520", display: "grid", placeItems: "center", color: elementMeta[reading.luckyElement].color }}>
+                      <Shop size={20} variant="Bulk" color="currentColor" />
+                    </Box>
+                    <Typography sx={{ fontSize: "1.02rem", fontWeight: 800, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>
+                      ของมงคลนำโชคแนะนำ (เสริมธาตุ{elementMeta[reading.luckyElement].label})
+                    </Typography>
                   </Stack>
                   
                   {isProductsLoading ? (
                     <Box sx={{ py: 4, textAlign: "center" }}>
-                      <CircularProgress size={24} sx={{ color: "#10b981" }} />
-                      <Typography sx={{ mt: 1, fontSize: "0.8rem", color: "#64748b" }}>กำลังค้นหาสินค้าเสริมพลังชีวิต...</Typography>
+                      <CircularProgress size={24} sx={{ color: elementMeta[reading.luckyElement].color }} />
+                      <Typography sx={{ mt: 1, fontSize: "0.8rem", color: "#5A4D43", fontFamily: "var(--font-prompt), sans-serif" }}>กำลังค้นหาสินค้าเสริมพลังชีวิต...</Typography>
                     </Box>
                   ) : affiliateProducts.length > 0 ? (
                     <Stack spacing={2.2}>
@@ -2704,22 +2586,96 @@ return (
                           platform={product.platform}
                           platformLabel={product.platform}
                           productSlug={product.productSlug}
+                          rating={product.rating}
+                          reviewCount={product.reviewCount}
+                          originalPrice={product.originalPrice}
                           variant="sidebar"
                           accentColor={elementMeta[reading.luckyElement].color}
-                          badge="แนะนำเสริมพลังดวง"
+                          badge={`แนะนำเสริมธาตุ${elementMeta[reading.luckyElement].label}`}
                         />
                       ))}
                     </Stack>
                   ) : (
-                    <Box sx={{ p: 2, bgcolor: "#f8fafc", borderRadius: "12px", textAlign: "center" }}>
-                      <Typography sx={{ fontSize: "0.8rem", color: "#64748b" }}>ยังไม่มีสินค้าแนะนำสำหรับธาตุนี้</Typography>
+                    <Box sx={{ p: 2, bgcolor: "#FAF8F2", borderRadius: "12px", border: "2px solid #2D2520", textAlign: "center" }}>
+                      <Typography sx={{ fontSize: "0.8rem", color: "#5A4D43", fontFamily: "var(--font-prompt), sans-serif" }}>ยังไม่มีสินค้าแนะนำสำหรับธาตุนี้</Typography>
                     </Box>
                   )}
                   
-                  <Typography sx={{ color: "#94a3b8", fontSize: "0.65rem", textAlign: "center", mt: 2.5, fontStyle: "italic", fontWeight: 500 }}>
-                    * แนะนำของมงคลตามพลังงานธาตุ {elementMeta[reading.luckyElement].label} เพื่อปรับหนุนและเสริมจุดบกพร่องของชะตาชีวิตคุณ
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.65rem", textAlign: "center", mt: 2.5, fontStyle: "italic", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
+                    * แนะนำของมงคลตามพลังงานธาตุ{elementMeta[reading.luckyElement].label} เพื่อปรับหนุนและเสริมจุดบกพร่องของชะตาชีวิตคุณ
                   </Typography>
                 </Box>
+
+                {/* Remedy Action Plan Card */}
+                {remedyPlan && (
+                  <Box sx={{ bgcolor: "#FFFDF9", borderRadius: "20px", border: "2.5px solid #2D2520", boxShadow: "4px 4px 0px #2D2520", overflow: "hidden" }}>
+                    <Box sx={{ p: 3, bgcolor: "#FAF8F2", borderBottom: "2.5px solid #2D2520" }}>
+                      <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+                        <Box sx={{ width: 38, height: 38, borderRadius: "10px", bgcolor: "#FFFDF9", border: "2px solid #2D2520", display: "grid", placeItems: "center" }}>
+                          <MagicStar size={18} color="#FF8E9E" variant="Bulk" />
+                        </Box>
+                        <Box>
+                          <Typography sx={{ color: "#2D2520", fontSize: "1.05rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>คัมภีร์แก้ชะตาชีวิต (Action Plan)</Typography>
+                          <Typography sx={{ color: "#5A4D43", fontSize: "0.78rem", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>คำแนะนำการปรับและแก้จุดติดขัดในชีวิต</Typography>
+                        </Box>
+                      </Stack>
+                    </Box>
+
+                    <Box sx={{ p: 3 }}>
+                      
+                      {/* Basis chips */}
+                      <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", rowGap: 1, mb: 2.5 }}>
+                        {remedyPlan.basis.map((item) => (
+                          <Chip key={item} label={item} size="small" sx={{ bgcolor: "#FFFDF9", color: "#2D2520", border: "1.5px solid #2D2520", fontWeight: 800, fontSize: "0.7rem", fontFamily: "var(--font-prompt), sans-serif" }} />
+                        ))}
+                      </Stack>
+
+                      {/* Warning, Action, Avoid grids */}
+                      <Stack spacing={2} sx={{ mb: 3 }}>
+                        {[
+                          { label: "⚠️ สิ่งที่ควรระมัดระวัง (Caution)", text: remedyPlan.caution, color: "#d97706", bg: "#FFFDF9", border: "#2D2520" },
+                          { label: "✅ สิ่งที่ควรปฏิบัติ (Action)", text: remedyPlan.action, color: "#059669", bg: "#FFFDF9", border: "#2D2520" },
+                          { label: "❌ สิ่งที่ควรหลีกเลี่ยง (Avoid)", text: remedyPlan.avoid, color: "#e11d48", bg: "#FFFDF9", border: "#2D2520" },
+                        ].map((item) => (
+                          <Box 
+                            key={item.label} 
+                            sx={{ 
+                              p: 2.2, 
+                              borderRadius: "12px", 
+                              bgcolor: item.bg, 
+                              border: "2px solid " + item.border, 
+                              borderLeft: "8px solid " + item.color,
+                            }}
+                          >
+                            <Typography sx={{ color: item.color, fontSize: "0.78rem", fontWeight: 800, mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>{item.label}</Typography>
+                            <Typography sx={{ color: "#2D2520", fontSize: "0.85rem", lineHeight: 1.6, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>{item.text}</Typography>
+                          </Box>
+                        ))}
+                      </Stack>
+
+                      {/* Specific Element Remedy Bullets */}
+                      <Box sx={{ p: 2.2, borderRadius: "12px", bgcolor: "#FFFDF9", border: `2px solid #2D2520`, borderLeft: `8px solid ${elementMeta[reading.luckyElement].color}`, mb: 2.5 }}>
+                        <Typography sx={{ color: "#2D2520", fontSize: "0.88rem", fontWeight: 800, mb: 1, fontFamily: "var(--font-prompt), sans-serif" }}>{remedyPlan.elementTitle}</Typography>
+                        <Box component="ul" sx={{ m: 0, pl: 2, color: "#2D2520" }}>
+                          {remedyPlan.elementItems.map((item, index) => (
+                            <Typography key={`${item}-${index}`} component="li" sx={{ fontSize: "0.84rem", lineHeight: 1.7, fontWeight: 500, mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>
+                              {item}
+                            </Typography>
+                          ))}
+                        </Box>
+                      </Box>
+
+                      {/* Extra tips */}
+                      <Stack spacing={1.5} sx={{ p: 1, borderTop: "2px solid #2D2520", mt: 1 }}>
+                        <Typography sx={{ color: "#5A4D43", fontSize: "0.82rem", lineHeight: 1.6, fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>{remedyPlan.balanceTip}</Typography>
+                        <Typography sx={{ color: "#5A4D43", fontSize: "0.78rem", lineHeight: 1.55, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>{remedyPlan.dayMasterTip}</Typography>
+                      </Stack>
+
+                    </Box>
+                  </Box>
+                )}
+
+
 
               </Box>
 
@@ -2727,9 +2683,9 @@ return (
 
           </Box>
         ) : (
-          <Box sx={{ py: 10, border: "2px dashed #e2e8f0", borderRadius: "24px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <SearchNormal size={56} color="#cbd5e1" variant="TwoTone" />
-            <Typography sx={{ color: "#94a3b8", fontSize: "1.1rem", mt: 2.5, fontWeight: 600 }}>รอการวิเคราะห์ข้อมูลพื้นดวงชะตาชีวิต</Typography>
+          <Box sx={{ py: 10, bgcolor: "#FFFDF9", border: "2.5px dashed #2D2520", borderRadius: "24px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", boxShadow: "inset 0 4px 10px rgba(0,0,0,0.02)" }}>
+            <SearchNormal size={56} color="#5A4D43" variant="TwoTone" />
+            <Typography sx={{ color: "#2D2520", fontSize: "1.1rem", mt: 2.5, fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>รอการวิเคราะห์ข้อมูลพื้นดวงชะตาชีวิต</Typography>
           </Box>
         )}
       </Container>

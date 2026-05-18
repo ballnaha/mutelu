@@ -5,14 +5,17 @@ import { Footer } from "@/app/components/footer";
 import { TarotDailyClient } from "./tarot-daily-client";
 
 export const metadata: Metadata = {
-  title: "ดูดวงไพ่ยิปซีรายวัน | MUTELU.",
+  title: "ดูดวงไพ่ยิปซีรายวัน | mulamoon.",
   description:
     "เปิดไพ่ยิปซีรายวันแบบ 3 ใบ พร้อมคำทำนายภาพรวม ความรัก การงาน การเงิน และคำแนะนำประจำวัน",
 };
 
 export default function TarotPage() {
   return (
-    <Box sx={{ bgcolor: "#f8fafc", minHeight: "100vh" }}>
+    <Box sx={{
+      background: "linear-gradient(180deg, #E6F3FF 0%, #FAF8F2 20%, #FAF8F2 100%)",
+      minHeight: "100vh"
+    }}>
       <Header />
       <TarotDailyClient />
       <Footer />

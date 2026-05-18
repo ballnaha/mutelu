@@ -69,7 +69,7 @@ model blogpost {
   title                String
   excerpt              String                 @db.Text
   publishedAt          DateTime?
-  authorName           String                 @default("MUTELU Editorial")
+  authorName           String                 @default("MULAMOON Editorial")
   authorRole           String?
   authorImage          String?
   heroImage            String?
@@ -138,21 +138,39 @@ model MasterAffiliateProduct {
   name        String
   description String   @db.Text
   price       String
+  originalPrice String?
   image       String   @db.Text
   url         String   @db.Text
   platform    String   @default("shopee")
   productSlug String?
   element     Element  @default(NONE)
   category    String   @default("general")
+  aspect      String   @default("general")
   isActive    Boolean  @default(true)
+  rating      Float?   @default(4.9)
+  reviewCount Int?     @default(120)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   blogaffiliateproduct blogaffiliateproduct[]
 
   @@index([element])
   @@index([category])
+  @@index([aspect])
   @@index([isActive])
   @@index([platform, productSlug], map: "MasterAffiliateProduct_platform_productSlug_idx")
+}
+
+model AffiliateCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([sortOrder])
 }
 
 enum Element {

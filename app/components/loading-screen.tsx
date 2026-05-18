@@ -20,7 +20,7 @@ export function LoadingScreen() {
 
   useEffect(() => {
     setIsMounted(true);
-    
+
     const handleLoad = () => {
       // Small delay for smooth transition
       setTimeout(() => {
@@ -102,9 +102,9 @@ export function LoadingScreen() {
           color: "var(--primary)",
         }}
       >
-        MUTELU
+        mulamoon
       </Typography>
-      
+
       <Typography
         sx={{
           mt: 1,

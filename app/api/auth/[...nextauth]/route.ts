@@ -13,9 +13,9 @@ export const authOptions: NextAuthOptions = {
     createUser: (data: Omit<AdapterUser, "id">) => prisma.user.create({ data: { id: randomUUID(), updatedAt: new Date(), ...data } }),
     linkAccount: (data: AdapterAccount) => prisma.account.create({ data: { id: randomUUID(), ...data } }),
     createSession: (data: AdapterSession) => prisma.session.create({ data: { id: randomUUID(), ...data } }),
-    createVerificationToken: (data: VerificationToken) => prisma.verificationtoken.create({ data }),
+    createVerificationToken: (data: VerificationToken) => prisma.verificationToken.create({ data }),
     useVerificationToken: (identifier_token: { identifier: string; token: string }) =>
-      prisma.verificationtoken.delete({
+      prisma.verificationToken.delete({
         where: { identifier_token },
       }),
   },

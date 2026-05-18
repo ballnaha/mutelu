@@ -5,63 +5,95 @@ import {
   Container,
   Typography,
   Stack,
-  Divider,
 } from "@mui/material";
 import React from "react";
 
 export function Footer() {
   return (
-    <Box sx={{ py: 6, bgcolor: "#ffffff", borderTop: "1px solid #f1f5f9" }}>
+    <Box sx={{
+      py: 6,
+      bgcolor: "#FAF8F2", // Cozy Ghibli watercolor cream background
+      borderTop: "3px solid #2D2520", // Solid comic boundary line
+      position: "relative",
+      overflow: "hidden"
+    }}>
+
+      {/* Whimsical background flower badge */}
+      <Box sx={{
+        position: "absolute",
+        top: "20%",
+        left: "8%",
+        fontSize: "1.2rem",
+        opacity: 0.35,
+        userSelect: "none",
+        pointerEvents: "none"
+      }}>🍀</Box>
+      <Box sx={{
+        position: "absolute",
+        bottom: "20%",
+        right: "6%",
+        fontSize: "1.2rem",
+        opacity: 0.35,
+        userSelect: "none",
+        pointerEvents: "none"
+      }}>✨</Box>
+
       <Container maxWidth="xl">
-        <Box 
-          sx={{ 
-            display: "flex", 
-            flexDirection: { xs: "column", md: "row" }, 
-            justifyContent: "space-between", 
-            alignItems: "center", 
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            justifyContent: "space-between",
+            alignItems: "center",
             gap: 4
           }}
         >
-          {/* Logo Side */}
+          {/* Logo stamp sticker */}
           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-            <Box sx={{ 
-              width: 32, 
-              height: 32, 
-              bgcolor: "#eef2ff", 
-              borderRadius: "10px", 
-              display: "flex", 
-              alignItems: "center", 
+            <Box sx={{
+              width: 32,
+              height: 32,
+              bgcolor: "#FFF066", // Cute yellow marker highlight
+              border: "2px solid #2D2520",
+              borderRadius: "10px",
+              display: "flex",
+              alignItems: "center",
               justifyContent: "center",
-              color: "#4f46e5"
+              color: "#2D2520",
+              boxShadow: "1.5px 1.5px 0px #2D2520"
             }}>
-              <Typography sx={{ fontSize: "1rem", fontWeight: 700 }}>✦</Typography>
+              <Typography sx={{ fontSize: "1rem", fontWeight: 900 }}>✦</Typography>
             </Box>
-            <Typography sx={{ 
-              fontWeight: 700, 
-              color: "#0f172a", 
-              fontSize: "1.25rem", 
-              letterSpacing: "0.15em",
+            <Typography sx={{
+              fontWeight: 900,
+              color: "#2D2520",
+              fontSize: "1.25rem",
+              letterSpacing: "0.12em",
               fontFamily: "var(--font-serif), serif"
             }}>
-              MUTELU
+              mulamoon
             </Typography>
           </Stack>
 
-          {/* Minimal Links */}
-          <Stack 
-            direction="row" 
-            spacing={{ xs: 2.5, md: 4 }} 
-            sx={{ 
-              flexWrap: "wrap", 
+          {/* Minimal Links styled as cozy planner labels */}
+          <Stack
+            direction="row"
+            spacing={{ xs: 2.5, md: 4 }}
+            sx={{
+              flexWrap: "wrap",
               justifyContent: "center",
               "& .footer-link": {
                 fontSize: "0.9rem",
-                fontWeight: 500,
-                color: "#64748b",
+                fontWeight: 800,
+                color: "#5A4D43", // Warm chocolate cocoa instead of dark gray
                 cursor: "pointer",
-                transition: "0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                 textDecoration: "none",
-                "&:hover": { color: "#4f46e5" }
+                fontFamily: "var(--font-prompt), sans-serif",
+                "&:hover": {
+                  color: "#7296F8", // Soft blue highlighter
+                  transform: "translateY(-1.5px)"
+                }
               }
             }}
           >
@@ -71,15 +103,16 @@ export function Footer() {
             <Typography className="footer-link">ติดต่อเรา</Typography>
           </Stack>
 
-          {/* Social / Copy */}
+          {/* Copyright Stamp */}
           <Box sx={{ textAlign: { xs: "center", md: "right" } }}>
-            <Typography sx={{ 
-              fontSize: "0.8rem", 
-              fontWeight: 500, 
-              color: "#94a3b8", 
-              letterSpacing: "0.02em" 
+            <Typography sx={{
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              color: "#8B7E74", // Cozy warm taupe
+              letterSpacing: "0.04em",
+              fontFamily: "var(--font-prompt), sans-serif"
             }}>
-              © 2025 MUTELU. ALL RIGHTS RESERVED.
+              © 2026 mulamoon. ALL RIGHTS RESERVED.
             </Typography>
           </Box>
         </Box>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { Alert, Box, Button, CircularProgress, Container, Stack, Typography } from "@mui/material";
 import { Calendar, Cup, Refresh, ShieldTick, MagicStar } from "iconsax-react";
 import type { LotteryApiPayload, LotteryCheckMatch, LotteryDraw, LotteryHistoryItem } from "@/lib/lottery";
 import { checkLotteryNumber } from "@/lib/lottery";
+import { AffiliateCard } from "../components/affiliate-card";
 
 type LotteryClientProps = {
   initialData: LotteryApiPayload | null;
@@ -45,6 +46,19 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState(initialError);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [wealthProducts, setWealthProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/affiliate")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const wealth = data.filter((p: any) => p.aspect?.toLowerCase() === "wealth");
+          setWealthProducts(wealth.length > 0 ? wealth.slice(0, 3) : data.slice(0, 3));
+        }
+      })
+      .catch((err) => console.error("Failed to load wealth affiliate products:", err));
+  }, []);
 
   const cleanNumber = number.replace(/\D/g, "").slice(0, 6);
 
@@ -113,11 +127,15 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
     <Box
       component="main"
       sx={{
-        pt: { xs: 9, md: 11 },
-        pb: { xs: 2, md: 3 },
+        pt: { xs: 11, md: 13 },
+        pb: { xs: 4, md: 6 },
         minHeight: "100vh",
-        bgcolor: "#f8fafc",
-        color: "#0f172a",
+        bgcolor: "#FAF8F2",
+        backgroundImage: 'radial-gradient(rgba(45, 37, 32, 0.04) 1.5px, transparent 1.5px), radial-gradient(rgba(255, 142, 158, 0.03) 1.5px, transparent 1.5px)',
+        backgroundSize: "48px 48px",
+        backgroundPosition: "0 0, 24px 24px",
+        color: "#2D2520",
+        fontFamily: "var(--font-prompt), sans-serif",
       }}
     >
       <Container maxWidth="xl">
@@ -125,31 +143,31 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
           sx={{
             display: "grid",
             gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1fr) 400px" },
-            gap: { xs: 2.5, lg: 3 },
+            gap: { xs: 3.5, lg: 4 },
             alignItems: "start",
           }}
         >
           {/* Main Checker Card */}
           <Box
             sx={{
-              borderRadius: "28px",
-              bgcolor: "#fff",
-              border: "1px solid #f1f5f9",
-              boxShadow: "0 12px 40px -12px rgba(0,0,0,0.06)",
+              borderRadius: "24px",
+              bgcolor: "#FFFDF9",
+              border: "2.5px solid #2D2520",
+              boxShadow: "5px 5px 0px #2D2520",
               p: { xs: 2.25, sm: 3, md: 3.5 },
               position: "relative",
               overflow: "hidden",
             }}
           >
             <Stack direction="row" spacing={1.25} sx={{ flexWrap: "wrap", gap: 0.75, mb: 2.5 }}>
-              <Box sx={{ bgcolor: "#eef2ff", color: "#4f46e5", px: 2, py: 0.6, borderRadius: "99px", display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ bgcolor: "rgba(114, 150, 248, 0.15)", color: "#7296F8", px: 2, py: 0.6, borderRadius: "99px", display: "flex", alignItems: "center", gap: 1, border: "2px solid #2D2520" }}>
                 <ShieldTick size={16} variant="Bold" color="currentColor" />
-                <Typography sx={{ fontWeight: 700, fontSize: "0.75rem", letterSpacing: "0.02em" }}>ตรวจสอบผลสลาก</Typography>
+                <Typography sx={{ fontWeight: 800, fontSize: "0.75rem", letterSpacing: "0.02em", fontFamily: "var(--font-prompt), sans-serif" }}>ตรวจสอบผลสลาก</Typography>
               </Box>
               {lottery?.result.date && (
-                <Box sx={{ bgcolor: "#fef9c3", color: "#a16207", px: 2, py: 0.6, borderRadius: "99px", display: "flex", alignItems: "center", gap: 1 }}>
+                <Box sx={{ bgcolor: "rgba(255, 142, 158, 0.15)", color: "#FF8E9E", px: 2, py: 0.6, borderRadius: "99px", display: "flex", alignItems: "center", gap: 1, border: "2px solid #2D2520" }}>
                   <Calendar size={16} variant="Bold" color="currentColor" />
-                  <Typography sx={{ fontWeight: 700, fontSize: "0.75rem", letterSpacing: "0.02em" }}>งวดวันที่ {lottery.result.date}</Typography>
+                  <Typography sx={{ fontWeight: 800, fontSize: "0.75rem", letterSpacing: "0.02em", fontFamily: "var(--font-prompt), sans-serif" }}>งวดวันที่ {lottery.result.date}</Typography>
                 </Box>
               )}
             </Stack>
@@ -157,12 +175,13 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
             <Typography
               component="h1"
               sx={{
-                color: "#0f172a",
-                fontSize: { xs: "2rem", md: "3rem" },
+                color: "#2D2520",
+                fontSize: { xs: "2rem", md: "2.8rem" },
                 lineHeight: 1.1,
                 fontWeight: 800,
                 mb: 1,
-                letterSpacing: "-0.03em"
+                letterSpacing: "-0.02em",
+                fontFamily: "var(--font-prompt), sans-serif",
               }}
             >
               ตรวจลอตเตอรี่
@@ -170,10 +189,12 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
             <Typography
               sx={{
                 maxWidth: 600,
-                color: "#64748b",
-                fontSize: { xs: "1rem", md: "1.05rem" },
+                color: "#5A4D43",
+                fontSize: { xs: "0.95rem", md: "1rem" },
                 lineHeight: 1.5,
                 mb: 2.5,
+                fontWeight: 500,
+                fontFamily: "var(--font-prompt), sans-serif",
               }}
             >
               กรอกเลขสลาก 6 หลักเพื่อตรวจสอบผลรางวัล ระบบจะเช็ครางวัลทั้งหมดให้คุณโดยละเอียด
@@ -186,12 +207,12 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                 handleCheck();
               }}
               sx={{
-                borderRadius: "28px",
-                bgcolor: "#ffffff",
-                border: "2px solid #f1f5f9",
+                borderRadius: "20px",
+                bgcolor: "#FAF8F2",
+                border: "2.5px solid #2D2520",
                 p: { xs: 2, md: 3 },
                 mb: 2.5,
-                boxShadow: "0 10px 25px -5px rgba(0,0,0,0.04)"
+                boxShadow: "3px 3px 0px #2D2520"
               }}
             >
               <Stack direction={{ xs: "column", lg: "row" }} spacing={{ xs: 2, lg: 3 }} sx={{ alignItems: "center" }}>
@@ -230,20 +251,20 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                             sx={{
                               width: { xs: 42, sm: 56, md: 66 },
                               height: { xs: 58, sm: 72, md: 84 },
-                              borderRadius: "14px",
-                              bgcolor: "#fff",
-                              border: "3px solid",
-                              borderColor: isFilled ? "#4f46e5" : isActive ? "#4f46e5" : "#e2e8f0",
+                              borderRadius: "12px",
+                              bgcolor: "#FFFDF9",
+                              border: "2.5px solid",
+                              borderColor: isFilled ? "#FF8E9E" : isActive ? "#7296F8" : "#2D2520",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              fontSize: { xs: "2rem", md: "3rem" },
+                              fontSize: { xs: "2rem", md: "2.8rem" },
                               fontWeight: 800,
-                              color: "#0f172a",
+                              color: "#2D2520",
                               boxShadow: isFilled
-                                ? "0 8px 16px rgba(79,70,229,0.15)"
+                                ? "3px 3px 0px #2D2520"
                                 : isActive
-                                  ? "0 0 0 4px rgba(79,70,229,0.1)"
+                                  ? "0 0 0 4px rgba(114, 150, 248, 0.15)"
                                   : "none",
                               transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                               position: "relative",
@@ -253,7 +274,7 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                                 bottom: 12,
                                 width: "40%",
                                 height: 4,
-                                bgcolor: "#4f46e5",
+                                bgcolor: "#7296F8",
                                 borderRadius: "2px",
                                 animation: "blink 1s infinite",
                               } : {},
@@ -276,7 +297,7 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                       <Button
                         size="small"
                         onClick={() => { setNumber(""); setMatches(null); inputRef.current?.focus(); }}
-                        sx={{ color: "#94a3b8", fontSize: "0.8rem", fontWeight: 600, textTransform: "none", "&:hover": { color: "#ef4444" } }}
+                        sx={{ color: "#5A4D43", fontSize: "0.8rem", fontWeight: 800, textTransform: "none", fontFamily: "var(--font-prompt), sans-serif", "&:hover": { color: "#ef4444" } }}
                       >
                         ล้างเลขทั้งหมด
                       </Button>
@@ -290,16 +311,18 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                   sx={{
                     minWidth: { xs: "100%", md: 200 },
                     height: 60,
-                    borderRadius: "16px",
-                    bgcolor: "#4f46e5",
-                    color: "#fff",
-                    fontSize: "1.1rem",
-                    fontWeight: 700,
+                    borderRadius: "14px",
+                    bgcolor: "#FF8E9E",
+                    color: "#2D2520",
+                    border: "2.5px solid #2D2520",
+                    fontSize: "1.05rem",
+                    fontWeight: 800,
                     textTransform: "none",
-                    boxShadow: "0 8px 20px rgba(79,70,229,0.3)",
-                    "&:hover": { bgcolor: "#4338ca", transform: "translateY(-2px)", boxShadow: "0 12px 24px rgba(79,70,229,0.4)" },
-                    "&.Mui-disabled": { bgcolor: "#f1f5f9", color: "#cbd5e1" },
-                    transition: "all 0.3s"
+                    fontFamily: "var(--font-prompt), sans-serif",
+                    boxShadow: "3px 3px 0px #2D2520",
+                    "&:hover": { bgcolor: "#FF7D8F", transform: "translateY(-2px)", boxShadow: "4px 4px 0px #2D2520" },
+                    "&.Mui-disabled": { bgcolor: "#FAF8F2", color: "#cbd5e1", border: "2px solid #cbd5e1", boxShadow: "none" },
+                    transition: "all 0.2s"
                   }}
                 >
                   {checking ? <CircularProgress size={24} color="inherit" /> : "ตรวจสอบรางวัล"}
@@ -308,20 +331,113 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
             </Box>
 
             {matches && (
-              <Box sx={{ mt: 2 }}>
+              <Box sx={{ mt: 3 }}>
                 {matches.length > 0 ? (
-                  <Alert
-                    severity="success"
-                    icon={<Cup size={24} variant="Bold" color="currentColor" />}
-                    sx={{ borderRadius: "16px", py: 2, px: 3, fontSize: "1.05rem", fontWeight: 700, bgcolor: "#ecfdf5", color: "#065f46", border: "1px solid #d1fae5" }}
+                  <Box
+                    sx={{
+                      borderRadius: "20px",
+                      border: "3.5px solid #2D2520",
+                      backgroundImage: "linear-gradient(135deg, #FFF6E3 0%, #FFEBEF 50%, #EAF0FF 100%)",
+                      p: { xs: 3, md: 4 },
+                      boxShadow: "8px 8px 0px #2D2520",
+                      textAlign: "center",
+                      position: "relative",
+                      overflow: "hidden",
+                      animation: "bounceIn 0.5s ease-out",
+                      "@keyframes bounceIn": {
+                        "0%": { transform: "scale(0.9)", opacity: 0 },
+                        "50%": { transform: "scale(1.03)" },
+                        "100%": { transform: "scale(1)", opacity: 1 },
+                      }
+                    }}
                   >
-                    ยินดีด้วย! คุณถูกรางวัลทั้งหมด {matches.length} รายการ
-                  </Alert>
+                    {/* Decorative Ghibli-themed floating sparkles/stars */}
+                    <Box sx={{ position: "absolute", top: 12, left: 16, animation: "spin 6s linear infinite", display: { xs: "none", sm: "block" } }}>
+                      <MagicStar size={24} variant="Bold" color="#fbbf24" />
+                    </Box>
+                    <Box sx={{ position: "absolute", bottom: 12, right: 16, animation: "spin-reverse 8s linear infinite", display: { xs: "none", sm: "block" } }}>
+                      <MagicStar size={20} variant="Bold" color="#FF8E9E" />
+                    </Box>
+
+                    <Stack spacing={1.5} sx={{ alignItems: "center", mb: 2.5 }}>
+                      <Box
+                        sx={{
+                          width: 64,
+                          height: 64,
+                          borderRadius: "50%",
+                          bgcolor: "#fef9c3",
+                          border: "2.5px solid #2D2520",
+                          boxShadow: "3px 3px 0px #2D2520",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#a16207",
+                          animation: "pulse 2s ease-in-out infinite"
+                        }}
+                      >
+                        <Cup size={36} variant="Bold" color="currentColor" />
+                      </Box>
+                      <Typography
+                        sx={{
+                          color: "#2D2520",
+                          fontSize: { xs: "1.5rem", sm: "1.8rem", md: "2.2rem" },
+                          fontWeight: 800,
+                          fontFamily: "var(--font-prompt), sans-serif",
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        🎉 ยินดีด้วยอย่างยิ่ง! คุณถูกรางวัล 🎉
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: "#5A4D43",
+                          fontSize: "0.95rem",
+                          fontWeight: 700,
+                          fontFamily: "var(--font-prompt), sans-serif",
+                        }}
+                      >
+                        ถูกรางวัลทั้งหมด <Box component="span" sx={{ color: "#FF8E9E", fontWeight: 800 }}>{matches.length} รายการ</Box> ในงวดนี้
+                      </Typography>
+                    </Stack>
+
+                    {/* Total Winnings Summary Panel */}
+                    <Box
+                      sx={{
+                        bgcolor: "#FFFDF9",
+                        border: "2.5px solid #2D2520",
+                        borderRadius: "16px",
+                        py: 2.5,
+                        px: 3,
+                        boxShadow: "4px 4px 0px #2D2520",
+                        display: "inline-block",
+                        minWidth: 260,
+                        mb: 1,
+                      }}
+                    >
+                      <Typography sx={{ color: "#5A4D43", fontSize: "0.8rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>
+                        รวมเงินรางวัลสะสมทั้งหมด
+                      </Typography>
+                      <Typography sx={{ color: "#FF8E9E", fontSize: { xs: "2rem", sm: "2.4rem", md: "2.8rem" }, fontWeight: 800, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
+                        {formatBaht(matches.reduce((sum, m) => sum + m.reward, 0))} <Box component="span" sx={{ fontSize: "1.2rem", fontWeight: 800, color: "#2D2520" }}>บาท</Box>
+                      </Typography>
+                    </Box>
+                  </Box>
                 ) : (
                   <Alert
                     severity="info"
                     icon={false}
-                    sx={{ borderRadius: "16px", py: 2, px: 3, fontSize: "1.05rem", fontWeight: 600, bgcolor: "#f8fafc", color: "#64748b", border: "1px solid #f1f5f9" }}
+                    sx={{
+                      borderRadius: "16px",
+                      py: 2,
+                      px: 3,
+                      fontSize: "1.05rem",
+                      fontWeight: 800,
+                      bgcolor: "#FAF8F2",
+                      color: "#5A4D43",
+                      border: "2.5px solid #2D2520",
+                      boxShadow: "4px 4px 0px #2D2520",
+                      fontFamily: "var(--font-prompt), sans-serif"
+                    }}
                   >
                     ไม่พบรางวัลสำหรับเลข {cleanNumber} ในงวดนี้ พยายามใหม่ในงวดหน้านะครับ
                   </Alert>
@@ -331,6 +447,17 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
 
             {matches && matches.length > 0 && (
               <Stack spacing={2} sx={{ mt: 4 }}>
+                <Typography
+                  sx={{
+                    color: "#2D2520",
+                    fontSize: "1.1rem",
+                    fontWeight: 800,
+                    fontFamily: "var(--font-prompt), sans-serif",
+                    mb: 0.5
+                  }}
+                >
+                  รายละเอียดรางวัลที่ได้รับ:
+                </Typography>
                 {matches.map((match) => (
                   <Box
                     key={`${match.id}-${match.matchedNumber}`}
@@ -338,51 +465,60 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      borderRadius: "20px",
-                      bgcolor: "#fff",
-                      border: "1.5px solid #d1fae5",
+                      borderRadius: "16px",
+                      bgcolor: "#FFFDF9",
+                      border: "2.5px solid #2D2520",
+                      backgroundImage: "linear-gradient(135deg, #FFFDF0 0%, #FFF3D6 100%)",
                       p: 3,
-                      boxShadow: "0 4px 12px rgba(6,95,70,0.05)",
+                      boxShadow: "4px 4px 0px #2D2520",
+                      position: "relative",
+                      transition: "all 0.2s",
+                      "&:hover": { transform: "translateY(-2px)", boxShadow: "5px 5px 0px #2D2520" }
                     }}
                   >
                     <Box>
-                      <Typography sx={{ color: "#065f46", fontSize: "1.1rem", fontWeight: 800, mb: 0.5 }}>{match.name}</Typography>
-                      <Typography sx={{ color: "#059669", fontSize: "0.9rem", fontWeight: 500 }}>
-                        เลขที่ถูกรางวัล: <Box component="span" sx={{ fontWeight: 800 }}>{match.matchedNumber}</Box>
+                      <Typography sx={{ color: "#2D2520", fontSize: "1.15rem", fontWeight: 800, mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>{match.name}</Typography>
+                      <Typography sx={{ color: "#5A4D43", fontSize: "0.9rem", fontWeight: 700, fontFamily: "var(--font-prompt), sans-serif" }}>
+                        เลขที่ถูกรางวัล: <Box component="span" sx={{ fontWeight: 800, color: "#FF8E9E", borderBottom: "2px dashed #FF8E9E" }}>{match.matchedNumber}</Box>
                       </Typography>
                     </Box>
-                    <Typography sx={{ color: "#059669", fontSize: "1.4rem", fontWeight: 900 }}>
-                      {formatBaht(match.reward)} <Box component="span" sx={{ fontSize: "1rem", fontWeight: 600 }}>บาท</Box>
-                    </Typography>
+                    <Box sx={{ textAlign: "right" }}>
+                      <Typography sx={{ color: "#2D2520", fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase", mb: 0.25, fontFamily: "var(--font-prompt), sans-serif" }}>
+                        มูลค่ารางวัล
+                      </Typography>
+                      <Typography sx={{ color: "#FF8E9E", fontSize: "1.45rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif", lineHeight: 1.1 }}>
+                        +{formatBaht(match.reward)} <Box component="span" sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#2D2520" }}>บาท</Box>
+                      </Typography>
+                    </Box>
                   </Box>
                 ))}
               </Stack>
             )}
 
             {error && (
-              <Alert severity="error" sx={{ mt: 3, borderRadius: "12px" }}>{error}</Alert>
+              <Alert severity="error" sx={{ mt: 3, borderRadius: "12px", border: "2px solid #ef4444" }}>{error}</Alert>
             )}
           </Box>
 
           {/* Side Info Cards */}
-            <Stack spacing={2}>
+          <Stack spacing={2}>
             {/* Quick Result Dashboard */}
             <Box
               sx={{
-                borderRadius: "28px",
-                bgcolor: "#fff",
-                border: "1px solid #f1f5f9",
-                boxShadow: "0 10px 30px -10px rgba(0,0,0,0.05)",
+                borderRadius: "24px",
+                bgcolor: "#FFFDF9",
+                border: "2.5px solid #2D2520",
+                boxShadow: "5px 5px 0px #2D2520",
                 p: { xs: 2.25, md: 2.5 },
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 2 }}>
-                <Box sx={{ width: 36, height: 36, borderRadius: "12px", bgcolor: "#fef9c3", color: "#a16207", display: "grid", placeItems: "center" }}>
+                <Box sx={{ width: 36, height: 36, borderRadius: "10px", bgcolor: "rgba(255, 142, 158, 0.15)", color: "#FF8E9E", display: "grid", placeItems: "center", border: "2px solid #2D2520" }}>
                   <MagicStar size={20} variant="Bold" color="currentColor" />
                 </Box>
                 <Box>
-                  <Typography sx={{ fontSize: "0.75rem", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase" }}>Quick View</Typography>
-                  <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a" }}>
+                  <Typography sx={{ fontSize: "0.75rem", fontWeight: 800, color: "#5A4D43", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>Quick View</Typography>
+                  <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>
                     {lottery?.result.date ? `งวดวันที่ ${lottery.result.date}` : "งวดวันที่"}
                   </Typography>
                 </Box>
@@ -401,7 +537,7 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                       display: "flex",
                       flexDirection: "column",
                       gap: 1.25,
-                      bgcolor: "#ffffff",
+                      bgcolor: "#FFFDF9",
                       zIndex: 2,
                       animation: "fadeIn 0.2s ease-in-out",
                       "@keyframes fadeIn": {
@@ -415,8 +551,10 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                         key={i}
                         sx={{
                           height: 70,
-                          borderRadius: "16px",
-                          bgcolor: "#f8fafc",
+                          borderRadius: "12px",
+                          bgcolor: "#FAF8F2",
+                          border: "2px solid #2D2520",
+                          boxShadow: "2px 2px 0px #2D2520",
                           position: "relative",
                           overflow: "hidden",
                           "&::after": {
@@ -455,18 +593,18 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                           key={prize.id}
                           sx={{
                             p: 1.5,
-                            borderRadius: "16px",
-                            bgcolor: isFirst ? "#fefce8" : "#f8fafc",
-                            border: "1px solid",
-                            borderColor: isFirst ? "#fef08a" : "#f1f5f9",
-                            boxShadow: isFirst ? "0 4px 12px rgba(254,240,138,0.3)" : "none",
-                            transition: "all 0.3s",
+                            borderRadius: "12px",
+                            bgcolor: isFirst ? "rgba(251, 191, 36, 0.12)" : "#FAF8F2",
+                            border: "2px solid #2D2520",
+                            borderLeft: isFirst ? "8px solid #fbbf24" : "8px solid #7296F8",
+                            boxShadow: "2px 2px 0px #2D2520",
+                            transition: "all 0.2s",
                           }}
                         >
-                          <Typography sx={{ color: isFirst ? "#a16207" : "#64748b", fontSize: "0.7rem", fontWeight: 800, mb: 0.5, textTransform: "uppercase" }}>
+                          <Typography sx={{ color: "#5A4D43", fontSize: "0.7rem", fontWeight: 800, mb: 0.5, textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
                             {prize.name}
                           </Typography>
-                          <Typography sx={{ color: isFirst ? "#854d0e" : "#0f172a", fontSize: isFirst ? "1.4rem" : "1.1rem", fontWeight: 900, letterSpacing: "0.05em" }}>
+                          <Typography sx={{ color: "#2D2520", fontSize: isFirst ? "1.4rem" : "1.1rem", fontWeight: 800, letterSpacing: "0.05em", fontFamily: "var(--font-prompt), sans-serif" }}>
                             {prize.numbers.join(", ")}
                           </Typography>
                         </Box>
@@ -484,13 +622,15 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                 sx={{
                   mt: 2,
                   height: 46,
-                  borderRadius: "14px",
-                  color: "#64748b",
-                  bgcolor: "#f8fafc",
-                  border: "1px solid #f1f5f9",
-                  fontWeight: 700,
+                  borderRadius: "12px",
+                  color: "#2D2520",
+                  bgcolor: "#FAF8F2",
+                  border: "2px solid #2D2520",
+                  boxShadow: "3px 3px 0px #2D2520",
+                  fontWeight: 800,
                   textTransform: "none",
-                  "&:hover": { bgcolor: "#f1f5f9", color: "#0f172a" }
+                  fontFamily: "var(--font-prompt), sans-serif",
+                  "&:hover": { bgcolor: "#FFFDF9", transform: "translateY(-2px)", boxShadow: "4px 4px 0px #2D2520" }
                 }}
               >
                 รีเฟรชงวดล่าสุด
@@ -499,14 +639,78 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
           </Stack>
         </Box>
 
+        {/* Recommended Wealth Products Section */}
+        {wealthProducts.length > 0 && (
+          <Box
+            sx={{
+              p: { xs: 3, md: 5 },
+              mt: { xs: 5, md: 6 },
+              borderRadius: "24px",
+              border: "3px solid #2D2520",
+              bgcolor: "#FFFDF9",
+              boxShadow: "6px 6px 0px 0px #2D2520",
+            }}
+          >
+            <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
+              <Box
+                sx={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: "10px",
+                  display: "grid",
+                  placeItems: "center",
+                  bgcolor: "rgba(255, 142, 158, 0.15)",
+                  border: "2px solid #2D2520"
+                }}
+              >
+                <MagicStar size={22} variant="Bulk" color="#FF8E9E" />
+              </Box>
+              <Box>
+                <Typography sx={{ color: "#FF8E9E", fontWeight: 950, fontSize: "0.78rem", letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
+                  RECOMMENDED WEALTH ITEMS
+                </Typography>
+                <Typography variant="h5" sx={{ color: "#2D2520", fontWeight: 950, fontSize: { xs: "1.2rem", md: "1.5rem" }, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  ของมงคลนำโชคเสริมดวงโชคลาภและการเงิน
+                </Typography>
+              </Box>
+            </Stack>
+
+            <Typography sx={{ color: "#5A4D43", fontSize: "0.9rem", mb: 4, lineHeight: 1.6, fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
+              เพิ่มพลังหนุนนำดวงการเงินและช่วยเปิดทางโชคลาภให้คุณอย่างราบรื่น! อาจารย์คัดสรรไอเทมสายมูยอดนิยมที่ผ่านพิธีประจุพลังงานเสริมสิริมงคล เสริมดวงโภคทรัพย์มาให้บูชาค่ะ
+            </Typography>
+
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", lg: "repeat(3, minmax(0, 1fr))" }, gap: 3 }}>
+              {wealthProducts.map((product) => (
+                <AffiliateCard
+                  key={product.id}
+                  name={product.name}
+                  description={product.description}
+                  price={product.price}
+                  originalPrice={product.originalPrice}
+                  image={product.image}
+                  link={product.url}
+                  platform={product.platform}
+                  platformLabel={product.platform}
+                  productSlug={product.productSlug}
+                  rating={product.rating}
+                  reviewCount={product.reviewCount}
+                  variant="sidebar"
+                  accentColor="#FF8E9E"
+                  badge="ดึงดูดทรัพย์เสี่ยงดวง"
+                />
+              ))}
+            </Box>
+          </Box>
+        )}
+
         {/* History Table Section */}
-        <Box sx={{ mt: { xs: 4, md: 5 } }}>
+        <Box sx={{ mt: { xs: 5, md: 6 } }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 2.5 }}>
-            <Box sx={{ width: 7, height: 28, bgcolor: "#4f46e5", borderRadius: "4px" }} />
-            <Typography variant="h2" sx={{ color: "#0f172a", fontSize: { xs: "1.55rem", md: "1.8rem" }, fontWeight: 800 }}>สถิติและผลรางวัลย้อนหลัง</Typography>
+            <Box sx={{ width: 8, height: 28, bgcolor: "#FF8E9E", border: "1.5px solid #2D2520", borderRadius: "4px" }} />
+            <Typography variant="h2" sx={{ color: "#2D2520", fontSize: { xs: "1.55rem", md: "1.8rem" }, fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>สถิติและผลรางวัลย้อนหลัง</Typography>
           </Box>
 
-          <Stack spacing={1.5}>
+          <Stack spacing={2}>
             {history.map((item, index) => {
               const parts = item.date.split(" ");
               const day = parts[0];
@@ -523,13 +727,14 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                   sx={{
                     display: "flex",
                     flexDirection: { xs: "column", sm: "row" },
-                    gap: 2,
-                    p: { xs: 2, md: 2.25 },
+                    gap: 2.5,
+                    p: { xs: 2.25, md: 2.5 },
                     borderRadius: "20px",
-                    bgcolor: "#fff",
-                    border: "1px solid #f1f5f9",
+                    bgcolor: "#FFFDF9",
+                    border: "2.5px solid #2D2520",
+                    boxShadow: "4px 4px 0px #2D2520",
                     transition: "all 0.2s",
-                    "&:hover": { borderColor: "#c7d2fe", boxShadow: "0 8px 24px rgba(79,70,229,0.06)" }
+                    "&:hover": { transform: "translateY(-2px)", boxShadow: "5px 5px 0px #2D2520" }
                   }}
                 >
                   <Box
@@ -539,28 +744,30 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                       width: 68,
                       height: 68,
                       flexShrink: 0,
-                      bgcolor: index === 0 ? "#4f46e5" : "#f8fafc",
-                      color: index === 0 ? "#fff" : "#4f46e5",
-                      borderRadius: "16px",
+                      bgcolor: index === 0 ? "#FF8E9E" : "#FAF8F2",
+                      color: "#2D2520",
+                      borderRadius: "12px",
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      border: "none",
+                      border: "2px solid #2D2520",
+                      boxShadow: "2px 2px 0px #2D2520",
                       cursor: "pointer",
                       transition: "all 0.2s",
+                      "&:hover": { transform: "scale(1.05)" }
                     }}
                   >
-                    <Typography sx={{ fontSize: "1.8rem", fontWeight: 800, lineHeight: 1 }}>{day}</Typography>
-                    <Typography sx={{ fontSize: "0.8rem", fontWeight: 700 }}>{monthAbbr}</Typography>
+                    <Typography sx={{ fontSize: "1.65rem", fontWeight: 800, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>{day}</Typography>
+                    <Typography sx={{ fontSize: "0.8rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>{monthAbbr}</Typography>
                   </Box>
 
                   <Box sx={{ flexGrow: 1 }}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
-                      <Typography sx={{ color: "#0f172a", fontWeight: 800, fontSize: "1.15rem" }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5, flexWrap: "wrap", rowGap: 1 }}>
+                      <Typography sx={{ color: "#2D2520", fontWeight: 800, fontSize: "1.15rem", fontFamily: "var(--font-prompt), sans-serif" }}>
                         งวดประจำวันที่ {item.date}
                       </Typography>
-                      <Button onClick={() => loadDraw(item.id)} size="small" sx={{ fontWeight: 700, color: "#4f46e5" }}>รายละเอียด →</Button>
+                      <Button onClick={() => loadDraw(item.id)} size="small" sx={{ fontWeight: 800, color: "#FF8E9E", fontFamily: "var(--font-prompt), sans-serif", "&:hover": { color: "#FF7D8F" } }}>รายละเอียด →</Button>
                     </Box>
 
                     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" }, gap: 1.25 }}>
@@ -570,9 +777,9 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                         { label: "เลขท้าย 3 ตัว", value: t3 },
                         { label: "เลขท้าย 2 ตัว", value: t2, highlight: true },
                       ].map((col, i) => (
-                        <Box key={i} sx={{ bgcolor: col.highlight ? "#f8fafc" : "transparent", p: 1.25, borderRadius: "12px", border: col.highlight ? "1px solid #e2e8f0" : "none" }}>
-                          <Typography sx={{ fontSize: "0.65rem", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", mb: 0.5 }}>{col.label}</Typography>
-                          <Typography sx={{ fontSize: "1.25rem", fontWeight: 900, color: col.highlight ? "#4f46e5" : "#1e293b" }}>{col.value}</Typography>
+                        <Box key={i} sx={{ bgcolor: col.highlight ? "rgba(255, 142, 158, 0.08)" : "transparent", p: 1.25, borderRadius: "10px", border: col.highlight ? "2px solid #2D2520" : "none", boxShadow: col.highlight ? "2px 2px 0px #2D2520" : "none" }}>
+                          <Typography sx={{ fontSize: "0.68rem", color: "#5A4D43", fontWeight: 800, textTransform: "uppercase", mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>{col.label}</Typography>
+                          <Typography sx={{ fontSize: "1.25rem", fontWeight: 800, color: col.highlight ? "#FF8E9E" : "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>{col.value}</Typography>
                         </Box>
                       ))}
                     </Box>
@@ -582,6 +789,7 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
             })}
           </Stack>
         </Box>
+
       </Container>
     </Box>
   );

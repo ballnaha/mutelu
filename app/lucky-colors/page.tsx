@@ -6,10 +6,12 @@ import { ArrowLeft, Briefcase, Calendar, MagicStar, MoneyRecive, Heart, CloseCir
 import { Footer } from "@/app/components/footer";
 import { Header } from "@/app/components/header";
 import { getMonthlyLuckyColors, type LuckyColor } from "@/lib/lucky-colors";
+import { prisma } from "@/lib/prisma";
+import { AffiliateCard } from "@/app/components/affiliate-card";
 
 export const metadata: Metadata = {
-  title: "สีเสื้อมงคลประจำเดือน | MUTELU.",
-  description: "ตารางสีเสื้อมงคลประจำเดือน แยกสีเสริมงาน การเงิน ความรัก โชค และสีที่ควรเลี่ยง",
+  title: "สีเสื้อมงคลประจำเดือน | mulamoon.",
+  description: "ตารางสีเสื้อมงคลประจำเดือน แยกสีเสริมงาน การเงิน ความรัก โชค และสีที่ควรเลี่ยง สไตล์สีน้ำแสนอบอุ่น",
 };
 
 export const revalidate = 3600;
@@ -24,7 +26,7 @@ const colorLabels = [
 
 type MonthlyLuckyColorsData = NonNullable<ReturnType<typeof getMonthlyLuckyColors>>;
 
-function ColorDot({ color, size = 18 }: { color: LuckyColor, size?: number }) {
+function ColorDot({ color, size = 18 }: { color: LuckyColor; size?: number }) {
   const needsBorder = color.hex === "#f8fafc" || color.hex === "#fde68a";
 
   return (
@@ -35,19 +37,19 @@ function ColorDot({ color, size = 18 }: { color: LuckyColor, size?: number }) {
         height: size,
         borderRadius: "50%",
         bgcolor: color.hex,
-        border: needsBorder ? "1px solid rgba(15,23,42,0.18)" : "2px solid rgba(255,255,255,0.9)",
-        boxShadow: `0 0 0 1px rgba(15,23,42,0.06), 2px 2px 8px ${color.hex}55`,
+        border: "2px solid #2D2520",
+        boxShadow: `2px 2px 0px 0px #2D2520`,
         flexShrink: 0,
       }}
     />
   );
 }
 
-function CompactColorCell({ color, alignRight = false, isLarge = false }: { color: LuckyColor, alignRight?: boolean, isLarge?: boolean }) {
+function CompactColorCell({ color, alignRight = false, isLarge = false }: { color: LuckyColor; alignRight?: boolean; isLarge?: boolean }) {
   return (
-    <Stack direction="row" spacing={isLarge ? 1 : 0.75} sx={{ alignItems: "center", justifyContent: alignRight ? "flex-end" : "flex-start", minWidth: 0 }}>
+    <Stack direction="row" spacing={isLarge ? 1.2 : 0.8} sx={{ alignItems: "center", justifyContent: alignRight ? "flex-end" : "flex-start", minWidth: 0 }}>
       <ColorDot color={color} size={isLarge ? 22 : 18} />
-      <Typography sx={{ color: "#0f172a", fontSize: isLarge ? "0.96rem" : "0.86rem", fontWeight: 700, lineHeight: 1.2, whiteSpace: "nowrap" }}>
+      <Typography sx={{ color: "#2D2520", fontSize: isLarge ? "0.96rem" : "0.86rem", fontWeight: 600, lineHeight: 1.2, whiteSpace: "nowrap", fontFamily: "var(--font-prompt), sans-serif" }}>
         {color.name}
       </Typography>
     </Stack>
@@ -62,31 +64,31 @@ function CategoryBadge({
   Icon: (typeof colorLabels)[number]["icon"];
 }) {
   const toneMap: Record<string, { bg: string; border: string; color: string }> = {
-    งาน: { bg: "#dbeafe", border: "#bfdbfe", color: "#1d4ed8" },
-    เงิน: { bg: "#dcfce7", border: "#bbf7d0", color: "#15803d" },
-    รัก: { bg: "#fce7f3", border: "#fbcfe8", color: "#be185d" },
-    โชค: { bg: "#fef9c3", border: "#fde68a", color: "#a16207" },
-    เลี่ยง: { bg: "#ffedd5", border: "#fed7aa", color: "#c2410c" },
+    งาน: { bg: "rgba(114, 150, 248, 0.08)", border: "#7296F8", color: "#7296F8" },
+    เงิน: { bg: "rgba(232, 162, 67, 0.08)", border: "#E8A243", color: "#E8A243" },
+    รัก: { bg: "rgba(255, 142, 158, 0.08)", border: "#FF8E9E", color: "#FF8E9E" },
+    โชค: { bg: "rgba(139, 92, 246, 0.08)", border: "#8B5CF6", color: "#8B5CF6" },
+    เลี่ยง: { bg: "rgba(231, 97, 97, 0.08)", border: "#E76161", color: "#E76161" },
   };
-  const tone = toneMap[label] ?? { bg: "#f8fafc", border: "#e2e8f0", color: "#475569" };
+  const tone = toneMap[label] ?? { bg: "#FAF8F2", border: "#2D2520", color: "#2D2520" };
 
   return (
     <Box
       sx={{
         display: "inline-flex",
         alignItems: "center",
-        gap: 0.45,
-        px: 0.78,
-        py: 0.42,
-        borderRadius: "999px",
+        gap: 0.5,
+        px: 1.2,
+        py: 0.5,
+        borderRadius: "8px",
         bgcolor: tone.bg,
-        border: `1px solid ${tone.border}`,
+        border: `1.5px solid ${tone.border}`,
         width: "fit-content",
         maxWidth: "100%",
       }}
     >
       <Icon size={13} variant="Bulk" color={tone.color} />
-      <Typography sx={{ color: tone.color, fontSize: "0.74rem", fontWeight: 600, lineHeight: 1 }}>
+      <Typography sx={{ color: tone.color, fontSize: "0.76rem", fontWeight: 800, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
         {label}
       </Typography>
     </Box>
@@ -101,18 +103,18 @@ function DesktopCategoryLabel({
   Icon: (typeof colorLabels)[number]["icon"];
 }) {
   const toneMap: Record<string, string> = {
-    งาน: "#1d4ed8",
-    เงิน: "#15803d",
-    รัก: "#be185d",
-    โชค: "#a16207",
-    เลี่ยง: "#c2410c",
+    งาน: "#7296F8",
+    เงิน: "#E8A243",
+    รัก: "#FF8E9E",
+    โชค: "#8B5CF6",
+    เลี่ยง: "#E76161",
   };
-  const color = toneMap[label] ?? "#475569";
+  const color = toneMap[label] ?? "#2D2520";
 
   return (
-    <Stack direction="row" spacing={0.6} sx={{ alignItems: "center" }}>
-      <Icon size={14} variant="Bulk" color={color} />
-      <Typography sx={{ color, fontSize: "0.86rem", fontWeight: 600, lineHeight: 1.1 }}>
+    <Stack direction="row" spacing={0.8} sx={{ alignItems: "center" }}>
+      <Icon size={15} variant="Bulk" color={color} />
+      <Typography sx={{ color, fontSize: "0.88rem", fontWeight: 800, lineHeight: 1.1, fontFamily: "var(--font-prompt), sans-serif" }}>
         {label}
       </Typography>
     </Stack>
@@ -135,7 +137,7 @@ function DesktopColorTable({
       sx={{
         display: { xs: "none", lg: "grid" },
         gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-        gap: 1.5,
+        gap: 2.5,
       }}
     >
       {days.map((day) => (
@@ -143,39 +145,52 @@ function DesktopColorTable({
           key={day.date}
           sx={{
             borderRadius: "20px",
-            border: day.date === featuredDate ? "1px solid #fde68a" : "1px solid #f1f5f9",
-            bgcolor: day.date === featuredDate ? "#fffbeb" : "#fff",
-            boxShadow: "0 10px 30px -12px rgba(15,23,42,0.1)",
-            p: 2,
-            transition: "background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease",
+            border: day.date === featuredDate ? "3px solid #E8A243" : "2.5px solid #2D2520",
+            bgcolor: day.date === featuredDate ? "#FAF8F2" : "#FFFDF9",
+            boxShadow: day.date === featuredDate ? "6px 6px 0px 0px #E8A243" : "4px 4px 0px 0px #2D2520",
+            p: 3,
+            transition: "all 0.2s ease",
             "&:hover": {
-              borderColor: day.date === featuredDate ? "#facc15" : "#c7d2fe",
-              transform: "translateY(-2px)",
+              borderColor: day.date === featuredDate ? "#E8A243" : "#FF8E9E",
+              transform: "translate(2px, 2px)",
+              boxShadow: day.date === featuredDate ? "3px 3px 0px 0px #E8A243" : "2px 2px 0px 0px #FF8E9E",
             },
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 1, mb: 1.15 }}>
+          <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 1, mb: 2 }}>
             <Box>
-              <Typography sx={{ color: "#0f172a", fontSize: "1rem", fontWeight: 800, lineHeight: 1.2 }}>
+              <Typography sx={{ color: "#2D2520", fontSize: "1.08rem", fontWeight: 800, lineHeight: 1.2, fontFamily: "var(--font-prompt), sans-serif" }}>
                 วัน{day.weekdayLabel}ที่ {day.day}
               </Typography>
-              <Typography sx={{ color: "#94a3b8", fontSize: "0.73rem", fontWeight: 500, mt: 0.35 }}>
+              <Typography sx={{ color: "#5A4D43", fontSize: "0.78rem", fontWeight: 500, mt: 0.35, fontFamily: "var(--font-prompt), sans-serif" }}>
                 เดือน{monthLabel} พ.ศ. {yearBE}
               </Typography>
             </Box>
             {day.date === featuredDate ? (
-              <Typography sx={{ color: "#a16207", fontSize: "0.7rem", fontWeight: 800, lineHeight: 1, bgcolor: "#fef3c7", px: 1, py: 0.45, borderRadius: "99px" }}>
+              <Typography sx={{
+                color: "#2D2520",
+                fontSize: "0.72rem",
+                fontWeight: 800,
+                lineHeight: 1,
+                bgcolor: "#E8A243",
+                border: "1.5px solid #2D2520",
+                boxShadow: "1.5px 1.5px 0px 0px #2D2520",
+                px: 1.25,
+                py: 0.5,
+                borderRadius: "99px",
+                fontFamily: "var(--font-prompt), sans-serif"
+              }}>
                 วันนี้
               </Typography>
             ) : null}
           </Box>
 
-          <Stack spacing={1.25} sx={{ mt: 1.5 }}>
+          <Stack spacing={1.5} sx={{ mt: 1.5 }}>
             {colorLabels.map(({ key, label, icon: Icon }) => {
               const color = day.colors[key];
 
               return (
-                <Box key={key} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1.5, borderBottom: "1px solid #f1f5f9", pb: 1, "&:last-child": { borderBottom: "none", pb: 0 } }}>
+                <Box key={key} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1.5, borderBottom: "1.5px dashed rgba(45,37,32,0.15)", pb: 1.2, "&:last-child": { borderBottom: "none", pb: 0 } }}>
                   <DesktopCategoryLabel label={label} Icon={Icon} />
                   <CompactColorCell color={color} alignRight />
                 </Box>
@@ -200,40 +215,52 @@ function MobileColorList({
   yearBE: number;
 }) {
   return (
-    <Stack spacing={1} sx={{ display: { xs: "flex", lg: "none" } }}>
+    <Stack spacing={2} sx={{ display: { xs: "flex", lg: "none" } }}>
       {days.map((day) => (
         <Box
           key={day.date}
           sx={{
             borderRadius: "20px",
-            border: day.date === featuredDate ? "1px solid #fde68a" : "1px solid #f1f5f9",
-            bgcolor: day.date === featuredDate ? "#fffbeb" : "#fff",
-            boxShadow: "0 10px 30px -12px rgba(15,23,42,0.1)",
-            p: 2,
+            border: day.date === featuredDate ? "3px solid #E8A243" : "2.5px solid #2D2520",
+            bgcolor: day.date === featuredDate ? "#FAF8F2" : "#FFFDF9",
+            boxShadow: day.date === featuredDate ? "6px 6px 0px 0px #E8A243" : "4px 4px 0px 0px #2D2520",
+            p: 2.5,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 1, mb: 1.1 }}>
+          <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 1, mb: 2 }}>
             <Box>
-              <Typography sx={{ color: "#0f172a", fontSize: "0.96rem", fontWeight: 800, lineHeight: 1.2 }}>
+              <Typography sx={{ color: "#2D2520", fontSize: "1.02rem", fontWeight: 800, lineHeight: 1.2, fontFamily: "var(--font-prompt), sans-serif" }}>
                 วัน{day.weekdayLabel}ที่ {day.day}
               </Typography>
-              <Typography sx={{ color: "#94a3b8", fontSize: "0.73rem", fontWeight: 500, mt: 0.35 }}>
+              <Typography sx={{ color: "#5A4D43", fontSize: "0.78rem", fontWeight: 500, mt: 0.35, fontFamily: "var(--font-prompt), sans-serif" }}>
                 เดือน{monthLabel} พ.ศ. {yearBE}
               </Typography>
             </Box>
             {day.date === featuredDate ? (
-              <Typography sx={{ color: "#a16207", fontSize: "0.7rem", fontWeight: 800, lineHeight: 1, bgcolor: "#fef3c7", px: 1, py: 0.45, borderRadius: "99px" }}>
+              <Typography sx={{
+                color: "#2D2520",
+                fontSize: "0.72rem",
+                fontWeight: 800,
+                lineHeight: 1,
+                bgcolor: "#E8A243",
+                border: "1.5px solid #2D2520",
+                boxShadow: "1.5px 1.5px 0px 0px #2D2520",
+                px: 1.25,
+                py: 0.5,
+                borderRadius: "99px",
+                fontFamily: "var(--font-prompt), sans-serif"
+              }}>
                 วันนี้
               </Typography>
             ) : null}
           </Box>
 
-          <Stack spacing={1.25} sx={{ mt: 1.5 }}>
+          <Stack spacing={1.5} sx={{ mt: 1.5 }}>
             {colorLabels.map(({ key, label, icon: Icon }) => {
               const color = day.colors[key];
 
               return (
-                <Box key={key} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1.5, borderBottom: "1px solid #f1f5f9", pb: 1, "&:last-child": { borderBottom: "none", pb: 0 } }}>
+                <Box key={key} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1.5, borderBottom: "1.5px dashed rgba(45,37,32,0.15)", pb: 1.2, "&:last-child": { borderBottom: "none", pb: 0 } }}>
                   <CategoryBadge label={label} Icon={Icon} />
                   <CompactColorCell color={color} alignRight />
                 </Box>
@@ -246,7 +273,7 @@ function MobileColorList({
   );
 }
 
-export default function LuckyColorsPage() {
+export default async function LuckyColorsPage() {
   const data = getMonthlyLuckyColors();
 
   if (!data) {
@@ -255,52 +282,48 @@ export default function LuckyColorsPage() {
 
   const featuredDay = data.today ?? data.days[0];
 
+  // Fetch 3 active master products for the same 3-column layout as Tarot.
+  const products = await prisma.masterAffiliateProduct.findMany({
+    where: { isActive: true },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+
   return (
-    <Box sx={{ bgcolor: "#f8fafc", minHeight: "100vh", color: "#0f172a" }}>
+    <Box sx={{ bgcolor: "#FFFDF9", minHeight: "100vh", color: "#2D2520" }}>
       <Header />
 
       <Box
         component="main"
         sx={{
-          pt: { xs: 9, md: 11 },
-          pb: { xs: 4, md: 6 },
+          pt: { xs: 11, md: 13 },
+          pb: { xs: 6, md: 8 },
         }}
       >
         <Container maxWidth="xl">
-          <Box sx={{ mb: 2 }}>
-            <Link href="/" style={{ textDecoration: "none", display: "inline-flex" }}>
-              <Button
-                startIcon={<ArrowLeft size={18} color="currentColor" />}
-                sx={{
-                  borderRadius: "12px",
-                  px: 0,
-                  color: "#64748b",
-                  fontWeight: 700,
-                  textTransform: "none",
-                  "&:hover": { color: "#4f46e5", bgcolor: "transparent" },
-                }}
-              >
-                กลับหน้าแรก
-              </Button>
-            </Link>
-          </Box>
+
 
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1fr) 360px" },
-              gap: { xs: 2.5, lg: 3 },
-              alignItems: "stretch",
-              mb: { xs: 3, md: 4 },
+              gridTemplateColumns: {
+                xs: "1fr",
+                lg: "minmax(0, 1.15fr) minmax(280px, 0.78fr) minmax(320px, 0.95fr)",
+              },
+              gap: { xs: 3, lg: 4 },
+              alignItems: "start",
+              mb: { xs: 4, md: 5 },
             }}
           >
             <Box
               sx={{
-                borderRadius: "28px",
-                border: "1px solid #f1f5f9",
-                bgcolor: "#fff",
-                boxShadow: "0 12px 40px -12px rgba(0,0,0,0.06)",
-                p: { xs: 2.5, sm: 3, md: 4 },
+                borderRadius: "24px",
+                border: "3px solid #2D2520",
+                bgcolor: "#FFFDF9",
+                boxShadow: "6px 6px 0px 0px #2D2520",
+                p: { xs: 3, sm: 4, md: 5 },
+                position: "relative",
+                overflow: "hidden"
               }}
             >
               <Box
@@ -308,64 +331,87 @@ export default function LuckyColorsPage() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 0.75,
-                  px: 1.5,
-                  py: 0.65,
+                  px: 2,
+                  py: 0.75,
                   borderRadius: "99px",
-                  bgcolor: "#fef9c3",
-                  color: "#a16207",
+                  bgcolor: "#FAF8F2",
+                  color: "#2D2520",
+                  border: "2px solid #2D2520",
+                  boxShadow: "2px 2px 0px 0px #2D2520",
                   fontWeight: 800,
-                  mb: 2.5,
+                  mb: 3,
                 }}
               >
                 <Calendar size={16} color="currentColor" />
-                <Typography component="span" sx={{ color: "inherit", fontSize: "0.82rem", fontWeight: 800, lineHeight: 1 }}>
+                <Typography component="span" sx={{ color: "inherit", fontSize: "0.84rem", fontWeight: 800, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
                   เดือน{data.monthLabel} พ.ศ. {data.yearBE}
                 </Typography>
               </Box>
 
-              <Typography sx={{ color: "#4f46e5", fontSize: "0.76rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", mb: 1 }}>
-                สีมงคล
+              <Typography sx={{ color: "#FF8E9E", fontSize: "0.82rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", mb: 1.5, fontFamily: "var(--font-prompt), sans-serif" }}>
+                🌸 ตารางสีสิริมงคล
               </Typography>
-              <Typography component="h1" sx={{ color: "#0f172a", fontSize: { xs: "2rem", sm: "2.35rem", md: "3rem" }, lineHeight: 1.08, fontWeight: 800, mb: 1 }}>
+              <Typography component="h1" sx={{ color: "#2D2520", fontSize: { xs: "2rem", sm: "2.35rem", md: "3rem" }, lineHeight: 1.1, fontWeight: 800, mb: 2, fontFamily: "var(--font-prompt), sans-serif" }}>
                 สีเสื้อมงคลประจำเดือน
               </Typography>
-              <Typography sx={{ maxWidth: 700, color: "#64748b", fontSize: { xs: "0.96rem", md: "1rem" }, lineHeight: 1.7, fontWeight: 400 }}>
-                เดือนนี้เด่นเรื่อง{data.theme} เลือกสีให้ตรงกับเป้าหมายของวันได้ง่าย ๆ ทั้งงาน เงิน ความรัก โชค และสีที่ควรเลี่ยง
+              <Typography sx={{ maxWidth: 700, color: "#5A4D43", fontSize: { xs: "0.96rem", md: "1.02rem" }, lineHeight: 1.75, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
+                เดือนนี้เด่นเรื่อง <strong style={{ color: "#FF8E9E" }}>{data.theme}</strong> เลือกสีเสื้อผ้าตามเป้าหมายของวันได้อย่างสมบูรณ์แบบ ทั้งการงาน การเงิน ความรัก โชคลาภ และสีเลี่ยงที่ต้องระวังค่ะ
               </Typography>
             </Box>
 
             <Box
               sx={{
                 position: "relative",
-                borderRadius: "28px",
-                border: "1px solid #fde68a",
-                bgcolor: "#fffbeb",
-                boxShadow: "0 12px 40px -12px rgba(161,98,7,0.16)",
-                p: { xs: 2.5, md: 3 },
+                borderRadius: "24px",
+                border: "3px solid #2D2520",
+                bgcolor: "#FAF8F2",
+                boxShadow: "6px 6px 0px 0px #2D2520",
+                p: { xs: 3, md: 3.5 },
                 overflow: "hidden",
               }}
             >
-              <Typography sx={{ color: "#a16207", fontSize: "0.8rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", mb: 1, display: "flex", alignItems: "center", gap: 0.5 }}>
-                <MagicStar size={14} variant="Bulk" color="currentColor" /> วันนี้
+              <Typography sx={{ color: "#FF8E9E", fontSize: "0.8rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", mb: 1.5, display: "flex", alignItems: "center", gap: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>
+                <MagicStar size={14} variant="Bulk" color="currentColor" /> วันนี้มงคลพิเศษ
               </Typography>
-              <Typography sx={{ color: "#0f172a", fontSize: "1.2rem", fontWeight: 800, lineHeight: 1.35, mb: 0.2 }}>
+              <Typography sx={{ color: "#2D2520", fontSize: "1.25rem", fontWeight: 800, lineHeight: 1.35, mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>
                 วัน{featuredDay.weekdayLabel}ที่ {featuredDay.day}
               </Typography>
-              <Typography sx={{ color: "#94a3b8", fontSize: "0.78rem", fontWeight: 600, mb: 1.5 }}>
+              <Typography sx={{ color: "#5A4D43", fontSize: "0.78rem", fontWeight: 500, mb: 2.2, fontFamily: "var(--font-prompt), sans-serif" }}>
                 เดือน{data.monthLabel} พ.ศ. {data.yearBE}
               </Typography>
-              <Typography sx={{ color: "#64748b", fontSize: "0.9rem", lineHeight: 1.7, fontWeight: 400, mb: 2 }}>
-                {featuredDay.shortAdvice}
+
+              <Typography sx={{
+                color: "#5A4D43",
+                fontSize: "0.92rem",
+                lineHeight: 1.7,
+                fontWeight: 500,
+                mb: 2.5,
+                p: 1.5,
+                bgcolor: "#FFFDF9",
+                borderLeft: "4px solid #FF8E9E",
+                borderRadius: "8px",
+                fontStyle: "italic",
+                fontFamily: "var(--font-prompt), sans-serif"
+              }}>
+                &ldquo;{featuredDay.shortAdvice}&rdquo;
               </Typography>
 
               <Stack spacing={0} sx={{ mt: 1 }}>
                 {colorLabels.map(({ key, label, icon: Icon }) => {
                   const color = featuredDay.colors[key];
+                  const toneColors: Record<string, string> = {
+                    งาน: "#7296F8",
+                    เงิน: "#E8A243",
+                    รัก: "#FF8E9E",
+                    โชค: "#8B5CF6",
+                    เลี่ยง: "#E76161",
+                  };
+                  const iconColor = toneColors[label] ?? "#2D2520";
                   return (
-                    <Box key={key} sx={{ display: "grid", gridTemplateColumns: "24px 1fr", alignItems: "center", gap: 1.5, py: 1.15, borderBottom: "1px solid rgba(161,98,7,0.12)", "&:last-child": { borderBottom: "none", pb: 0 } }}>
-                      <Icon size={20} variant="Bulk" color="#4f46e5" />
+                    <Box key={key} sx={{ display: "grid", gridTemplateColumns: "24px 1fr", alignItems: "center", gap: 1.5, py: 1.2, borderBottom: "1.5px dashed rgba(45,37,32,0.15)", "&:last-child": { borderBottom: "none", pb: 0 } }}>
+                      <Icon size={20} variant="Bulk" color={iconColor} />
                       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <Typography sx={{ color: "#475569", fontSize: "0.96rem", fontWeight: 700 }}>
+                        <Typography sx={{ color: "#2D2520", fontSize: "0.96rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
                           {label}
                         </Typography>
                         <CompactColorCell color={color} alignRight isLarge />
@@ -375,6 +421,59 @@ export default function LuckyColorsPage() {
                 })}
               </Stack>
             </Box>
+
+            {products.length > 0 && (
+              <Box
+                sx={{
+                  bgcolor: "#FFFDF9",
+                  p: 3,
+                  borderRadius: "20px",
+                  border: "2.5px solid #2D2520",
+                  borderTop: "8px solid #FF8E9E",
+                  boxShadow: "4px 4px 0px #2D2520",
+                }}
+              >
+                <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2.5 }}>
+                  <Box sx={{ width: 32, height: 32, borderRadius: "8px", bgcolor: "rgba(255, 142, 158, 0.15)", border: "2px solid #2D2520", display: "grid", placeItems: "center" }}>
+                    <MagicStar size={20} variant="Bulk" color="#FF8E9E" />
+                  </Box>
+                  <Box>
+                    <Typography sx={{ color: "#2D2520", fontSize: "1.02rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
+                      ของมงคลแนะนำประจำวัน
+                    </Typography>
+                    <Typography sx={{ color: "#5A4D43", fontSize: "0.76rem", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
+                      เสริมพลังตามสีและเจตนามงคลวันนี้
+                    </Typography>
+                  </Box>
+                </Stack>
+
+                <Stack spacing={2.2}>
+                  {products.map((product) => (
+                    <AffiliateCard
+                      key={product.id}
+                      name={product.name}
+                      description={product.description}
+                      price={product.price}
+                      originalPrice={product.originalPrice}
+                      image={product.image}
+                      link={product.url}
+                      platform={product.platform}
+                      platformLabel={product.platform}
+                      productSlug={product.productSlug}
+                      rating={product.rating}
+                      reviewCount={product.reviewCount}
+                      variant="sidebar"
+                      accentColor="#FF8E9E"
+                      badge={product.aspect === "love" ? "หนุนดวงความรัก" : product.aspect === "wealth" ? "ดึงดูดทรัพย์เสี่ยงดวง" : product.aspect === "health" ? "หนุนสุขภาพกายใจ" : "เสริมการงานและอำนาจ"}
+                    />
+                  ))}
+                </Stack>
+
+                <Typography sx={{ color: "#5A4D43", fontSize: "0.65rem", textAlign: "center", mt: 2.5, fontStyle: "italic", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  * แนะนำตามพลังสีมงคลและสินค้า active ล่าสุด
+                </Typography>
+              </Box>
+            )}
           </Box>
 
           <MobileColorList
@@ -390,8 +489,8 @@ export default function LuckyColorsPage() {
             yearBE={data.yearBE}
           />
 
-          <Typography sx={{ color: "#64748b", fontSize: "0.84rem", lineHeight: 1.72, fontWeight: 400, mt: 3 }}>
-            {data.sourceNote}
+          <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", lineHeight: 1.72, fontWeight: 500, mt: 5, fontFamily: "var(--font-prompt), sans-serif" }}>
+            * {data.sourceNote}
           </Typography>
         </Container>
       </Box>
