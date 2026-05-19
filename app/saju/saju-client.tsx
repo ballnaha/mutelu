@@ -71,19 +71,19 @@ const luckyElementAdvice: Record<ElementKey, string> = {
 
 const timeOptions = [
   { label: "ไม่ระบุเวลา", value: "none", helper: "คำนวณ 3 เสา" },
-  { label: "01:00 - 03:00", value: "02:00", helper: "ยามโฉ่ว" },
-  { label: "03:00 - 05:00", value: "04:00", helper: "ยามอิ๋น" },
-  { label: "05:00 - 07:00", value: "06:00", helper: "ยามเหมี่ยว" },
-  { label: "07:00 - 09:00", value: "08:00", helper: "ยามเฉิน" },
-  { label: "09:00 - 11:00", value: "10:00", helper: "ยามซื่อ" },
-  { label: "11:00 - 13:00", value: "12:00", helper: "ยามอู่" },
-  { label: "13:00 - 15:00", value: "14:00", helper: "ยามเวย" },
-  { label: "15:00 - 17:00", value: "16:00", helper: "ยามเซิน" },
-  { label: "17:00 - 19:00", value: "18:00", helper: "ยามโหย่ว" },
-  { label: "19:00 - 21:00", value: "20:00", helper: "ยามซวี" },
-  { label: "21:00 - 23:00", value: "22:00", helper: "ยามไห่" },
-  { label: "23:00 - 00:00", value: "23:00", helper: "ยามจื้อ (ต้น)" },
-  { label: "00:00 - 01:00", value: "00:00", helper: "ยามจื้อ (ปลาย)" },
+  { label: "01:00 - 02:59", value: "02:00", helper: "ยามโฉ่ว" },
+  { label: "03:00 - 04:59", value: "04:00", helper: "ยามอิ๋น" },
+  { label: "05:00 - 06:59", value: "06:00", helper: "ยามเหมี่ยว" },
+  { label: "07:00 - 08:59", value: "08:00", helper: "ยามเฉิน" },
+  { label: "09:00 - 10:59", value: "10:00", helper: "ยามซื่อ" },
+  { label: "11:00 - 12:59", value: "12:00", helper: "ยามอู่" },
+  { label: "13:00 - 14:59", value: "14:00", helper: "ยามเวย" },
+  { label: "15:00 - 16:59", value: "16:00", helper: "ยามเซิน" },
+  { label: "17:00 - 18:59", value: "18:00", helper: "ยามโหย่ว" },
+  { label: "19:00 - 20:59", value: "20:00", helper: "ยามซวี" },
+  { label: "21:00 - 22:59", value: "22:00", helper: "ยามไห่" },
+  { label: "23:00 - 23:59", value: "23:00", helper: "ยามจื้อ (ต้น)" },
+  { label: "00:00 - 00:59", value: "00:00", helper: "ยามจื้อ (ปลาย)" },
 ];
 
 const genderOptions: Array<{ label: string; value: BirthGender; symbol: string; helper: string }> = [

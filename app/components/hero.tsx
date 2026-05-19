@@ -8,9 +8,11 @@ import {
   Stack,
 } from "@mui/material";
 import { keyframes } from "@mui/system";
+import Link from "next/link";
 import React from "react";
 import { Briefcase, CloseCircle, Heart, MagicStar, MoneyRecive } from "iconsax-react";
 import type { DailyLuckyColor } from "@/lib/lucky-colors";
+import type { HomepageHeroPost } from "@/lib/blog-posts";
 
 // Ghibli / Webtoon Animation Keyframes
 const floatCloud = keyframes`
@@ -28,9 +30,22 @@ const spinSparkle = keyframes`
   50% { transform: scale(1.2) rotate(20deg); opacity: 1; }
 `;
 
-const STORIES = [
+type HeroStory = {
+  id: string;
+  slot?: number;
+  category: string;
+  bgcolor: string;
+  color: string;
+  title: string;
+  image: string;
+  href?: string;
+  author?: string;
+  date?: string;
+};
+
+const STORIES: HeroStory[] = [
   { 
-    id: 1, 
+    id: "desk-decor",
     category: "Lifestyle", 
     bgcolor: "#FFF0F2", 
     color: "#E88D9C", 
@@ -38,7 +53,7 @@ const STORIES = [
     image: "/images/ghibli_desk_decor.png" 
   },
   { 
-    id: 2, 
+    id: "mindfulness",
     category: "Mindfulness", 
     bgcolor: "#EBF3FF", 
     color: "#7296F8", 
@@ -48,6 +63,7 @@ const STORIES = [
 ];
 
 interface HeroProps {
+  heroPosts?: HomepageHeroPost[];
   todayLuckyColor?: DailyLuckyColor | null;
   luckyColorMonthLabel?: string;
   luckyColorYearBE?: number;
@@ -69,6 +85,27 @@ const colorStampThemes = {
   luck: { color: "#54B435", bg: "#EDF7EC" },
   avoid: { color: "#E76161", bg: "#FCEBEB" },
 } as const;
+
+function heroPostsToStories(posts: HomepageHeroPost[]): HeroStory[] {
+  const themes = [
+    { bgcolor: "#FFF0F2", color: "#E88D9C" },
+    { bgcolor: "#EBF3FF", color: "#7296F8" },
+    { bgcolor: "#EDF7EC", color: "#54B435" },
+  ];
+
+  return posts.map((post, index) => ({
+    id: post.slug,
+    slot: post.homeHeroSlot,
+    category: post.category,
+    bgcolor: themes[index % themes.length].bgcolor,
+    color: themes[index % themes.length].color,
+    title: post.title,
+    image: post.heroImage,
+    href: `/blog/${post.slug}`,
+    author: post.author,
+    date: post.date,
+  }));
+}
 
 function ShirtIcon() {
   return (
@@ -101,7 +138,24 @@ function ShirtIcon() {
   );
 }
 
-export function Hero({ todayLuckyColor = null, luckyColorMonthLabel, luckyColorYearBE }: HeroProps) {
+export function Hero({ heroPosts = [], todayLuckyColor = null, luckyColorMonthLabel, luckyColorYearBE }: HeroProps) {
+  const heroStories = heroPostsToStories(heroPosts);
+  const storiesBySlot = new Map(heroStories.map((story) => [story.slot ?? 1, story]));
+  const mainStory = storiesBySlot.get(1) ?? {
+    id: "life-balance",
+    category: "Editor's Pick",
+    bgcolor: "#EBF3FF",
+    color: "#7296F8",
+    title: "จัดสมดุลชีวิตให้ลงตัวเพื่อความสุขในทุกๆ วัน",
+    image: "/images/ghibli_life_balance.png",
+    author: "กองบรรณาธิการ",
+    date: "อ่าน 5 นาที",
+  };
+  const sideStories = [
+    storiesBySlot.get(2) ?? STORIES[0],
+    storiesBySlot.get(3) ?? STORIES[1],
+  ];
+
   return (
     <Box sx={{ 
       pt: { xs: 10, md: 13 }, 
@@ -189,6 +243,8 @@ export function Hero({ todayLuckyColor = null, luckyColorMonthLabel, luckyColorY
           
           {/* Main Card (Editor's Pick with sunny cat) */}
           <Box 
+            component={mainStory.href ? Link : "div"}
+            href={mainStory.href}
             sx={{ 
               gridArea: "main",
               position: "relative", 
@@ -228,13 +284,14 @@ export function Hero({ todayLuckyColor = null, luckyColorMonthLabel, luckyColorY
                 letterSpacing: "0.1em",
                 fontFamily: "var(--font-prompt), sans-serif",
               }}>
-                ✦ EDITOR'S PICK
+                ✦ {heroStories.length > 0 ? "FEATURED STORY" : "EDITOR'S PICK"}
               </Typography>
             </Box>
 
             <Box 
               component="img" 
-              src="/images/ghibli_life_balance.png" 
+              src={mainStory.image}
+              alt={mainStory.title}
               sx={{ 
                 width: "100%", 
                 height: "100%", 
@@ -262,7 +319,7 @@ export function Hero({ todayLuckyColor = null, luckyColorMonthLabel, luckyColorY
                 fontFamily: "var(--font-prompt), sans-serif",
                 textShadow: "2px 2px 0px #ffffff, -2px -2px 0px #ffffff, 2px -2px 0px #ffffff, -2px 2px 0px #ffffff"
               }}>
-                จัดสมดุลชีวิตให้ลงตัว<br/>เพื่อความสุขในทุกๆ วัน
+                {mainStory.title}
               </Typography>
               <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
                 <Box sx={{ 
@@ -273,9 +330,9 @@ export function Hero({ todayLuckyColor = null, luckyColorMonthLabel, luckyColorY
                   borderRadius: "99px",
                   boxShadow: "1.5px 1.5px 0px #2D2520"
                 }}>
-                  <Typography sx={{ color: "#2D2520", fontSize: "0.75rem", fontWeight: 800 }}>โดย กองบรรณาธิการ</Typography>
+                  <Typography sx={{ color: "#2D2520", fontSize: "0.75rem", fontWeight: 800 }}>โดย {mainStory.author ?? "กองบรรณาธิการ"}</Typography>
                 </Box>
-                <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 600 }}>• อ่าน 5 นาที</Typography>
+                <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 600 }}>• {mainStory.date ?? "อ่าน 5 นาที"}</Typography>
               </Stack>
             </Box>
           </Box>
@@ -293,8 +350,12 @@ export function Hero({ todayLuckyColor = null, luckyColorMonthLabel, luckyColorY
             px: { xs: 2, sm: 0 }, 
             "&::-webkit-scrollbar": { display: "none" } 
           }}>
-            {STORIES.map((item) => (
-              <Box key={item.id} sx={{ 
+            {sideStories.map((item) => (
+              <Box
+                key={item.id}
+                component={item.href ? Link : "div"}
+                href={item.href}
+                sx={{ 
                 position: "relative", 
                 flex: { xs: "0 0 85%", sm: 1 },
                 scrollSnapAlign: "center",
@@ -308,6 +369,7 @@ export function Hero({ todayLuckyColor = null, luckyColorMonthLabel, luckyColorY
                 isolation: "isolate",
                 WebkitTransform: "translateZ(0)",
                 transition: "transform 0.3s ease",
+                textDecoration: "none",
                 "&:hover img": { transform: "scale(1.035)" }
               }}>
                 {/* Vintage stamp serrated masking tape corner */}
@@ -326,6 +388,7 @@ export function Hero({ todayLuckyColor = null, luckyColorMonthLabel, luckyColorY
                 <Box 
                   component="img" 
                   src={item.image} 
+                  alt={item.title}
                   sx={{ 
                     width: "100%", 
                     height: "100%", 
@@ -458,7 +521,6 @@ export function Hero({ todayLuckyColor = null, luckyColorMonthLabel, luckyColorY
               }}>
                 {["work", "money", "love", "luck"].map((key) => {
                   const c = todayLuckyColor.colors[key as keyof typeof todayLuckyColor.colors];
-                  const details = colorStampThemes[key as keyof typeof colorStampThemes];
                   const label = colorLabels.find(l => l.key === key)?.label ?? "";
                   const isWhite = c.hex.toLowerCase() === "#ffffff" || c.hex.toLowerCase() === "#f8fafc";
                   

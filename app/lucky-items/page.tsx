@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
-import { Briefcase, Heart, MagicStar, MoneyRecive, Shop, ShieldTick } from "iconsax-react";
+import { Box, Button, Chip, Container, Divider, Stack, Typography } from "@mui/material";
+import { ArrowRight, Briefcase, Heart, MagicStar, MoneyRecive, Shop, ShieldTick } from "iconsax-react";
 import { Element, Prisma } from "@prisma/client";
 import { cache } from "react";
 
-import { AffiliateCard } from "@/app/components/affiliate-card";
 import { Footer } from "@/app/components/footer";
 import { Header } from "@/app/components/header";
 import { prisma } from "@/lib/prisma";
@@ -47,6 +46,8 @@ const aspectLabels: Record<string, string> = {
   health: "หนุนสุขภาพกายใจ",
   general: "ของมงคลนำโชคดวงดี",
 };
+
+type ShopProduct = Prisma.MasterAffiliateProductGetPayload<Record<string, never>>;
 
 type LuckyItemsSearchParams = Promise<{
   aspect?: string | string[];
@@ -151,6 +152,197 @@ function buildLuckyItemsDescription(summary: string[], productCount: number) {
   const filterText = summary.filter((item) => item !== "ทั้งหมด" && item !== "ทุกธาตุ" && item !== "ทุกประเภท").join(" ");
   const scopedText = filterText ? `${filterText} ` : "";
   return `รวมสินค้าและไอเทมมงคล${scopedText}คัดตามด้านเสริมดวง ธาตุ และประเภทสินค้า มี ${productCount} รายการให้เลือกดูใน mulamoon.`;
+}
+
+function normalizePlatform(platform: string) {
+  return platform.toLowerCase().replaceAll(" ", "-");
+}
+
+function productHref(product: Pick<ShopProduct, "platform" | "productSlug" | "url">) {
+  if (product.productSlug) {
+    return `/go/${normalizePlatform(product.platform)}/${product.productSlug}`;
+  }
+
+  return product.url;
+}
+
+function getDiscount(price: string, originalPrice?: string | null) {
+  if (!originalPrice) return null;
+
+  const sale = Number(price.replace(/[^0-9]/g, ""));
+  const original = Number(originalPrice.replace(/[^0-9]/g, ""));
+  if (!sale || !original || original <= sale) return null;
+
+  return `-${Math.round((1 - sale / original) * 100)}%`;
+}
+
+function platformTheme(platform: string) {
+  const key = platform.toLowerCase();
+  if (key.includes("shopee")) return { color: "#f05d3b", bg: "#fff0ec", label: "Shopee" };
+  if (key.includes("lazada")) return { color: "#1d2aa7", bg: "#eef0ff", label: "Lazada" };
+  if (key.includes("tiktok")) return { color: "#111827", bg: "#f1f5f9", label: "TikTok Shop" };
+  return { color: "#2D2520", bg: "#F5EFE6", label: platform };
+}
+
+function ProductCard({ product }: { product: ShopProduct }) {
+  const href = productHref(product);
+  const discount = getDiscount(product.price, product.originalPrice);
+  const platform = platformTheme(product.platform);
+  const rating = product.rating?.toFixed(1) ?? "4.9";
+  const reviewCount = product.reviewCount ?? 120;
+
+  return (
+    <Box
+      sx={{
+        bgcolor: "#FFFFFF",
+        border: "2px solid #2D2520",
+        borderRadius: "8px",
+        overflow: "hidden",
+        boxShadow: "4px 4px 0px #2D2520",
+        minWidth: 0,
+        display: "flex",
+        flexDirection: "column",
+        transition: "transform 0.16s ease, box-shadow 0.16s ease",
+        "&:hover": {
+          transform: "translate(-2px, -2px)",
+          boxShadow: "6px 6px 0px #2D2520",
+        },
+        "&:hover img": {
+          transform: "scale(1.035)",
+        },
+      }}
+    >
+      <Box
+        component="a"
+        href={href}
+        target="_blank"
+        rel="nofollow sponsored noopener"
+        sx={{
+          position: "relative",
+          aspectRatio: "1/1",
+          bgcolor: "#FAF8F2",
+          borderBottom: "2px solid #2D2520",
+          display: "grid",
+          placeItems: "center",
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          component="img"
+          src={product.image}
+          alt={product.name}
+          sx={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            p: 1.25,
+            transition: "transform 0.35s ease",
+          }}
+        />
+        <Stack direction="row" spacing={0.75} sx={{ position: "absolute", top: 10, left: 10, right: 10, justifyContent: "space-between", alignItems: "flex-start" }}>
+          <Chip
+            label={aspectLabels[product.aspect] ?? aspectLabels.general}
+            size="small"
+            sx={{ height: 24, maxWidth: "72%", bgcolor: "#FFF066", color: "#2D2520", border: "1.5px solid #2D2520", borderRadius: "6px", fontWeight: 900, fontSize: "0.66rem", fontFamily: "var(--font-prompt), sans-serif" }}
+          />
+          {discount && (
+            <Chip
+              label={discount}
+              size="small"
+              sx={{ height: 24, bgcolor: "#FFE6EA", color: "#E11D48", border: "1.5px solid #E11D48", borderRadius: "6px", fontWeight: 950, fontSize: "0.68rem", fontFamily: "var(--font-prompt), sans-serif" }}
+            />
+          )}
+        </Stack>
+      </Box>
+
+      <Stack spacing={1.1} sx={{ p: 1.6, flex: 1 }}>
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: "center", justifyContent: "space-between" }}>
+          <Chip
+            label={platform.label}
+            size="small"
+            sx={{ height: 22, bgcolor: platform.bg, color: platform.color, border: `1.5px solid ${platform.color}`, borderRadius: "5px", fontWeight: 900, fontSize: "0.64rem", fontFamily: "var(--font-prompt), sans-serif" }}
+          />
+          <Typography sx={{ color: "#5A4D43", fontSize: "0.72rem", fontWeight: 800, whiteSpace: "nowrap", fontFamily: "var(--font-prompt), sans-serif" }}>
+            ★ {rating} ({reviewCount})
+          </Typography>
+        </Stack>
+
+        <Typography
+          component="h2"
+          sx={{
+            color: "#2D2520",
+            fontSize: "0.98rem",
+            fontWeight: 950,
+            lineHeight: 1.34,
+            minHeight: "2.65em",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            fontFamily: "var(--font-prompt), sans-serif",
+          }}
+        >
+          {product.name}
+        </Typography>
+
+        <Typography
+          sx={{
+            color: "#6B625A",
+            fontSize: "0.78rem",
+            lineHeight: 1.45,
+            minHeight: "2.9em",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            fontWeight: 550,
+            fontFamily: "var(--font-prompt), sans-serif",
+          }}
+        >
+          {product.description}
+        </Typography>
+
+        <Box sx={{ flex: 1 }} />
+
+        <Stack direction="row" spacing={1} sx={{ alignItems: "flex-end", justifyContent: "space-between" }}>
+          <Stack spacing={0.2} sx={{ minWidth: 0 }}>
+            {product.originalPrice && (
+              <Typography sx={{ color: "#9CA3AF", fontSize: "0.74rem", textDecoration: "line-through", fontWeight: 700, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
+                {product.originalPrice}
+              </Typography>
+            )}
+            <Typography sx={{ color: "#FF4F73", fontSize: "1.18rem", fontWeight: 950, lineHeight: 1.05, fontFamily: "var(--font-prompt), sans-serif" }}>
+              {product.price}
+            </Typography>
+          </Stack>
+          <Button
+            component="a"
+            href={href}
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            variant="contained"
+            endIcon={<ArrowRight size={15} color="currentColor" />}
+            sx={{
+              bgcolor: "#2D2520",
+              color: "#FFFDF9",
+              borderRadius: "7px",
+              minWidth: 92,
+              px: 1.4,
+              py: 0.75,
+              fontWeight: 950,
+              fontSize: "0.78rem",
+              textTransform: "none",
+              boxShadow: "none",
+              fontFamily: "var(--font-prompt), sans-serif",
+              "&:hover": { bgcolor: "#1F1916" },
+            }}
+          >
+            ดูสินค้า
+          </Button>
+        </Stack>
+      </Stack>
+    </Box>
+  );
 }
 
 export async function generateMetadata({
@@ -298,174 +490,191 @@ export default async function LuckyItemsPage({
             </Typography>
           </Box>
 
-          <Box
-            sx={{
-              mb: 2.5,
-              p: { xs: 2, md: 2.25 },
-              borderRadius: "16px",
-              border: "2.5px solid #2D2520",
-              bgcolor: "#FAF8F2",
-              boxShadow: "4px 4px 0px 0px #2D2520",
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1.1fr) minmax(0, 0.75fr) minmax(0, 0.95fr)" },
-              gap: { xs: 2, lg: 3 },
-            }}
-          >
-            <Box role="group" aria-label="กรองตามด้านเสริมดวง">
-              <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.9rem", fontFamily: "var(--font-prompt), sans-serif" }}>
-                ด้านเสริมดวง
-              </Typography>
-              <Stack direction="row" spacing={0.8} sx={{ flexWrap: "wrap", rowGap: 0.9 }}>
-                {aspectFilters.map((item) => {
-                  const Icon = item.icon;
-                  const active = aspect === item.value;
-                  return (
-                    <Button
-                      key={item.value}
-                      component="a"
-                      href={buildHref(item.value, element, activeCategoryValue)}
-                      aria-pressed={active}
-                      startIcon={<Icon size={16} variant="Bulk" color={active ? "#FFFDF9" : item.color} />}
-                      sx={{
-                        color: active ? "#FFFDF9" : "#2D2520",
-                        bgcolor: active ? item.color : "#FFFDF9",
-                        border: "2px solid #2D2520",
-                        borderRadius: "10px",
-                        boxShadow: active ? "2px 2px 0px 0px #2D2520" : "none",
-                        px: 1.2,
-                        py: 0.55,
-                        minHeight: 34,
-                        fontSize: "0.8rem",
-                        fontWeight: 900,
-                        textTransform: "none",
-                        fontFamily: "var(--font-prompt), sans-serif",
-                        "&:hover": { bgcolor: active ? item.color : "#FFFDF9", boxShadow: "2px 2px 0px 0px #2D2520" },
-                      }}
-                    >
-                      {item.label}
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "280px minmax(0, 1fr)" }, gap: 3, alignItems: "start" }}>
+            <Box
+              component="aside"
+              sx={{
+                position: { lg: "sticky" },
+                top: { lg: 96 },
+                p: 2,
+                borderRadius: "8px",
+                border: "2.5px solid #2D2520",
+                bgcolor: "#FAF8F2",
+                boxShadow: "4px 4px 0px 0px #2D2520",
+              }}
+            >
+              <Stack spacing={2.2}>
+                <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                  <Typography sx={{ color: "#2D2520", fontWeight: 950, fontSize: "1rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                    ตัวกรองสินค้า
+                  </Typography>
+                  {(aspect !== "all" || element !== "all" || category !== "all") && (
+                    <Button component="a" href="/lucky-items" size="small" sx={{ color: "#FF4F73", fontWeight: 900, textTransform: "none", minWidth: 0, p: 0.5, fontSize: "0.75rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                      ล้าง
                     </Button>
-                  );
-                })}
+                  )}
+                </Stack>
+
+                <Divider sx={{ borderColor: "rgba(45, 37, 32, 0.22)", borderStyle: "dashed" }} />
+
+                <Box role="group" aria-label="กรองตามด้านเสริมดวง">
+                  <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.86rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                    ด้านเสริมดวง
+                  </Typography>
+                  <Stack spacing={0.75}>
+                    {aspectFilters.map((item) => {
+                      const Icon = item.icon;
+                      const active = aspect === item.value;
+                      return (
+                        <Button
+                          key={item.value}
+                          component="a"
+                          href={buildHref(item.value, element, activeCategoryValue)}
+                          aria-pressed={active}
+                          startIcon={<Icon size={16} variant="Bulk" color={active ? "#FFFDF9" : item.color} />}
+                          sx={{
+                            justifyContent: "flex-start",
+                            color: active ? "#FFFDF9" : "#2D2520",
+                            bgcolor: active ? item.color : "#FFFDF9",
+                            border: "2px solid #2D2520",
+                            borderRadius: "7px",
+                            boxShadow: active ? "2px 2px 0px 0px #2D2520" : "none",
+                            px: 1.2,
+                            py: 0.75,
+                            minHeight: 38,
+                            fontSize: "0.82rem",
+                            fontWeight: 900,
+                            textTransform: "none",
+                            fontFamily: "var(--font-prompt), sans-serif",
+                            "&:hover": { bgcolor: active ? item.color : "#FFFDF9", boxShadow: "2px 2px 0px 0px #2D2520" },
+                          }}
+                        >
+                          {item.label}
+                        </Button>
+                      );
+                    })}
+                  </Stack>
+                </Box>
+
+                <Box role="group" aria-label="กรองตามธาตุ">
+                  <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.86rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                    ธาตุ
+                  </Typography>
+                  <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0.75 }}>
+                    {elementFilters.map((item) => {
+                      const active = element === item.value;
+                      return (
+                        <Button
+                          key={item.value}
+                          component="a"
+                          href={buildHref(aspect, item.value, activeCategoryValue)}
+                          aria-pressed={active}
+                          sx={{
+                            minWidth: "auto",
+                            color: active ? "#FFFDF9" : "#2D2520",
+                            bgcolor: active ? "#2D2520" : "#FFFDF9",
+                            border: "2px solid #2D2520",
+                            borderRadius: "7px",
+                            px: 0.9,
+                            py: 0.62,
+                            minHeight: 36,
+                            fontSize: "0.78rem",
+                            fontWeight: 900,
+                            textTransform: "none",
+                            fontFamily: "var(--font-prompt), sans-serif",
+                            "&:hover": { bgcolor: active ? "#2D2520" : "#FFFDF9", boxShadow: "2px 2px 0px 0px #2D2520" },
+                          }}
+                        >
+                          {item.label}
+                        </Button>
+                      );
+                    })}
+                  </Box>
+                </Box>
+
+                <Box role="group" aria-label="กรองตามประเภทสินค้า">
+                  <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.86rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                    ประเภทสินค้า
+                  </Typography>
+                  <Stack direction="row" spacing={0.75} sx={{ flexWrap: "wrap", rowGap: 0.75 }}>
+                    {dynamicCategoryFilters.map((item) => {
+                      const active = activeCategoryValue === item.value;
+                      return (
+                        <Button
+                          key={item.value}
+                          component="a"
+                          href={buildHref(aspect, element, item.value)}
+                          aria-pressed={active}
+                          sx={{
+                            minWidth: "auto",
+                            color: active ? "#FFFDF9" : "#2D2520",
+                            bgcolor: active ? "#FF8E9E" : "#FFFDF9",
+                            border: "2px solid #2D2520",
+                            borderRadius: "999px",
+                            boxShadow: active ? "2px 2px 0px 0px #2D2520" : "none",
+                            px: 1.15,
+                            py: 0.5,
+                            minHeight: 32,
+                            fontSize: "0.76rem",
+                            fontWeight: 900,
+                            textTransform: "none",
+                            fontFamily: "var(--font-prompt), sans-serif",
+                            "&:hover": { bgcolor: active ? "#FF8E9E" : "#FFFDF9", boxShadow: "2px 2px 0px 0px #2D2520" },
+                          }}
+                        >
+                          {item.label}
+                        </Button>
+                      );
+                    })}
+                  </Stack>
+                </Box>
               </Stack>
             </Box>
 
-            <Box role="group" aria-label="กรองตามธาตุ">
-              <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.9rem", fontFamily: "var(--font-prompt), sans-serif" }}>
-                ธาตุ
-              </Typography>
-              <Stack direction="row" spacing={0.8} sx={{ flexWrap: "wrap", rowGap: 0.9 }}>
-                {elementFilters.map((item) => {
-                  const active = element === item.value;
-                  return (
-                    <Button
-                      key={item.value}
-                      component="a"
-                      href={buildHref(aspect, item.value, activeCategoryValue)}
-                      aria-pressed={active}
-                      sx={{
-                        minWidth: "auto",
-                        color: active ? "#FFFDF9" : "#2D2520",
-                        bgcolor: active ? "#2D2520" : "#FFFDF9",
-                        border: "2px solid #2D2520",
-                        borderRadius: "10px",
-                        px: 1.2,
-                        py: 0.55,
-                        minHeight: 34,
-                        fontSize: "0.8rem",
-                        fontWeight: 900,
-                        textTransform: "none",
-                        fontFamily: "var(--font-prompt), sans-serif",
-                        "&:hover": { bgcolor: active ? "#2D2520" : "#FFFDF9", boxShadow: "2px 2px 0px 0px #2D2520" },
-                      }}
-                    >
-                      {item.label}
-                    </Button>
-                  );
-                })}
-              </Stack>
-            </Box>
+            <Box sx={{ minWidth: 0 }}>
+              <Box
+                sx={{
+                  mb: 2,
+                  p: 1.5,
+                  border: "2px solid #2D2520",
+                  borderRadius: "8px",
+                  bgcolor: "#FFFFFF",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 1.5,
+                  flexWrap: "wrap",
+                }}
+              >
+                <Typography sx={{ color: "#5A4D43", fontSize: "0.86rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  กำลังแสดง: {selectedFilterSummary.join(" • ")}
+                </Typography>
+                <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                  <Typography sx={{ color: "#2D2520", fontSize: "0.78rem", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }}>
+                    เรียงตาม
+                  </Typography>
+                  <Chip label="สินค้าใหม่ล่าสุด" sx={{ bgcolor: "#FFF066", color: "#2D2520", border: "1.5px solid #2D2520", borderRadius: "6px", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }} />
+                </Stack>
+              </Box>
 
-            <Box role="group" aria-label="กรองตามประเภทสินค้า">
-              <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.9rem", fontFamily: "var(--font-prompt), sans-serif" }}>
-                ประเภทสินค้า
-              </Typography>
-              <Stack direction="row" spacing={0.8} sx={{ flexWrap: "wrap", rowGap: 0.9 }}>
-                {dynamicCategoryFilters.map((item) => {
-                  const active = activeCategoryValue === item.value;
-                  return (
-                    <Button
-                      key={item.value}
-                      component="a"
-                      href={buildHref(aspect, element, item.value)}
-                      aria-pressed={active}
-                      sx={{
-                        minWidth: "auto",
-                        color: active ? "#FFFDF9" : "#2D2520",
-                        bgcolor: active ? "#FF8E9E" : "#FFFDF9",
-                        border: "2px solid #2D2520",
-                        borderRadius: "10px",
-                        boxShadow: active ? "2px 2px 0px 0px #2D2520" : "none",
-                        px: 1.2,
-                        py: 0.55,
-                        minHeight: 34,
-                        fontSize: "0.8rem",
-                        fontWeight: 900,
-                        textTransform: "none",
-                        fontFamily: "var(--font-prompt), sans-serif",
-                        "&:hover": { bgcolor: active ? "#FF8E9E" : "#FFFDF9", boxShadow: "2px 2px 0px 0px #2D2520" },
-                      }}
-                    >
-                      {item.label}
-                    </Button>
-                  );
-                })}
-              </Stack>
+              {products.length > 0 ? (
+                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", md: "repeat(3, minmax(0, 1fr))", xl: "repeat(4, minmax(0, 1fr))" }, gap: { xs: 1.8, md: 2.4 } }}>
+                  {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </Box>
+              ) : (
+                <Box sx={{ p: 4, borderRadius: "8px", border: "2.5px solid #2D2520", bgcolor: "#FFFDF9", textAlign: "center", boxShadow: "4px 4px 0px 0px #2D2520" }}>
+                  <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
+                    ยังไม่มีสินค้าในตัวกรองนี้
+                  </Typography>
+                  <Typography sx={{ color: "#5A4D43", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
+                    ลองเลือกด้านเสริมดวงหรือธาตุอื่นเพื่อดูรายการที่พร้อมแนะนำ
+                  </Typography>
+                </Box>
+              )}
             </Box>
           </Box>
-
-          <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 2, gap: 2, flexWrap: "wrap" }}>
-            <Typography sx={{ color: "#5A4D43", fontSize: "0.86rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
-              กำลังแสดง: {selectedFilterSummary.join(" • ")}
-            </Typography>
-            {(aspect !== "all" || element !== "all" || category !== "all") && (
-              <Button component="a" href="/lucky-items" sx={{ color: "#FF8E9E", fontWeight: 900, textTransform: "none", fontFamily: "var(--font-prompt), sans-serif" }}>
-                ล้างตัวกรอง
-              </Button>
-            )}
-          </Stack>
-
-          {products.length > 0 ? (
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", lg: "repeat(3, minmax(0, 1fr))" }, gap: 3 }}>
-              {products.map((product) => (
-                <AffiliateCard
-                  key={product.id}
-                  name={product.name}
-                  description={product.description}
-                  price={product.price}
-                  originalPrice={product.originalPrice}
-                  image={product.image}
-                  link={product.url}
-                  platform={product.platform}
-                  platformLabel={product.platform}
-                  productSlug={product.productSlug}
-                  rating={product.rating}
-                  reviewCount={product.reviewCount}
-                  variant="sidebar"
-                  accentColor="#FF8E9E"
-                  badge={aspectLabels[product.aspect] ?? aspectLabels.general}
-                />
-              ))}
-            </Box>
-          ) : (
-            <Box sx={{ p: 4, borderRadius: "20px", border: "2.5px solid #2D2520", bgcolor: "#FFFDF9", textAlign: "center", boxShadow: "4px 4px 0px 0px #2D2520" }}>
-              <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
-                ยังไม่มีสินค้าในตัวกรองนี้
-              </Typography>
-              <Typography sx={{ color: "#5A4D43", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
-                ลองเลือกด้านเสริมดวงหรือธาตุอื่นเพื่อดูรายการที่พร้อมแนะนำ
-              </Typography>
-            </Box>
-          )}
         </Container>
       </Box>
 

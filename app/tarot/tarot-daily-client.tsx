@@ -70,6 +70,9 @@ const tarotIntentOptions = {
     "สิ่งที่ควรระวัง",
     "โอกาสที่กำลังเข้ามา",
     "คำแนะนำจากไพ่",
+    "พลังงานโดยรวมของวันนี้",
+    "สิ่งที่ควรปล่อยวาง",
+    "สิ่งที่ควรเริ่มต้น",
     "อื่น ๆ ที่ไพ่อยากบอก",
   ],
   love: [
@@ -77,6 +80,9 @@ const tarotIntentOptions = {
     "ความสัมพันธ์ปัจจุบัน",
     "เรื่องค้างใจหรือคนเก่า",
     "ควรเปิดใจต่ออย่างไร",
+    "ความรู้สึกจริงของอีกฝ่าย",
+    "จุดที่ควรปรับในความสัมพันธ์",
+    "สัญญาณรักที่กำลังเข้ามา",
     "อื่น ๆ เรื่องหัวใจ",
   ],
   career: [
@@ -84,6 +90,9 @@ const tarotIntentOptions = {
     "โอกาสใหม่หรือการเปลี่ยนงาน",
     "การเรียนหรือการสอบ",
     "ทีมงาน เจ้านาย หรือผู้ร่วมงาน",
+    "ทักษะที่ควรพัฒนา",
+    "จังหวะเลื่อนขั้นหรือเติบโต",
+    "อุปสรรคที่ควรเตรียมรับมือ",
     "อื่น ๆ เรื่องงาน/เรียน",
   ],
   finance: [
@@ -91,6 +100,9 @@ const tarotIntentOptions = {
     "รายจ่ายที่ควรระวัง",
     "โชคลาภและโอกาสเสี่ยงดวง",
     "การซื้อ ลงทุน หรือเก็บเงิน",
+    "เงินก้อนหรือผลตอบแทน",
+    "หนี้สินและภาระการเงิน",
+    "ของมงคลเสริมทรัพย์",
     "อื่น ๆ เรื่องเงิน/โชคลาภ",
   ],
   health: [
@@ -98,6 +110,9 @@ const tarotIntentOptions = {
     "ความเครียดและการพักใจ",
     "การนอนและการฟื้นตัว",
     "สมดุลชีวิตและรูทีนดูแลตัวเอง",
+    "สัญญาณที่ร่างกายอยากบอก",
+    "อารมณ์สะสมที่ควรดูแล",
+    "กิจกรรมที่ช่วยคืนพลัง",
     "อื่น ๆ เรื่องสุขภาพกายใจ",
   ],
 } as const;
@@ -109,6 +124,23 @@ const focusCategoryOptions = [
   { value: "finance", label: "เงิน/โชคลาภ", icon: WalletMoney, color: "#E8A243" },
   { value: "health", label: "สุขภาพกายใจ", icon: ShieldTick, color: "#10B981" },
 ] as const;
+
+const timeOptions = [
+  { label: "ไม่ระบุเวลา", value: "none", helper: "คำนวณ 3 เสา" },
+  { label: "01:00 - 02:59", value: "02:00", helper: "ยามโฉ่ว" },
+  { label: "03:00 - 04:59", value: "04:00", helper: "ยามอิ๋น" },
+  { label: "05:00 - 06:59", value: "06:00", helper: "ยามเหมี่ยว" },
+  { label: "07:00 - 08:59", value: "08:00", helper: "ยามเฉิน" },
+  { label: "09:00 - 10:59", value: "10:00", helper: "ยามซื่อ" },
+  { label: "11:00 - 12:59", value: "12:00", helper: "ยามอู่" },
+  { label: "13:00 - 14:59", value: "14:00", helper: "ยามเวย" },
+  { label: "15:00 - 16:59", value: "16:00", helper: "ยามเซิน" },
+  { label: "17:00 - 18:59", value: "18:00", helper: "ยามโหย่ว" },
+  { label: "19:00 - 20:59", value: "20:00", helper: "ยามซวี" },
+  { label: "21:00 - 22:59", value: "22:00", helper: "ยามไห่" },
+  { label: "23:00 - 23:59", value: "23:00", helper: "ยามจื้อ (ต้น)" },
+  { label: "00:00 - 00:59", value: "00:00", helper: "ยามจื้อ (ปลาย)" },
+];
 
 function getIntentOptions(category: string) {
   return tarotIntentOptions[category as keyof typeof tarotIntentOptions] ?? tarotIntentOptions.general;
@@ -722,26 +754,28 @@ function TarotImage({
               </Typography>
             </Box>
           )}
-          <Box
-            sx={{
-              position: "absolute",
-              inset: 0,
-              background: "linear-gradient(to top, rgba(250,246,238,0.96) 0%, rgba(250,246,238,0.3) 65%, transparent 100%)",
-              zIndex: 2,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "flex-end",
-              p: 1.5,
-              textAlign: "center",
-            }}
-          >
-            <Typography sx={{ color: "#2D2520", fontSize: isSmall ? "0.6rem" : "0.85rem", fontWeight: 950, mb: 0.1, fontFamily: "var(--font-prompt), sans-serif" }}>
-              {card.thaiName}
-            </Typography>
-            <Typography sx={{ color: "#FF8E9E", fontSize: isSmall ? "0.45rem" : "0.55rem", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "var(--font-prompt), sans-serif" }}>
-              {card.name} {isReversed ? "• (กลับหัว)" : ""}
-            </Typography>
-          </Box>
+          {backFailed && (
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                background: "linear-gradient(to top, rgba(250,246,238,0.96) 0%, rgba(250,246,238,0.3) 65%, transparent 100%)",
+                zIndex: 2,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-end",
+                p: 1.5,
+                textAlign: "center",
+              }}
+            >
+              <Typography sx={{ color: "#2D2520", fontSize: isSmall ? "0.6rem" : "0.85rem", fontWeight: 950, mb: 0.1, fontFamily: "var(--font-prompt), sans-serif" }}>
+                {card.thaiName}
+              </Typography>
+              <Typography sx={{ color: "#FF8E9E", fontSize: isSmall ? "0.45rem" : "0.55rem", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "var(--font-prompt), sans-serif" }}>
+                {card.name} {isReversed ? "• (กลับหัว)" : ""}
+              </Typography>
+            </Box>
+          )}
           <Box sx={{ position: "absolute", inset: 6, border: "1px solid rgba(45,37,32,0.08)", borderRadius: "10px", zIndex: 3 }} />
         </Box>
       </Box>
@@ -843,6 +877,7 @@ export function TarotDailyClient() {
   const [isPredicting, setIsPredicting] = useState(false);
   const [isShuffling, setIsShuffling] = useState(false);
   const [hasShuffled, setHasShuffled] = useState(false);
+  const [revealAllCards, setRevealAllCards] = useState(false);
   const [shuffleKey, setShuffleKey] = useState(0);
 
   const selectedCardsList = selectedCardsState.map(sc => ({
@@ -862,6 +897,7 @@ export function TarotDailyClient() {
     setValidationError("");
     setIsShuffling(true);
     setHasShuffled(false);
+    setRevealAllCards(false);
     setSelectedCardsState([]);
     setShowResults(false);
 
@@ -919,6 +955,7 @@ export function TarotDailyClient() {
     setSelectedCardsState([]);
     setShowResults(false);
     setHasShuffled(false);
+    setRevealAllCards(false);
     setShowConfig(true);
   };
 
@@ -940,6 +977,8 @@ export function TarotDailyClient() {
     }
   };
   const recommendedProducts = getRecommendedProducts();
+  const activeFocusOption = focusCategoryOptions.find((option) => option.value === focusCategory) ?? focusCategoryOptions[0];
+  const activeFocusColor = activeFocusOption.color;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
@@ -1170,54 +1209,47 @@ export function TarotDailyClient() {
                       />
                     </Box>
 
-                    {/* Birth Time Select */}
+                    {/* Birth Time Selection */}
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                       <Stack direction="row" spacing={1} sx={{ justifyContent: "space-between", alignItems: "center" }}>
                         <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }}>
-                          เวลาเกิด (ถ้าทราบ)
+                          ระบุเวลาเกิด (Yam)
                         </Typography>
                         <Box sx={{ fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#E6F3FF", color: "#7296F8", border: "1.5px solid #7296F8", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
                           ทางเลือก
                         </Box>
                       </Stack>
-                      <Box
-                        component="select"
-                        value={birthTime}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setBirthTime(e.target.value)}
-                        sx={{
-                          width: "100%",
-                          bgcolor: "#ffffff",
-                          border: "2.5px solid #2D2520",
-                          borderRadius: "12px",
-                          p: "14px",
-                          color: "#2D2520",
-                          fontSize: "0.95rem",
-                          fontWeight: 700,
-                          fontFamily: "var(--font-prompt), sans-serif",
-                          outline: "none",
-                          cursor: "pointer",
-                          transition: "all 0.2s ease",
-                          "& option": {
-                            bgcolor: "#ffffff",
-                            color: "#2D2520"
-                          },
-                          "&:hover": { borderColor: "#FF8E9E" },
-                          "&:focus": { borderColor: "#FF8E9E", boxShadow: "0 0 0 3px rgba(255, 142, 158, 0.2)" }
-                        }}
-                      >
-                        <option value="none">ไม่ระบุเวลาเกิด</option>
-                        <option value="00:00">ยามชวด (23:00 - 00:59)</option>
-                        <option value="02:00">ยามฉลู (01:00 - 02:59)</option>
-                        <option value="04:00">ยามขาล (03:00 - 04:59)</option>
-                        <option value="06:00">ยามเถาะ (05:00 - 06:59)</option>
-                        <option value="08:00">ยามมะโรง (07:00 - 08:59)</option>
-                        <option value="10:00">ยามมะเส็ง (09:00 - 10:59)</option>
-                        <option value="12:00">ยามมะเมีย (11:00 - 12:59)</option>
-                        <option value="14:00">ยามมะแม (13:00 - 14:59)</option>
-                        <option value="16:00">ยามวอก (15:00 - 16:59)</option>
-                        <option value="18:00">ยามระกา (17:00 - 18:59)</option>
-                        <option value="20:00">ยามจอ (19:00 - 20:59)</option>
-                        <option value="22:00">ยามกุน (21:00 - 22:59)</option>
+                      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)" }, gap: 1 }}>
+                        {timeOptions.map((opt) => (
+                          <Button
+                            key={opt.value}
+                            onClick={() => setBirthTime(opt.value)}
+                            sx={{
+                              borderRadius: "12px",
+                              border: "2.5px solid #2D2520",
+                              bgcolor: birthTime === opt.value ? "#FF8E9E" : "#FFFDF9",
+                              color: birthTime === opt.value ? "#FFFDF9" : "#2D2520",
+                              p: 1.2,
+                              minHeight: 56,
+                              flexDirection: "column",
+                              textTransform: "none",
+                              fontSize: "0.8rem",
+                              fontWeight: 800,
+                              lineHeight: 1.2,
+                              fontFamily: "var(--font-prompt), sans-serif",
+                              boxShadow: birthTime === opt.value ? "2px 2px 0px #2D2520" : "none",
+                              transition: "all 0.2s",
+                              "&:hover": {
+                                bgcolor: birthTime === opt.value ? "#FF8E9E" : "#FAF8F2",
+                                borderColor: "#2D2520",
+                                transform: "translateY(-1px)"
+                              }
+                            }}
+                          >
+                            <Box>{opt.label.split(" (")[0]}</Box>
+                            <Box sx={{ fontSize: "0.6rem", opacity: 0.8, fontWeight: 700 }}>{opt.helper}</Box>
+                          </Button>
+                        ))}
                       </Box>
                     </Box>
                   </Box>
@@ -1299,7 +1331,10 @@ export function TarotDailyClient() {
                           มีตัวเลือกอื่น ๆ
                         </Box>
                       </Stack>
-                      <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 1 }}>
+                      <Typography sx={{ color: "#5A4D43", fontSize: "0.78rem", fontWeight: 650, lineHeight: 1.6, fontFamily: "var(--font-prompt), sans-serif" }}>
+                        เลือกคำถามที่ใกล้กับความรู้สึกตอนนี้ที่สุด ไพ่จะใช้เจตนานี้เป็นแกนหลักในการอ่านทั้ง 3 ใบ
+                      </Typography>
+                      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" }, gap: 1 }}>
                         {getIntentOptions(focusCategory).map((intent) => {
                           const selected = question === intent;
 
@@ -1308,16 +1343,16 @@ export function TarotDailyClient() {
                               key={intent}
                               type="button"
                               onClick={() => setQuestion(intent)}
-                              startIcon={<MessageQuestion size={18} variant="Bulk" color={selected ? "#FFFDF9" : "#FF8E9E"} />}
+                              startIcon={<MessageQuestion size={18} variant="Bulk" color={selected ? "#FFFDF9" : activeFocusColor} />}
                               sx={{
                                 justifyContent: "flex-start",
                                 textAlign: "left",
-                                minHeight: 46,
+                                minHeight: 58,
                                 px: 1.5,
                                 py: 1,
                                 borderRadius: "12px",
                                 border: "2px solid #2D2520",
-                                bgcolor: selected ? "#FF8E9E" : "#ffffff",
+                                bgcolor: selected ? activeFocusColor : "#ffffff",
                                 color: selected ? "#FFFDF9" : "#2D2520",
                                 fontSize: "0.85rem",
                                 fontWeight: 850,
@@ -1326,7 +1361,7 @@ export function TarotDailyClient() {
                                 whiteSpace: "normal",
                                 lineHeight: 1.3,
                                 "&:hover": {
-                                  bgcolor: selected ? "#FF8E9E" : "#FFFDF9",
+                                  bgcolor: selected ? activeFocusColor : "#FFFDF9",
                                   transform: "translate(1px, 1px)",
                                   boxShadow: "2px 2px 0px 0px #2D2520",
                                 },
@@ -1451,6 +1486,32 @@ export function TarotDailyClient() {
                   <Typography sx={{ display: { xs: 'none', lg: 'block' }, color: '#5A4D43', fontSize: '0.82rem', fontWeight: 700, lineHeight: 1.6, mt: 1.5, fontFamily: "var(--font-prompt), sans-serif" }}>
                     ตั้งใจถึงเจตนาที่เลือกไว้ จากนั้นเลือกไพ่ 3 ใบจากสำรับด้านขวา
                   </Typography>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<Cards size={18} variant="Bulk" color={revealAllCards ? "#FFFDF9" : "#2D2520"} />}
+                    onClick={() => setRevealAllCards(prev => !prev)}
+                    sx={{
+                      mt: 1.75,
+                      py: 1.1,
+                      borderRadius: "12px",
+                      border: "2px solid #2D2520",
+                      bgcolor: revealAllCards ? "#7296F8" : "#FFFDF9",
+                      color: revealAllCards ? "#FFFDF9" : "#2D2520",
+                      textTransform: "none",
+                      fontSize: "0.86rem",
+                      fontWeight: 950,
+                      fontFamily: "var(--font-prompt), sans-serif",
+                      boxShadow: revealAllCards ? "2px 2px 0px #2D2520" : "none",
+                      "&:hover": {
+                        bgcolor: revealAllCards ? "#7296F8" : "#FAF8F2",
+                        border: "2px solid #2D2520",
+                        transform: "translateY(-1px)",
+                      },
+                    }}
+                  >
+                    {revealAllCards ? "ปิดหน้าไพ่ทั้งหมด" : "เปิดดูไพ่ทั้งหมด"}
+                  </Button>
                 </Box>
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))', lg: '1fr' }, gap: { xs: 1, lg: 1.25 }, mb: { xs: 1.5, lg: 3 } }}>
@@ -1503,7 +1564,7 @@ export function TarotDailyClient() {
                         )}
                         {selectedCard && (
                           <Box sx={{ width: { xs: '100%', lg: 58 }, height: { xs: '100%', lg: 'auto' }, aspectRatio: '2/3', flexShrink: 0 }}>
-                            <TarotImage card={selectedCard.card} faceDown={true} isSmall={true} />
+                            <TarotImage card={selectedCard.card} faceDown={!revealAllCards} isSmall={true} />
                           </Box>
                         )}
                         <Box sx={{ display: { xs: 'none', lg: 'block' }, minWidth: 0 }}>
@@ -1594,7 +1655,7 @@ export function TarotDailyClient() {
                     >
                       <TarotImage
                         card={card}
-                        faceDown={true}
+                        faceDown={!revealAllCards}
                         isSelected={selectedCardsState.some(c => c.id === card.id)}
                         index={idx}
                         performanceMode={isMobilePerformance}

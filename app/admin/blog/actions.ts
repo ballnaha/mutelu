@@ -59,6 +59,8 @@ export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
     excerpt,
     categoryId,
     heroImage,
+    featuredOnHome,
+    homeHeroSlot,
     tags,
     seoTitle,
     seoDescription,
@@ -82,6 +84,8 @@ export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
       authorRole,
       authorImage,
       heroImage,
+      featuredOnHome: Boolean(featuredOnHome),
+      homeHeroSlot: featuredOnHome ? Number(homeHeroSlot) || 1 : null,
       tags: tags || [],
       seoTitle,
       seoDescription,
@@ -122,6 +126,7 @@ export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
   });
 
   revalidatePath("/admin/blog");
+  revalidatePath("/");
   revalidatePath("/blog");
   revalidatePath(`/blog/${slug}`);
   return result;
@@ -134,6 +139,8 @@ export async function updateBlogPost(id: string, data: any, blocks: BlogBlockInp
     excerpt,
     categoryId,
     heroImage,
+    featuredOnHome,
+    homeHeroSlot,
     tags,
     seoTitle,
     seoDescription,
@@ -164,6 +171,8 @@ export async function updateBlogPost(id: string, data: any, blocks: BlogBlockInp
         authorRole,
         authorImage,
         heroImage,
+        featuredOnHome: Boolean(featuredOnHome),
+        homeHeroSlot: featuredOnHome ? Number(homeHeroSlot) || 1 : null,
         tags: tags || [],
         seoTitle,
         seoDescription,
@@ -205,6 +214,7 @@ export async function updateBlogPost(id: string, data: any, blocks: BlogBlockInp
   });
 
   revalidatePath("/admin/blog");
+  revalidatePath("/");
   revalidatePath("/blog");
   revalidatePath(`/blog/${slug}`);
   return result;
@@ -238,6 +248,7 @@ export async function deleteBlogPost(id: string) {
   }
 
   revalidatePath("/admin/blog");
+  revalidatePath("/");
   revalidatePath("/blog");
   if (post?.slug) revalidatePath(`/blog/${post.slug}`);
 }

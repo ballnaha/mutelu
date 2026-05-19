@@ -109,9 +109,9 @@ export default function BlogTable({ initialPosts }: BlogTableProps) {
                             </Typography>
                           </Stack>
                           <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
-                            <Flash size={12} color="#facc15" variant="Bold" />
+                            <Flash size={12} color={post.featuredOnHome ? "#f59e0b" : "#facc15"} variant="Bold" />
                             <Typography sx={{ color: "#64748b", fontSize: "0.75rem", fontWeight: 700 }}>
-                              {(post._count?.blogpostsection || 0) + (post._count?.blogaffiliateproduct || 0)} บล็อก
+                              {post.featuredOnHome ? `Hero #${post.homeHeroSlot || 1}` : `${(post._count?.blogpostsection || 0) + (post._count?.blogaffiliateproduct || 0)} บล็อก`}
                             </Typography>
                           </Stack>
                         </Stack>

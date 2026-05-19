@@ -49,31 +49,17 @@ export function Footer() {
           }}
         >
           {/* Logo stamp sticker */}
-          <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-            <Box sx={{
-              width: 32,
-              height: 32,
-              bgcolor: "#FFF066", // Cute yellow marker highlight
-              border: "2px solid #2D2520",
-              borderRadius: "10px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#2D2520",
-              boxShadow: "1.5px 1.5px 0px #2D2520"
-            }}>
-              <Typography sx={{ fontSize: "1rem", fontWeight: 900 }}>✦</Typography>
-            </Box>
-            <Typography sx={{
-              fontWeight: 900,
-              color: "#2D2520",
-              fontSize: "1.25rem",
-              letterSpacing: "0.12em",
-              fontFamily: "var(--font-serif), serif"
-            }}>
-              mulamoon
-            </Typography>
-          </Stack>
+          <Box
+            component="img"
+            src="/images/logo-mulamoon.png"
+            alt="mulamoon"
+            sx={{
+              display: "block",
+              width: { xs: 166, md: 190 },
+              height: { xs: 48, md: 56 },
+              objectFit: "contain",
+            }}
+          />
 
           {/* Minimal Links styled as cozy planner labels */}
           <Stack

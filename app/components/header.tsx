@@ -60,34 +60,27 @@ function isNavActive(pathname: string, href: string, index: number) {
 function BrandMark() {
   return (
     <Box sx={{
-      bgcolor: "#FFF066", // Cute marker yellow highlight
-      border: "2px solid #2D2520",
-      px: 2,
-      py: 0.5,
-      borderRadius: "14px",
-      boxShadow: "2.5px 2.5px 0px #2D2520",
+      height: { xs: 42, md: 50 },
+      width: { xs: 148, md: 178 },
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
       "&:hover": {
         transform: "translate(-1px, -1px)",
-        boxShadow: "3.5px 3.5px 0px #2D2520"
       }
     }}>
-      <Typography
+      <Box
+        component="img"
+        src="/images/logo-mulamoon.png"
+        alt="mulamoon"
         sx={{
-          color: "#2D2520",
-          fontFamily: "var(--font-serif), serif",
-          fontSize: { xs: "0.95rem", md: "1.25rem" },
-          letterSpacing: "0.12em",
-          fontWeight: 900,
-          lineHeight: 1,
-          whiteSpace: "nowrap",
+          display: "block",
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
         }}
-      >
-        MULAMOON
-      </Typography>
+      />
     </Box>
   );
 }

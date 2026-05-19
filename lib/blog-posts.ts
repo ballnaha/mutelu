@@ -43,6 +43,17 @@ export type BlogArticle = {
   seoDescription: string;
 };
 
+export type HomepageHeroPost = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  date: string;
+  author: string;
+  heroImage: string;
+  homeHeroSlot: number;
+};
+
 type BlogPostRow = {
   id: string;
   slug: string;
@@ -57,6 +68,7 @@ type BlogPostRow = {
   tags: unknown;
   seoTitle: string | null;
   seoDescription: string | null;
+  homeHeroSlot?: number | null;
 };
 
 type BlogPostSectionRow = {
@@ -267,6 +279,61 @@ export async function getPublishedBlogPostSlugs() {
     `;
 
     return posts.map((post) => post.slug);
+  } catch (error) {
+    if (isMissingBlogTable(error)) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+export async function getHomepageHeroPosts(limit = 9): Promise<HomepageHeroPost[]> {
+  try {
+    const posts = await prisma.$queryRaw<BlogPostRow[]>`
+      SELECT
+        p.id,
+        p.slug,
+        p.title,
+        p.excerpt,
+        COALESCE(c.name, 'ทั่วไป') AS category,
+        p.publishedAt,
+        p.authorName,
+        p.authorRole,
+        p.authorImage,
+        p.heroImage,
+        p.tags,
+        p.seoTitle,
+        p.seoDescription,
+        p.homeHeroSlot
+      FROM blogpost p
+      LEFT JOIN blogcategory c ON p.categoryId = c.id
+      WHERE p.featuredOnHome = true
+        AND p.homeHeroSlot BETWEEN 1 AND 3
+        AND p.status = 'PUBLISHED'
+        AND (p.publishedAt IS NULL OR p.publishedAt <= NOW())
+      ORDER BY p.homeHeroSlot ASC, p.publishedAt DESC, p.createdAt DESC
+      LIMIT ${limit}
+    `;
+
+    const postsBySlot = new Map<number, BlogPostRow>();
+    for (const post of posts) {
+      const slot = post.homeHeroSlot ?? 1;
+      if (!postsBySlot.has(slot)) {
+        postsBySlot.set(slot, post);
+      }
+    }
+
+    return Array.from(postsBySlot.entries()).map(([slot, post]) => ({
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      category: post.category,
+      date: formatThaiDate(post.publishedAt),
+      author: post.authorName,
+      heroImage: post.heroImage || "/images/hero-bg.png",
+      homeHeroSlot: slot,
+    }));
   } catch (error) {
     if (isMissingBlogTable(error)) {
       return [];

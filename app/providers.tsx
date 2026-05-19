@@ -25,28 +25,28 @@ const theme = createTheme({
   typography: {
     fontFamily: "var(--font-prompt)",
     h1: {
-      fontFamily: "var(--font-prompt)",
+      fontFamily: "var(--font-heading)",
       fontWeight: 700,
-      letterSpacing: "-0.01em",
+      letterSpacing: "0",
     },
     h2: {
-      fontFamily: "var(--font-prompt)",
+      fontFamily: "var(--font-heading)",
       fontWeight: 700,
     },
     h3: {
-      fontFamily: "var(--font-prompt)",
+      fontFamily: "var(--font-heading)",
       fontWeight: 700,
     },
     h4: {
-      fontFamily: "var(--font-prompt)",
+      fontFamily: "var(--font-heading)",
       fontWeight: 700,
     },
     h5: {
-      fontFamily: "var(--font-prompt)",
+      fontFamily: "var(--font-heading)",
       fontWeight: 700,
     },
     h6: {
-      fontFamily: "var(--font-prompt)",
+      fontFamily: "var(--font-heading)",
       fontWeight: 700,
     },
     button: {

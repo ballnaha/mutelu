@@ -73,6 +73,8 @@ model blogpost {
   authorRole           String?
   authorImage          String?
   heroImage            String?
+  featuredOnHome       Boolean                @default(false)
+  homeHeroSlot         Int?
   tags                 Json?
   seoTitle             String?
   seoDescription       String?                @db.Text
@@ -86,6 +88,7 @@ model blogpost {
 
   @@index([categoryId], map: "BlogPost_categoryId_idx")
   @@index([status, publishedAt], map: "BlogPost_status_publishedAt_idx")
+  @@index([featuredOnHome, homeHeroSlot, status, publishedAt], map: "BlogPost_featuredOnHome_homeHeroSlot_status_publishedAt_idx")
 }
 
 model blogpostsection {

@@ -1,19 +1,24 @@
 import type { Metadata } from "next";
-import { Prompt, Playfair_Display } from "next/font/google";
-import { Box } from "@mui/material";
+import { Mali, Noto_Sans_Thai } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const prompt = Prompt({
+const notoSansThai = Noto_Sans_Thai({
   variable: "--font-prompt",
+  subsets: ["thai", "latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const mali = Mali({
+  variable: "--font-heading",
   subsets: ["thai", "latin"],
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const playfair = Playfair_Display({
+const maliBrand = Mali({
   variable: "--font-serif",
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800", "900"],
+  subsets: ["thai", "latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -30,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="th"
-      className={`${prompt.variable} ${playfair.variable} h-full antialiased`}
+      className={`${notoSansThai.variable} ${mali.variable} ${maliBrand.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

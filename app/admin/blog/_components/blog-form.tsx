@@ -17,6 +17,7 @@ import {
   Tabs,
   Tab,
   FormControlLabel,
+  Switch,
   Autocomplete
 } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
@@ -107,6 +108,8 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
     excerpt: initialData?.excerpt || "",
     categoryId: initialData?.categoryId || "",
     heroImage: initialData?.heroImage || "",
+    featuredOnHome: initialData?.featuredOnHome || false,
+    homeHeroSlot: initialData?.homeHeroSlot || 1,
     tags: initialData?.tags || [],
     seoTitle: initialData?.seoTitle || "",
     seoDescription: initialData?.seoDescription || "",
@@ -411,6 +414,55 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
                     onChange={(url) => setFormData(prev => ({ ...prev, heroImage: url }))}
                     onRemove={handleRemoveFile}
                   />
+
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData.featuredOnHome}
+                        onChange={(event) => setFormData(prev => ({
+                          ...prev,
+                          featuredOnHome: event.target.checked,
+                          homeHeroSlot: event.target.checked ? prev.homeHeroSlot || 1 : prev.homeHeroSlot,
+                        }))}
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography sx={{ fontWeight: 800, color: "#0f172a", fontSize: "0.95rem" }}>
+                          แสดงใน Hero หน้าแรก
+                        </Typography>
+                        <Typography sx={{ color: "#64748b", fontSize: "0.78rem", fontWeight: 600 }}>
+                          บทความต้องเผยแพร่แล้ว และวันที่เผยแพร่ต้องไม่อยู่ในอนาคต
+                        </Typography>
+                      </Box>
+                    }
+                    sx={{
+                      alignItems: "flex-start",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "14px",
+                      px: 1.5,
+                      py: 1,
+                      m: 0,
+                      bgcolor: formData.featuredOnHome ? "#f8fbff" : "#fff"
+                    }}
+                  />
+
+                  {formData.featuredOnHome && (
+                    <TextField
+                      fullWidth
+                      select
+                      label="ตำแหน่งใน Hero หน้าแรก"
+                      value={formData.homeHeroSlot}
+                      onChange={(event) => setFormData(prev => ({ ...prev, homeHeroSlot: Number(event.target.value) }))}
+                      helperText="ตำแหน่ง 1 คือการ์ดใหญ่ ส่วน 2 และ 3 คือการ์ดย่อยด้านขวา"
+                      variant="outlined"
+                      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "14px" } }}
+                    >
+                      <MenuItem value={1}>ตำแหน่ง 1 - การ์ดใหญ่</MenuItem>
+                      <MenuItem value={2}>ตำแหน่ง 2 - การ์ดย่อยบน</MenuItem>
+                      <MenuItem value={3}>ตำแหน่ง 3 - การ์ดย่อยล่าง</MenuItem>
+                    </TextField>
+                  )}
                 </Stack>
               </Card>
 

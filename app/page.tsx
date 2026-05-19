@@ -8,6 +8,7 @@ import { LuckyNumbers } from "./components/lucky-numbers";
 import { CategoryTabs } from "./components/category-tabs";
 import { getLuckyNumbersData } from "@/lib/lucky-numbers";
 import { getMonthlyLuckyColors } from "@/lib/lucky-colors";
+import { getHomepageHeroPosts } from "@/lib/blog-posts";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mulamoon.com";
 
@@ -139,7 +140,10 @@ const homepageJsonLd = {
 };
 
 export default async function Home() {
-  const luckyNumbersData = await getLuckyNumbersData();
+  const [luckyNumbersData, homepageHeroPosts] = await Promise.all([
+    getLuckyNumbersData(),
+    getHomepageHeroPosts(),
+  ]);
   const luckyColorsData = getMonthlyLuckyColors();
 
   return (
@@ -152,6 +156,7 @@ export default async function Home() {
 
       {/* Hero Section */}
       <Hero
+        heroPosts={homepageHeroPosts}
         todayLuckyColor={luckyColorsData?.today ?? null}
         luckyColorMonthLabel={luckyColorsData?.monthLabel}
         luckyColorYearBE={luckyColorsData?.yearBE}

@@ -23,8 +23,9 @@
   --jewel-jade: #10b981;
   --jewel-jade-light: #34d399;
 
-  --font-prompt: 'Prompt', sans-serif;
-  --font-serif: 'Playfair Display', serif;
+  --font-prompt: 'Noto Sans Thai', sans-serif;
+  --font-heading: 'Mali', sans-serif;
+  --font-serif: 'Mali', sans-serif;
   color-scheme: light;
 }
 
@@ -50,9 +51,9 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-prompt);
-  letter-spacing: -0.025em;
-  font-weight: 800;
+  font-family: var(--font-heading), var(--font-prompt), sans-serif;
+  letter-spacing: 0;
+  font-weight: 700;
   color: #1e293b;
 }
 
