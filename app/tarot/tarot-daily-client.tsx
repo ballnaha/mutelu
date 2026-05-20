@@ -33,7 +33,8 @@ import {
   MessageQuestion,
   Magicpen,
   Category,
-  MagicStar
+  MagicStar,
+  ExportSquare
 } from "iconsax-react";
 import {
   TarotCard,
@@ -46,6 +47,8 @@ import {
   ZodiacElement
 } from "./tarot-data";
 import { AffiliateCard } from "../components/affiliate-card";
+import { encodeTarotShareCards } from "@/lib/tarot-share-warning";
+import { openFacebookShare } from "@/lib/facebook-share";
 
 type TarotAffiliateProduct = {
   id: string;
@@ -966,6 +969,12 @@ export function TarotDailyClient() {
     personalBirthCard?.card.id ?? null
   );
 
+  const tarotSharePath = `/share/tarot-warning?cards=${encodeURIComponent(encodeTarotShareCards(selectedCardsState))}&focus=${encodeURIComponent(focusCategory)}`;
+
+  const shareTarotToFacebook = () => {
+    openFacebookShare(tarotSharePath);
+  };
+
   const getCategoryLabel = (cat: string) => {
     switch (cat) {
       case "general": return "ภาพรวมดวงชะตา";
@@ -1870,6 +1879,55 @@ export function TarotDailyClient() {
                     <Typography sx={{ color: "#5A4D43", fontSize: "0.75rem", fontWeight: 900, textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>ประเภทการพยากรณ์</Typography>
                     <Typography sx={{ color: "#2D2520", fontSize: "1.05rem", fontWeight: 950, mt: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>✨ อ่านชะตารวมทุกมิติชีวิต</Typography>
                   </Box>
+                </Stack>
+              </Paper>
+
+              <Paper
+                elevation={0}
+                sx={{
+                  p: { xs: 2.5, md: 3 },
+                  mb: 4,
+                  borderRadius: "22px",
+                  border: "3px solid #2D2520",
+                  bgcolor: "#FFF0F2",
+                  boxShadow: "5px 5px 0 #2D2520"
+                }}
+              >
+                <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ alignItems: { xs: "stretch", md: "center" }, justifyContent: "space-between" }}>
+                  <Box>
+                    <Typography sx={{ color: "#E76161", fontSize: "0.78rem", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "var(--font-prompt), sans-serif" }}>
+                      Fortune Warning Label
+                    </Typography>
+                    <Typography sx={{ color: "#2D2520", fontSize: { xs: "1rem", md: "1.08rem" }, fontWeight: 950, lineHeight: 1.35, mt: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>
+                      สร้างคำเตือนกวน ๆ จากไพ่ 3 ใบนี้ แล้วแชร์ให้เพื่อนรู้ว่าดวงวันนี้ไม่ได้มาเล่น ๆ
+                    </Typography>
+                    <Typography sx={{ color: "#5A4D43", fontSize: "0.82rem", fontWeight: 750, mt: 0.75, fontFamily: "var(--font-prompt), sans-serif" }}>
+                      แชร์เฉพาะผลไพ่ ไม่ใส่ชื่อหรือวันเกิดของคุณ
+                    </Typography>
+                  </Box>
+                  <Button
+                    onClick={shareTarotToFacebook}
+                    startIcon={<ExportSquare size={20} color="currentColor" variant="Bold" />}
+                    sx={{
+                      flexShrink: 0,
+                      bgcolor: "#1877F2",
+                      color: "#fff",
+                      border: "2px solid #2D2520",
+                      borderRadius: "14px",
+                      boxShadow: "3px 3px 0 #2D2520",
+                      fontWeight: 950,
+                      px: 3,
+                      py: 1.2,
+                      fontFamily: "var(--font-prompt), sans-serif",
+                      "&:hover": {
+                        bgcolor: "#166FE5",
+                        transform: "translate(1.5px, 1.5px)",
+                        boxShadow: "1.5px 1.5px 0 #2D2520"
+                      }
+                    }}
+                  >
+                    แชร์คำเตือนลง Facebook
+                  </Button>
                 </Stack>
               </Paper>
 

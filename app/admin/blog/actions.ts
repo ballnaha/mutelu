@@ -9,6 +9,16 @@ import crypto from "crypto";
 import sharp from "sharp";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import {
+  getStorageRelativePathFromUrl,
+  getUploadRoot,
+  getUploadUrl,
+  isManagedUploadUrl,
+  resolveUploadPath,
+} from "@/lib/upload-storage";
+
+const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
 
 export type BlogBlockInput =
   | { type: "section"; heading: string; paragraphs: string[]; sortOrder: number }
@@ -26,6 +36,13 @@ export type BlogBlockInput =
       targetUrl: string;
       sortOrder: number;
     };
+
+async function assertAdmin() {
+  const session = await getServerSession(authOptions);
+  if ((session?.user as { role?: string } | undefined)?.role !== "admin") {
+    throw new Error("Unauthorized");
+  }
+}
 
 export async function getBlogPosts() {
   return await prisma.blogpost.findMany({
@@ -254,8 +271,12 @@ export async function deleteBlogPost(id: string) {
 }
 
 async function uploadImageToFolder(formData: FormData, folder = "") {
+  await assertAdmin();
+
   const file = formData.get("file") as File;
   if (!file) throw new Error("No file provided");
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) throw new Error("Unsupported image type");
+  if (file.size > MAX_UPLOAD_SIZE) throw new Error("Image size must be 5MB or less");
 
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
@@ -264,8 +285,9 @@ async function uploadImageToFolder(formData: FormData, folder = "") {
   const hash = crypto.createHash("md5").update(buffer).digest("hex");
   const ext = ".jpg";
   const fileName = `${hash}${ext}`;
+  const relativePath = folder ? `${folder}/${fileName}` : fileName;
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
+  const uploadDir = path.join(getUploadRoot(), folder);
 
   // Ensure directory exists
   try {
@@ -282,7 +304,7 @@ async function uploadImageToFolder(formData: FormData, folder = "") {
     .jpeg({ quality: 85 })
     .toFile(filePath);
 
-  return `/uploads/${folder ? `${folder}/` : ""}${fileName}`;
+  return getUploadUrl(relativePath);
 }
 
 export async function uploadImage(formData: FormData) {
@@ -294,9 +316,16 @@ export async function uploadProductImage(formData: FormData) {
 }
 
 export async function deleteImage(imageUrl: string) {
-  if (!imageUrl || !imageUrl.startsWith("/uploads/")) return;
+  await assertAdmin();
 
-  const filePath = path.join(process.cwd(), "public", imageUrl);
+  if (!imageUrl || !isManagedUploadUrl(imageUrl)) return;
+
+  const relativePath = getStorageRelativePathFromUrl(imageUrl);
+  if (!relativePath) return;
+
+  const filePath = imageUrl.startsWith("/uploads/")
+    ? path.join(process.cwd(), "public", imageUrl)
+    : resolveUploadPath(relativePath);
   try {
     await fs.access(filePath);
     await fs.unlink(filePath);

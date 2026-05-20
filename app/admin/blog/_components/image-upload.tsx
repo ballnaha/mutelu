@@ -16,6 +16,10 @@ import {
 import { useDropzone } from "react-dropzone";
 import { CloudAdd as CloudPlus, CloseCircle, TickCircle, DocumentUpload } from "iconsax-react";
 
+function isServerUpload(value: unknown): value is string {
+  return typeof value === "string" && (value.startsWith("/api/uploads/") || value.startsWith("/uploads/"));
+}
+
 type ImageUploadProps = {
   value: string | File | null;
   onChange: (value: File | string | null) => void;
@@ -52,7 +56,7 @@ export default function ImageUpload({ value, onChange, onRemove, label, previewM
     e.stopPropagation();
     
     // If it's a server image, show confirmation
-    if (typeof value === "string" && value.startsWith("/uploads/")) {
+    if (isServerUpload(value)) {
       setConfirmOpen(true);
       return;
     }
@@ -62,7 +66,7 @@ export default function ImageUpload({ value, onChange, onRemove, label, previewM
   };
 
   const handleConfirmRemove = () => {
-    if (typeof value === "string" && value.startsWith("/uploads/")) {
+    if (isServerUpload(value)) {
       if (onRemove) onRemove(value);
     }
     onChange(null);

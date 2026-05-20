@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Mali, Noto_Sans_Thai } from "next/font/google";
 import "./globals.css";
+import { BackToTop } from "./components/back-to-top";
 import { Providers } from "./providers";
 
 const notoSansThai = Noto_Sans_Thai({
@@ -39,7 +40,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <BackToTop />
+        </Providers>
       </body>
     </html>
   );

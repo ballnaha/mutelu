@@ -15,6 +15,10 @@ import { createCategory, deleteImage, updateCategory, uploadImage } from "../../
 import ImageUpload from "../../blog/_components/image-upload";
 import { useRouter } from "next/navigation";
 
+function isManagedUpload(imageUrl: string) {
+  return imageUrl.startsWith("/api/uploads/") || imageUrl.startsWith("/uploads/");
+}
+
 type CategoryFormModalProps = {
   children: React.ReactElement<{ onClick?: () => void }>;
   initialData?: CategoryFormInitialData;
@@ -86,7 +90,7 @@ export default function CategoryFormModal({ children, initialData }: CategoryFor
       if (
         isEdit &&
         typeof initialData.image === "string" &&
-        initialData.image.startsWith("/uploads/") &&
+        isManagedUpload(initialData.image) &&
         initialData.image !== imageUrl
       ) {
         await deleteImage(initialData.image);

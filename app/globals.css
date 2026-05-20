@@ -23,9 +23,6 @@
   --jewel-jade: #10b981;
   --jewel-jade-light: #34d399;
 
-  --font-prompt: 'Noto Sans Thai', sans-serif;
-  --font-heading: 'Mali', sans-serif;
-  --font-serif: 'Mali', sans-serif;
   color-scheme: light;
 }
 
@@ -55,6 +52,11 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0;
   font-weight: 700;
   color: #1e293b;
+}
+
+.MuiTypography-root:is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-heading), var(--font-prompt), sans-serif !important;
+  letter-spacing: 0;
 }
 
 /* Glass Card */

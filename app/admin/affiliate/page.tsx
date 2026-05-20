@@ -30,6 +30,10 @@ import { Add, Edit, Eye, EyeSlash, Refresh, Shop, Trash } from "iconsax-react";
 import { deleteImage, uploadProductImage } from "../blog/actions";
 import ImageUpload from "../blog/_components/image-upload";
 
+function isProductUpload(imageUrl: string) {
+  return imageUrl.startsWith("/api/uploads/product/") || imageUrl.startsWith("/uploads/product/");
+}
+
 const ELEMENTS = [
   { value: "WOOD", label: "ไม้", detail: "Wood", color: "#10b981" },
   { value: "FIRE", label: "ไฟ", detail: "Fire", color: "#f43f5e" },
@@ -306,7 +310,7 @@ export default function AdminAffiliatePage() {
       if (res.ok) {
         if (
           editingProduct &&
-          editingProduct.image.startsWith("/uploads/product/") &&
+          isProductUpload(editingProduct.image) &&
           editingProduct.image !== imageUrl
         ) {
           await deleteImage(editingProduct.image);
@@ -332,7 +336,7 @@ export default function AdminAffiliatePage() {
     try {
       const res = await fetch(`/api/affiliate/${product.id}`, { method: "DELETE" });
       if (res.ok) {
-        if (product.image.startsWith("/uploads/product/")) {
+        if (isProductUpload(product.image)) {
           await deleteImage(product.image);
         }
         fetchProducts();
