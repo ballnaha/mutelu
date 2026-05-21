@@ -1,4 +1,4 @@
-import { getFortuneWarning } from "@/lib/fortune-warnings";
+import { decodeTarotShareCards, getTarotShareWarning } from "@/lib/tarot-share-warning";
 import type { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { readFileSync } from "fs";
@@ -10,7 +10,9 @@ const fontPath = path.join(process.cwd(), "public", "fonts", "Mali-Bold.ttf");
 const fontData = readFileSync(fontPath);
 
 export async function GET(request: NextRequest) {
-  const warning = getFortuneWarning(request.nextUrl.searchParams.get("id") ?? undefined);
+  const cards = decodeTarotShareCards(request.nextUrl.searchParams.get("cards"));
+  const focus = request.nextUrl.searchParams.get("focus") ?? "general";
+  const warning = getTarotShareWarning(cards, focus);
   const batch = new Date().toISOString().slice(5, 10).replace("-", "");
 
   return new ImageResponse(
@@ -31,13 +33,13 @@ export async function GET(request: NextRequest) {
         <div
           style={{
             position: "absolute",
-            top: "72px",
-            left: "90px",
+            top: "74px",
+            left: "92px",
             width: "1056px",
             height: "522px",
             borderRadius: "28px",
             border: "8px solid #2D2520",
-            opacity: 0.2,
+            opacity: 0.18,
           }}
         />
         <div
@@ -71,20 +73,23 @@ export async function GET(request: NextRequest) {
               </span>
             </div>
             <span style={{ color: "#2D2520", fontSize: "30px", fontWeight: 700 }}>
-              mulamoon
+              mulamoon tarot
             </span>
           </div>
 
           {/* Content area */}
           <div style={{ display: "flex", flexDirection: "column", marginTop: "40px", gap: "10px" }}>
             <span style={{ color: warning.accent, fontSize: "38px", fontWeight: 700 }}>
-              คำเตือนประจำวันนี้
+              คำเตือนจากไพ่วันนี้
             </span>
-            <span style={{ color: "#2D2520", fontSize: "60px", fontWeight: 700 }}>
+            <span style={{ color: "#2D2520", fontSize: "58px", fontWeight: 700 }}>
               {warning.warning}
             </span>
-            <span style={{ color: "#5A4D43", fontSize: "36px", fontWeight: 700, marginTop: "12px" }}>
+            <span style={{ color: "#5A4D43", fontSize: "34px", fontWeight: 700, marginTop: "12px" }}>
               {warning.detail}
+            </span>
+            <span style={{ color: "#8C7E74", fontSize: "24px", fontWeight: 700, marginTop: "8px" }}>
+              {warning.cardLine}
             </span>
           </div>
 
@@ -92,7 +97,7 @@ export async function GET(request: NextRequest) {
           <div
             style={{
               position: "absolute",
-              bottom: "109px",
+              bottom: "94px",
               left: "48px",
               width: "960px",
               borderTop: "4px dashed #2D2520",
@@ -112,13 +117,13 @@ export async function GET(request: NextRequest) {
             }}
           >
             <span style={{ color: "#5A4D43", fontSize: "28px", fontWeight: 700 }}>
-              BATCH: MOON-{batch}
+              BATCH: TAROT-{batch}
             </span>
             <span style={{ color: "#5A4D43", fontSize: "28px", fontWeight: 700 }}>
               RISK: {warning.risk}
             </span>
             <span style={{ color: "#5A4D43", fontSize: "28px", fontWeight: 700 }}>
-              SCAN YOUR LUCK
+              OPEN YOUR SPREAD
             </span>
           </div>
         </div>
