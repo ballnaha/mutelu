@@ -13,6 +13,8 @@ import {
   LinearProgress,
   Tabs,
   Tab,
+  Dialog,
+  IconButton,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -531,7 +533,9 @@ function TarotImage({
   isReversed = false,
   index = 0,
   isSmall = false,
-  performanceMode = false
+  performanceMode = false,
+  onClick,
+  cursor
 }: {
   card: TarotCard;
   faceDown?: boolean;
@@ -540,6 +544,8 @@ function TarotImage({
   index?: number;
   isSmall?: boolean;
   performanceMode?: boolean;
+  onClick?: () => void;
+  cursor?: string;
 }) {
   const rot = isSmall ? 0 : fixedRots[index % fixedRots.length];
   const [frontFailed, setFrontFailed] = useState(false);
@@ -548,9 +554,10 @@ function TarotImage({
   return (
     <Box
       className={isSmall ? "" : "card-scene"}
+      onClick={onClick}
       sx={{
         aspectRatio: "2 / 3",
-        cursor: "pointer",
+        cursor: cursor || (onClick ? "zoom-in" : "pointer"),
         transform: `rotate(${rot}deg)`,
         opacity: 1,
         willChange: performanceMode ? "auto" : "transform",
@@ -619,7 +626,6 @@ function TarotImage({
 
         {/* Back side of 3D Card (shows card face image when face-up) */}
         <Box className="card-face card-face-back" sx={{ borderRadius: "inherit", overflow: "hidden" }}>
-          <Box className="glint-effect" />
           {!backFailed ? (
             <Box
               component="img"
@@ -757,34 +763,51 @@ function TarotImage({
               </Typography>
             </Box>
           )}
-          {backFailed && (
-            <Box
-              sx={{
-                position: "absolute",
-                inset: 0,
-                background: "linear-gradient(to top, rgba(250,246,238,0.96) 0%, rgba(250,246,238,0.3) 65%, transparent 100%)",
-                zIndex: 2,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-end",
-                p: 1.5,
-                textAlign: "center",
-              }}
-            >
-              <Typography sx={{ color: "#2D2520", fontSize: isSmall ? "0.6rem" : "0.85rem", fontWeight: 950, mb: 0.1, fontFamily: "var(--font-prompt), sans-serif" }}>
-                {card.thaiName}
-              </Typography>
-              <Typography sx={{ color: "#FF8E9E", fontSize: isSmall ? "0.45rem" : "0.55rem", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "var(--font-prompt), sans-serif" }}>
-                {card.name} {isReversed ? "• (กลับหัว)" : ""}
-              </Typography>
-            </Box>
-          )}
-          <Box sx={{ position: "absolute", inset: 6, border: "1px solid rgba(45,37,32,0.08)", borderRadius: "10px", zIndex: 3 }} />
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 6,
+              left: 6,
+              right: 6,
+              background: "rgba(20, 16, 14, 0.92)",
+              zIndex: 3,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              p: isSmall ? 0.75 : 1.25,
+              textAlign: "center",
+              borderTop: "1.5px solid #FFFDF9",
+              borderBottomLeftRadius: "10px",
+              borderBottomRightRadius: "10px",
+              overflow: "hidden"
+            }}
+          >
+            <Typography sx={{ color: "#FFFDF9", fontSize: isSmall ? "0.65rem" : "0.95rem", fontWeight: 950, mb: 0.1, fontFamily: "var(--font-prompt), sans-serif" }}>
+              {card.thaiName}
+            </Typography>
+            <Typography sx={{ color: "#FF8E9E", fontSize: isSmall ? "0.48rem" : "0.62rem", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "var(--font-prompt), sans-serif" }}>
+              {card.name} {isReversed ? "• (กลับหัว)" : ""}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              position: "absolute",
+              inset: 6,
+              border: "3px solid #FFFDF9",
+              borderRadius: "10px",
+              zIndex: 5,
+              pointerEvents: "none",
+              boxShadow: "0 0 8px rgba(45, 37, 32, 0.15), inset 0 0 4px rgba(255, 255, 255, 0.3)"
+            }}
+          />
         </Box>
       </Box>
     </Box>
   );
 }
+
+// Feature Flags / Configuration
+const ENABLE_REVEAL_ALL_BUTTON = true; // ตั้งค่าเป็น true เพื่อเปิดแสดงปุ่มเปิดดูหน้าไพ่ทั้งหมด, หรือ false เพื่อซ่อนไว้
 
 export function TarotDailyClient() {
   const isMobilePerformance = useMediaQuery("(max-width:600px)");
@@ -882,6 +905,7 @@ export function TarotDailyClient() {
   const [hasShuffled, setHasShuffled] = useState(false);
   const [revealAllCards, setRevealAllCards] = useState(false);
   const [shuffleKey, setShuffleKey] = useState(0);
+  const [popupCard, setPopupCard] = useState<{ card: TarotCard; isReversed: boolean } | null>(null);
 
   const selectedCardsList = selectedCardsState.map(sc => ({
     card: tarotCards.find(c => c.id === sc.id)!,
@@ -1495,32 +1519,34 @@ export function TarotDailyClient() {
                   <Typography sx={{ display: { xs: 'none', lg: 'block' }, color: '#5A4D43', fontSize: '0.82rem', fontWeight: 700, lineHeight: 1.6, mt: 1.5, fontFamily: "var(--font-prompt), sans-serif" }}>
                     ตั้งใจถึงเจตนาที่เลือกไว้ จากนั้นเลือกไพ่ 3 ใบจากสำรับด้านขวา
                   </Typography>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={<Cards size={18} variant="Bulk" color={revealAllCards ? "#FFFDF9" : "#2D2520"} />}
-                    onClick={() => setRevealAllCards(prev => !prev)}
-                    sx={{
-                      mt: 1.75,
-                      py: 1.1,
-                      borderRadius: "12px",
-                      border: "2px solid #2D2520",
-                      bgcolor: revealAllCards ? "#7296F8" : "#FFFDF9",
-                      color: revealAllCards ? "#FFFDF9" : "#2D2520",
-                      textTransform: "none",
-                      fontSize: "0.86rem",
-                      fontWeight: 950,
-                      fontFamily: "var(--font-prompt), sans-serif",
-                      boxShadow: revealAllCards ? "2px 2px 0px #2D2520" : "none",
-                      "&:hover": {
-                        bgcolor: revealAllCards ? "#7296F8" : "#FAF8F2",
+                  {ENABLE_REVEAL_ALL_BUTTON && (
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      startIcon={<Cards size={18} variant="Bulk" color={revealAllCards ? "#FFFDF9" : "#2D2520"} />}
+                      onClick={() => setRevealAllCards(prev => !prev)}
+                      sx={{
+                        mt: 1.75,
+                        py: 1.1,
+                        borderRadius: "12px",
                         border: "2px solid #2D2520",
-                        transform: "translateY(-1px)",
-                      },
-                    }}
-                  >
-                    {revealAllCards ? "ปิดหน้าไพ่ทั้งหมด" : "เปิดดูไพ่ทั้งหมด"}
-                  </Button>
+                        bgcolor: revealAllCards ? "#7296F8" : "#FFFDF9",
+                        color: revealAllCards ? "#FFFDF9" : "#2D2520",
+                        textTransform: "none",
+                        fontSize: "0.86rem",
+                        fontWeight: 950,
+                        fontFamily: "var(--font-prompt), sans-serif",
+                        boxShadow: revealAllCards ? "2px 2px 0px #2D2520" : "none",
+                        "&:hover": {
+                          bgcolor: revealAllCards ? "#7296F8" : "#FAF8F2",
+                          border: "2px solid #2D2520",
+                          transform: "translateY(-1px)",
+                        },
+                      }}
+                    >
+                      {revealAllCards ? "ปิดหน้าไพ่ทั้งหมด" : "เปิดดูไพ่ทั้งหมด"}
+                    </Button>
+                  )}
                 </Box>
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))', lg: '1fr' }, gap: { xs: 1, lg: 1.25 }, mb: { xs: 1.5, lg: 3 } }}>
@@ -1947,8 +1973,8 @@ export function TarotDailyClient() {
                   }}
                 >
                   <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "140px 1fr" }, gap: 4, alignItems: "center" }}>
-                    <Box sx={{ maxWidth: "120px", mx: "auto", width: "100%" }}>
-                      <TarotImage card={personalBirthCard.card} />
+                    <Box sx={{ maxWidth: { xs: "190px", sm: "220px", md: "120px" }, mx: "auto", width: "100%" }}>
+                      <TarotImage card={personalBirthCard.card} onClick={() => setPopupCard({ card: personalBirthCard.card, isReversed: false })} />
                     </Box>
                     <Box>
                       <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1.5 }}>
@@ -2223,7 +2249,7 @@ export function TarotDailyClient() {
                           alignItems: { xs: "flex-start", md: "center" }
                         }}
                       >
-                        <Box sx={{ maxWidth: { xs: "160px", md: "240px" }, mx: "auto", width: "100%", position: "relative" }}>
+                        <Box sx={{ maxWidth: { xs: "260px", sm: "280px", md: "240px" }, mx: "auto", width: "100%", position: "relative" }}>
                           <Box
                             sx={{
                               position: "absolute",
@@ -2245,7 +2271,7 @@ export function TarotDailyClient() {
                             {positions[index]} {isReversed ? "(กลับหัว)" : ""}
                           </Box>
 
-                          <TarotImage card={card} isReversed={isReversed} />
+                          <TarotImage card={card} isReversed={isReversed} onClick={() => setPopupCard({ card, isReversed })} />
                         </Box>
 
                         <Stack spacing={{ xs: 2, md: 3 }} sx={{ width: "100%" }}>
@@ -2466,6 +2492,112 @@ export function TarotDailyClient() {
             </Box>
           )}
         </Container>
+
+        {/* Premium Tarot Card Detail Popup Modal */}
+        <Dialog
+          open={Boolean(popupCard)}
+          onClose={() => setPopupCard(null)}
+          maxWidth="xs"
+          fullWidth
+          slotProps={{
+            paper: {
+              sx: {
+                bgcolor: "transparent",
+                boxShadow: "none",
+                overflow: "visible",
+                mx: 2,
+              }
+            },
+            backdrop: {
+              sx: {
+                bgcolor: "rgba(20, 16, 14, 0.82)",
+                backdropFilter: "blur(8px)"
+              }
+            }
+          }}
+        >
+          {popupCard && (
+            <Box sx={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", outline: "none" }}>
+              {/* Close Button */}
+              <IconButton
+                onClick={() => setPopupCard(null)}
+                sx={{
+                  position: "absolute",
+                  top: -48,
+                  right: 0,
+                  color: "#FFFDF9",
+                  bgcolor: "rgba(255, 253, 249, 0.1)",
+                  border: "2px solid #FFFDF9",
+                  p: 0.8,
+                  zIndex: 10,
+                  "&:hover": {
+                    bgcolor: "#FF8E9E",
+                    borderColor: "#2D2520",
+                    color: "#2D2520",
+                    transform: "rotate(90deg)"
+                  },
+                  transition: "all 0.25s ease"
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </IconButton>
+
+              {/* Enlarged Card Container */}
+              <Box
+                sx={{
+                  width: "100%",
+                  maxWidth: "340px",
+                  transform: "scale(1)",
+                  animation: "scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  "@keyframes scaleIn": {
+                    "0%": { transform: "scale(0.8)", opacity: 0 },
+                    "100%": { transform: "scale(1)", opacity: 1 }
+                  }
+                }}
+              >
+                <TarotImage
+                  card={popupCard.card}
+                  isReversed={popupCard.isReversed}
+                  onClick={() => setPopupCard(null)}
+                  cursor="zoom-out"
+                />
+              </Box>
+
+              {/* Card Information underneath */}
+              <Box
+                sx={{
+                  mt: 3,
+                  width: "100%",
+                  maxWidth: "340px",
+                  p: 2.5,
+                  bgcolor: "#FFFDF9",
+                  borderRadius: "20px",
+                  border: "3px solid #2D2520",
+                  boxShadow: "5px 5px 0px 0px #2D2520",
+                  textAlign: "center",
+                  animation: "slideUp 0.35s ease",
+                  "@keyframes slideUp": {
+                    "0%": { transform: "translateY(15px)", opacity: 0 },
+                    "100%": { transform: "translateY(0)", opacity: 1 }
+                  }
+                }}
+              >
+                <Typography variant="h5" sx={{ fontWeight: 800, color: "#2D2520", mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  {popupCard.card.thaiName}
+                </Typography>
+                <Typography sx={{ color: "#FF8E9E", fontWeight: 800, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.08em", mb: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  {popupCard.card.name} {popupCard.isReversed ? "• (กลับหัว)" : ""}
+                </Typography>
+                <Typography sx={{ color: "#5A4D43", fontSize: "0.9rem", fontWeight: 700, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  ธีมไพ่: {popupCard.card.theme}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+        </Dialog>
       </Box>
     </LocalizationProvider>
   );

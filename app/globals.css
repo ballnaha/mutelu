@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 :root {
+  --font-prompt: var(--font-mali);
+  --font-heading: var(--font-mali);
+  --font-serif: var(--font-mali);
   --background: #f8fafc;
   --foreground: #0f172a;
   --primary: #3b82f6;          /* Modern Blue */
@@ -40,7 +43,7 @@
 html, body {
   background-color: var(--background) !important;
   color: var(--foreground);
-  font-family: var(--font-prompt), sans-serif;
+  font-family: var(--font-mali), sans-serif;
   overflow-x: hidden;
   margin: 0;
   padding: 0;
@@ -48,14 +51,14 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading), var(--font-prompt), sans-serif;
+  font-family: var(--font-mali), sans-serif;
   letter-spacing: 0;
   font-weight: 700;
   color: #1e293b;
 }
 
 .MuiTypography-root:is(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--font-heading), var(--font-prompt), sans-serif !important;
+  font-family: var(--font-mali), sans-serif !important;
   letter-spacing: 0;
 }
 

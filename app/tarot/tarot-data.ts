@@ -50,7 +50,7 @@ export function getZodiacElement(month: number, day: number): ZodiacInfo {
     return { zodiac: "ราศีมังกร (Capricorn)", element: "Earth", elementThai: "ดิน", icon: "🌱" };
   if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
     return { zodiac: "ราศีกุมภ์ (Aquarius)", element: "Air", elementThai: "ลม", icon: "💨" };
-  
+
   return { zodiac: "ราศีมีน (Pisces)", element: "Water", elementThai: "น้ำ", icon: "💧" };
 }
 
@@ -67,7 +67,7 @@ export function getBirthTarotCard(birthDateStr: string): { card: TarotCard; expl
 
     // Standard Tarot birth card calculation: Sum DD + MM + YYYY
     let sum = day + month + year;
-    
+
     // Reduce sum to a number between 1 and 22
     // If sum is greater than 22, sum its digits
     while (sum > 22) {
@@ -159,7 +159,7 @@ export function getReversedText(card: TarotCard, aspect: 'overview' | 'love' | '
 
   const originalText = card[aspect];
 
-  switch(aspect) {
+  switch (aspect) {
     case 'overview':
       if (isMajor) {
         return `[ไพ่กลับหัว - พลังงานถูกปิดกั้น] ภาพรวมชีวิตในวันนี้อาจพบความชะงักงันชั่วคราว หรือคุณกำลังเผชิญกับการปรับตัวครั้งสำคัญ การฝืนกระแสชะตาอาจทำให้เหนื่อยล้าเปล่าๆ ลองถอยออกมาก้าวหนึ่งแล้วสังเกตปัญหาในมุมกว้าง`;
@@ -259,7 +259,7 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-fool",
     name: "The Fool",
-    thaiName: "ไพ่คนพเนจร",
+    thaiName: "เด็กสาวกับการเริ่มต้น",
     imagePath: "/images/tarot/the-fool.png",
     theme: "เริ่มต้นใหม่",
     overview: "วันนี้เหมาะกับการลองทางใหม่ ๆ มีพลังสดใส แต่ควรเช็กข้อมูลก่อนตัดสินใจเรื่องสำคัญ",
@@ -272,7 +272,7 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-magician",
     name: "The Magician",
-    thaiName: "ไพ่นักมายากล",
+    thaiName: "ห้องแห่งการเนรมิต",
     imagePath: "/images/tarot/the-magician.png",
     theme: "ลงมือแล้วเห็นผล",
     overview: "วันนี้คุณมีเครื่องมือพร้อมกว่าที่คิด จังหวะดีสำหรับการสื่อสาร เจรจา และเปลี่ยนแผนให้เป็นจริง",
@@ -285,7 +285,7 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-high-priestess",
     name: "The High Priestess",
-    thaiName: "ไพ่นักบวชหญิง",
+    thaiName: "ความเงียบในห้องสมุดพฤกษา",
     imagePath: "/images/tarot/the-high-priestess.png",
     theme: "ฟังเสียงข้างใน",
     overview: "วันนี้เหมาะกับการสังเกตมากกว่าพุ่งชน คำตอบบางอย่างจะชัดเมื่อคุณเงียบพอจะฟังตัวเอง",
@@ -298,7 +298,7 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-empress",
     name: "The Empress",
-    thaiName: "ไพ่จักรพรรดินี",
+    thaiName: "ราชินีแห่งทุ่งรวงทอง",
     imagePath: "/images/tarot/the-empress.png",
     theme: "เติบโตและได้รับการดูแล",
     overview: "พลังวันนี้นุ่มแต่มั่นคง เหมาะกับการดูแลตัวเอง สร้างสรรค์ และต่อยอดสิ่งที่เริ่มไว้",
@@ -311,7 +311,7 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-emperor",
     name: "The Emperor",
-    thaiName: "ไพ่จักรพรรดิ",
+    thaiName: "ปราสาทเหนือเมฆ",
     imagePath: "/images/tarot/the-emperor.png",
     theme: "วางระบบให้มั่น",
     overview: "วันนี้ต้องใช้วินัยและขอบเขตที่ชัดเจน ยิ่งจัดลำดับความสำคัญดี ยิ่งควบคุมสถานการณ์ได้",
@@ -324,7 +324,7 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-lovers",
     name: "The Lovers",
-    thaiName: "ไพ่คู่รัก",
+    thaiName: "ทางแยกใต้ต้นไม้คู่",
     imagePath: "/images/tarot/the-lovers.png",
     theme: "เลือกด้วยหัวใจที่ชัด",
     overview: "วันนี้มีเรื่องให้เลือกหรือประสานใจคนสำคัญ ความสัมพันธ์และคุณค่าที่แท้จริงจะเป็นตัวนำทาง",
@@ -337,8 +337,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "strength",
     name: "Strength",
-    thaiName: "ไพ่พลังใจ",
-    imagePath: genericTarotImage,
+    thaiName: "มิตรภาพของเด็กสาวกับยักษ์",
+    imagePath: "/images/tarot/strength.png",
     theme: "ใจเย็นคือพลัง",
     overview: "วันนี้คุณชนะสถานการณ์ได้ด้วยความนิ่ง ความอดทน และการพูดอย่างอ่อนโยนแต่หนักแน่น",
     love: "ลดอารมณ์ปะทะแล้วความสัมพันธ์จะกลับมาน่ารักขึ้น",
@@ -350,8 +350,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-hermit",
     name: "The Hermit",
-    thaiName: "ไพ่ฤาษี",
-    imagePath: genericTarotImage,
+    thaiName: "แสงตะเกียงในถ้ำน้ำแข็ง",
+    imagePath: "/images/tarot/the-hermit.png",
     theme: "ถอยเพื่อเห็นชัด",
     overview: "วันนี้เหมาะกับการทบทวน วางแผนเงียบ ๆ และทำงานลึกมากกว่าการเข้าสังคมเยอะ",
     love: "ให้พื้นที่กันสักนิด ความเงียบไม่ได้แปลว่าห่างเสมอไป",
@@ -363,8 +363,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "wheel-of-fortune",
     name: "Wheel of Fortune",
-    thaiName: "ไพ่วงล้อโชคชะตา",
-    imagePath: genericTarotImage,
+    thaiName: "กังหันแห่งโชคชะตา",
+    imagePath: "/images/tarot/wheel-of-fortune.png",
     theme: "จังหวะเปลี่ยน",
     overview: "วันนี้มีความเปลี่ยนแปลงที่พาโอกาสมาแบบไม่คาดคิด เปิดรับไว้แต่ควรยืดหยุ่นกับแผน",
     love: "ความสัมพันธ์อาจมีจังหวะพลิกจากการทักทายหรือข่าวบางอย่าง",
@@ -376,8 +376,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "justice",
     name: "Justice",
-    thaiName: "ไพ่ความยุติธรรม",
-    imagePath: genericTarotImage,
+    thaiName: "ตาชั่งบนสะพานหิน",
+    imagePath: "/images/tarot/the-justice.png",
     theme: "ชัดเจนและตรงไปตรงมา",
     overview: "วันนี้เหมาะกับการตัดสินใจจากข้อเท็จจริง เอกสาร ข้อตกลง และความถูกต้องต้องมาก่อนความรู้สึก",
     love: "คุยกันด้วยเหตุผลและรับผิดชอบคำพูดของตัวเอง",
@@ -389,8 +389,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-star",
     name: "The Star",
-    thaiName: "ไพ่ดวงดาว",
-    imagePath: genericTarotImage,
+    thaiName: "ดวงดาวกลางสระน้ำ",
+    imagePath: "/images/tarot/the-star.png",
     theme: "ความหวังกลับมา",
     overview: "วันนี้พลังเบาขึ้น เหมาะกับการฟื้นใจ วางเป้าหมายใหม่ และเชื่อว่าทางข้างหน้ายังเปิดอยู่",
     love: "ความสัมพันธ์มีโอกาสเยียวยาหรือเริ่มคุยกันในโทนที่สบายกว่าเดิม",
@@ -402,8 +402,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-sun",
     name: "The Sun",
-    thaiName: "ไพ่พระอาทิตย์",
-    imagePath: genericTarotImage,
+    thaiName: "การฉลองใต้ดวงอาทิตย์ยักษ์",
+    imagePath: "/images/tarot/the-sun.png",
     theme: "ชัดเจนและสดใส",
     overview: "วันนี้มีพลังเปิดเผย เหมาะกับการออกหน้า พบปะผู้คน และทำสิ่งที่ต้องการความมั่นใจ",
     love: "บรรยากาศความรักสดใสขึ้น มีโอกาสได้รับคำตอบที่ทำให้ใจโล่ง",
@@ -415,8 +415,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-hierophant",
     name: "The Hierophant",
-    thaiName: "ไพ่สังฆราช",
-    imagePath: "images/tarot/the-hierophant.png",
+    thaiName: "บทเรียนของวิญญาณป่า",
+    imagePath: "/images/tarot/the-hierophant.png",
     theme: "ความเชื่อและประเพณี",
     overview: "วันนี้เหมาะกับการทำตามระเบียบแบบแผน หรือขอคำแนะนำจากผู้ใหญ่ที่มีประสบการณ์",
     love: "ความสัมพันธ์มั่นคง เรียบง่าย หรือมีการคุยเรื่องอนาคตที่เป็นทางการมากขึ้น",
@@ -428,8 +428,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-chariot",
     name: "The Chariot",
-    thaiName: "ไพ่รถศึก",
-    imagePath: genericTarotImage,
+    thaiName: "รถรางแห่งความมุ่งมั่น",
+    imagePath: "/images/tarot/the-chariot.png",
     theme: "มุ่งหน้าสู่ชัยชนะ",
     overview: "ความสำเร็จรออยู่แต่ต้องใช้ความพยายามและการควบคุมอารมณ์ให้มั่นคง",
     love: "อาจมีระยะทางมาเกี่ยวข้อง หรือต้องร่วมมือกันฟันฝ่าอุปสรรคบางอย่าง",
@@ -441,8 +441,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-hanged-man",
     name: "The Hanged Man",
-    thaiName: "ไพ่คนห้อยหัว",
-    imagePath: genericTarotImage,
+    thaiName: "มุมมองจากต้นวิลโลว์",
+    imagePath: "/images/tarot/the-hanged-man.png",
     theme: "มองต่างมุม",
     overview: "บางครั้งการหยุดนิ่งคือการเคลื่อนที่ที่เร็วที่สุด ลองมองปัญหาในมุมกลับ",
     love: "อยู่ในช่วงทบทวนความสัมพันธ์ หรือยอมเสียสละบางอย่างเพื่อความสบายใจของอีกฝ่าย",
@@ -454,8 +454,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "death",
     name: "Death",
-    thaiName: "ไพ่ความตาย",
-    imagePath: genericTarotImage,
+    thaiName: "การลาจากของฤดูกาล",
+    imagePath: "/images/tarot/death.png",
     theme: "การเปลี่ยนแปลงครั้งใหญ่",
     overview: "สิ่งที่หมดอายุขัยจะจากไปเพื่อเปิดทางให้สิ่งใหม่ที่ดีกว่าเข้ามาแทนที่",
     love: "จบปัญหาที่ค้างคาเพื่อเริ่มต้นใหม่ หรือมีการปรับเปลี่ยนนิสัยเดิมๆ อย่างจริงจัง",
@@ -467,8 +467,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "temperance",
     name: "Temperance",
-    thaiName: "ไพ่การปรับตัว",
-    imagePath: genericTarotImage,
+    thaiName: "การปรุงยาแห่งสมดุล",
+    imagePath: "/images/tarot/temperance.png",
     theme: "ความสมดุล",
     overview: "การผสมผสานสิ่งเก่าและใหม่เข้าด้วยกันอย่างพอดีจะนำมาซึ่งความสำเร็จ",
     love: "การปรับความเข้าใจและการประนีประนอมจะทำให้ความสัมพันธ์ราบรื่นขึ้น",
@@ -480,8 +480,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-devil",
     name: "The Devil",
-    thaiName: "ไพ่ปีศาจ",
-    imagePath: genericTarotImage,
+    thaiName: "ความหลงใหลในสวนขนม",
+    imagePath: "/images/tarot/the-devil.png",
     theme: "กิเลสและการยึดติด",
     overview: "ระวังการลุ่มหลงในความสบายชั่วคราวหรือสิ่งที่ทำให้คุณสูญเสียความเป็นตัวเอง",
     love: "เสน่ห์ดึงดูดแรงแต่อาจแฝงด้วยความหึงหวง หรือความสัมพันธ์ที่ตัดไม่ขาด",
@@ -493,8 +493,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-tower",
     name: "The Tower",
-    thaiName: "ไพ่ตึกพัง",
-    imagePath: genericTarotImage,
+    thaiName: "บ้านต้นไม้ท่ามกลางสายฟ้า",
+    imagePath: "/images/tarot/the-tower.png",
     theme: "เหตุการณ์ฉับพลัน",
     overview: "การเปลี่ยนแปลงที่ไม่ได้ตั้งตัวอาจเกิดขึ้นเพื่อให้คุณสร้างฐานที่มั่นคงกว่าเดิม",
     love: "ระวังปากเสียงฉับพลัน หรือความลับที่ถูกเปิดเผยซึ่งจะทำให้ทุกอย่างชัดเจนขึ้น",
@@ -506,8 +506,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-moon",
     name: "The Moon",
-    thaiName: "ไพ่พระจันทร์",
-    imagePath: genericTarotImage,
+    thaiName: "ความฝันใต้แสงจันทร์",
+    imagePath: "/images/tarot/the-moon.png",
     theme: "ความสับสนและความลับ",
     overview: "จิตใจอาจว้าวุ่นหรือมีความกังวลในสิ่งที่ยังมองไม่เห็นชัดเจน",
     love: "ความสัมพันธ์ที่มีความไม่ชัดเจน หรือความระแวงที่เกิดจากจินตนาการไปเอง",
@@ -519,8 +519,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "judgement",
     name: "Judgement",
-    thaiName: "ไพ่การตัดสิน",
-    imagePath: genericTarotImage,
+    thaiName: "เสียงขลุ่ยปลุกวิญญาณ",
+    imagePath: "/images/tarot/judgement.png",
     theme: "การตื่นรู้และการตัดสินใจ",
     overview: "ผลจากการกระทำในอดีตกำลังจะส่งผล หรือถึงเวลาต้องเลือกทางเดินใหม่ที่สำคัญ",
     love: "คนรักเก่าอาจกลับมา หรือถึงเวลาต้องตัดสินใจเด็ดขาดเกี่ยวกับความสัมพันธ์",
@@ -532,8 +532,8 @@ const majorArcanaCards: TarotCard[] = [
   {
     id: "the-world",
     name: "The World",
-    thaiName: "ไพ่โลก",
-    imagePath: genericTarotImage,
+    thaiName: "ระบำแห่งความสำเร็จ",
+    imagePath: "/images/tarot/the-world.png",
     theme: "ความสำเร็จที่สมบูรณ์",
     overview: "วัฏจักรหนึ่งกำลังจะจบลงด้วยความสำเร็จอันงดงามและพร้อมจะเริ่มต้นสิ่งใหม่",
     love: "ความสัมพันธ์ที่ลงตัว เข้าอกเข้าใจกันอย่างลึกซึ้ง หรือมีการเดินทางร่วมกัน",
