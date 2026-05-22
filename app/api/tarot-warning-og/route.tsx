@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
   const focus = request.nextUrl.searchParams.get("focus") ?? "general";
   const warning = getTarotShareWarning(cards, focus);
   const batch = new Date().toISOString().slice(5, 10).replace("-", "");
-  const headlineSize = warning.warning.length > 34 ? "42px" : "48px";
-  const detailSize = warning.detail.length > 90 ? "24px" : "27px";
+  const headlineSize = warning.warning.length > 34 ? "38px" : "44px";
+  const detailSize = warning.detail.length > 90 ? "22px" : "24px";
 
   return new ImageResponse(
     (
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
           height: "100%",
           backgroundColor: warning.background,
           display: "flex",
-          padding: "54px 70px",
+          padding: "58px 92px",
           position: "relative",
           fontFamily: "Mali",
           overflow: "hidden",
@@ -61,13 +61,13 @@ export async function GET(request: NextRequest) {
 
         <div
           style={{
-            width: "1060px",
-            height: "522px",
+            width: "1016px",
+            height: "514px",
             backgroundColor: "#FFFDF9",
             border: "6px solid #2D2520",
             borderRadius: "24px",
             display: "flex",
-            padding: "34px 40px",
+            padding: "34px 92px",
             position: "relative",
             overflow: "hidden",
           }}
@@ -86,10 +86,11 @@ export async function GET(request: NextRequest) {
           <div
             style={{
               position: "absolute",
-              right: "56px",
-              bottom: "74px",
-              width: "284px",
-              height: "304px",
+              right: "96px",
+              bottom: "78px",
+              width: "228px",
+              height: "238px",
+              opacity: 0.28,
               display: "flex",
               alignItems: "flex-end",
               justifyContent: "center",
@@ -99,10 +100,10 @@ export async function GET(request: NextRequest) {
               <div
                 key={`${card.id}-${index}`}
                 style={{
-                  width: "108px",
-                  height: "184px",
-                  marginLeft: index === 0 ? "0" : "-30px",
-                  marginBottom: `${index * 24}px`,
+                  width: "82px",
+                  height: "140px",
+                  marginLeft: index === 0 ? "0" : "-24px",
+                  marginBottom: `${index * 18}px`,
                   border: "5px solid #2D2520",
                   borderRadius: "18px",
                   backgroundColor: index % 2 === 0 ? warning.accent : "#FFFDF9",
@@ -116,7 +117,7 @@ export async function GET(request: NextRequest) {
                 <span
                   style={{
                     color: index % 2 === 0 ? "#FFFDF9" : warning.accent,
-                    fontSize: "20px",
+                    fontSize: "16px",
                     fontWeight: 700,
                   }}
                 >
@@ -125,7 +126,7 @@ export async function GET(request: NextRequest) {
                 <span
                   style={{
                     color: index % 2 === 0 ? "#FFFDF9" : "#2D2520",
-                    fontSize: "17px",
+                    fontSize: "12px",
                     lineHeight: 1.2,
                     fontWeight: 700,
                     textAlign: "center",
@@ -136,7 +137,7 @@ export async function GET(request: NextRequest) {
                 <span
                   style={{
                     color: index % 2 === 0 ? "#FFFDF9" : "#5A4D43",
-                    fontSize: "15px",
+                    fontSize: "11px",
                     fontWeight: 700,
                   }}
                 >
@@ -146,7 +147,7 @@ export async function GET(request: NextRequest) {
             ))}
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", width: "650px", height: "100%" }}>
+          <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", position: "relative", zIndex: 3 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
               <div
                 style={{
@@ -163,7 +164,7 @@ export async function GET(request: NextRequest) {
                   {warning.label}
                 </span>
               </div>
-              <span style={{ color: "#2D2520", fontSize: "23px", fontWeight: 700 }}>
+              <span style={{ color: "#2D2520", fontSize: "21px", fontWeight: 700 }}>
                 mulamoon tarot
               </span>
             </div>
@@ -172,13 +173,13 @@ export async function GET(request: NextRequest) {
               <span style={{ color: warning.accent, fontSize: "28px", fontWeight: 700 }}>
                 คำเตือนจากไพ่วันนี้
               </span>
-              <span style={{ color: "#2D2520", fontSize: headlineSize, lineHeight: 1.16, fontWeight: 700, marginTop: "8px" }}>
+              <span style={{ color: "#2D2520", fontSize: headlineSize, lineHeight: 1.16, fontWeight: 700, marginTop: "8px", width: "760px" }}>
                 {warning.warning}
               </span>
-              <span style={{ color: "#5A4D43", fontSize: detailSize, lineHeight: 1.34, fontWeight: 700, marginTop: "16px" }}>
+              <span style={{ color: "#5A4D43", fontSize: detailSize, lineHeight: 1.34, fontWeight: 700, marginTop: "14px", width: "690px" }}>
                 {warning.detail}
               </span>
-              <span style={{ color: "#8C7E74", fontSize: "18px", lineHeight: 1.25, fontWeight: 700, marginTop: "12px" }}>
+              <span style={{ color: "#8C7E74", fontSize: "16px", lineHeight: 1.25, fontWeight: 700, marginTop: "10px", width: "690px" }}>
                 {warning.cardLine}
               </span>
             </div>
@@ -192,7 +193,7 @@ export async function GET(request: NextRequest) {
                 justifyContent: "space-between",
                 alignItems: "center",
                 color: "#5A4D43",
-                fontSize: "18px",
+                fontSize: "16px",
                 fontWeight: 700,
               }}
             >
