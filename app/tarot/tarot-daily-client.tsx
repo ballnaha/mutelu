@@ -818,7 +818,7 @@ function TarotImage({
 }
 
 // Feature Flags / Configuration
-const ENABLE_REVEAL_ALL_BUTTON = true; // ตั้งค่าเป็น true เพื่อเปิดแสดงปุ่มเปิดดูหน้าไพ่ทั้งหมด, หรือ false เพื่อซ่อนไว้
+const ENABLE_REVEAL_ALL_BUTTON = false; // ตั้งค่าเป็น true เพื่อเปิดแสดงปุ่มเปิดดูหน้าไพ่ทั้งหมด, หรือ false เพื่อซ่อนไว้
 
 export function TarotDailyClient() {
   const isMobilePerformance = useMediaQuery("(max-width:600px)");
