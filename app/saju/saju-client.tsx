@@ -12,6 +12,8 @@ import {
   Tabs,
   Tab,
   Backdrop,
+  Drawer,
+  IconButton,
 } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -536,7 +538,7 @@ type QuickSummaryItem = {
   label: string;
   text: string;
   color: string;
-  icon?: any;
+  icon?: React.ElementType;
   iconColor?: string;
   variant?: "hero" | "core" | "remedy" | "lucky";
 };
@@ -863,17 +865,17 @@ function PillarItem({ pillar, isDayMaster }: { pillar: Pillar; isDayMaster?: boo
   const stemMeta = elementMeta[pillar.stem.element];
 
   return (
-    <Box 
-      sx={{ 
-        flex: 1, 
-        minWidth: { xs: "100%", sm: "calc(50% - 16px)", md: "0" }, 
-        p: 2.8, 
-        borderRadius: "20px", 
-        bgcolor: isDayMaster ? "rgba(79, 70, 229, 0.04)" : "#fff", 
-        border: isDayMaster ? "2.5px solid #4f46e5" : "1.5px solid #e2e8f0", 
+    <Box
+      sx={{
+        flex: 1,
+        minWidth: { xs: "100%", sm: "calc(50% - 16px)", md: "0" },
+        p: 2.8,
+        borderRadius: "20px",
+        bgcolor: isDayMaster ? "rgba(79, 70, 229, 0.04)" : "#fff",
+        border: isDayMaster ? "2.5px solid #4f46e5" : "1.5px solid #e2e8f0",
         boxShadow: isDayMaster ? "0 20px 40px -20px rgba(79, 70, 229, 0.15), inset 0 1px 1px rgba(255,255,255,0.8)" : "0 10px 25px -20px rgba(15,23,42,0.06)",
-        textAlign: "center", 
-        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)", 
+        textAlign: "center",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         position: "relative",
         overflow: "hidden",
         "&:hover": {
@@ -895,21 +897,21 @@ function PillarItem({ pillar, isDayMaster }: { pillar: Pillar; isDayMaster?: boo
         />
       )}
       {isDayMaster && (
-        <Chip 
-          label="⭐ DAY MASTER" 
-          size="small" 
-          sx={{ 
-            position: "absolute", 
-            top: 10, 
-            left: "50%", 
-            transform: "translateX(-50%)", 
-            background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)", 
-            color: "#fff", 
-            fontSize: "0.58rem", 
-            fontWeight: 900, 
+        <Chip
+          label="⭐ DAY MASTER"
+          size="small"
+          sx={{
+            position: "absolute",
+            top: 10,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+            color: "#fff",
+            fontSize: "0.58rem",
+            fontWeight: 900,
             height: 18,
             boxShadow: "0 4px 8px rgba(79,70,229,0.25)"
-          }} 
+          }}
         />
       )}
       <Typography sx={{ color: isDayMaster ? "#4f46e5" : "#64748b", fontSize: "0.75rem", fontWeight: 800, mt: isDayMaster ? 1.2 : 0, mb: 1.5, letterSpacing: "0.06rem", textTransform: "uppercase" }}>
@@ -1071,10 +1073,10 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
 
       {/* Main Grid Layout */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1.1fr) minmax(0, 2fr)" }, gap: 3.5, position: "relative", zIndex: 2 }}>
-        
+
         {/* Left Column: Hero Focus & Lucky Element (1/3 Width) */}
         <Stack spacing={3.5} sx={{ justifyContent: "stretch" }}>
-          
+
           {/* Hero Trend Card */}
           {heroItem && (
             <Box
@@ -1181,7 +1183,7 @@ function QuickSummaryPanel({ items }: { items: QuickSummaryItem[] }) {
 
         {/* Right Column: 3 Core Pillars + 2 Remedies (2/3 Width) */}
         <Stack spacing={3.5} sx={{ justifyContent: "space-between" }}>
-          
+
           {/* Three Core Cards Row (Love, Career, Money) */}
           <Box
             sx={{
@@ -1353,7 +1355,7 @@ const cosmicParticles = Array.from({ length: 30 }, (_, i) => {
 
 function SajuLoaderOverlay({ step }: { step: number }) {
   const percentComplete = step === 1 ? 25 : step === 2 ? 50 : step === 3 ? 75 : 98;
-  
+
   return (
     <Backdrop
       open={true}
@@ -1477,7 +1479,7 @@ function SajuLoaderOverlay({ step }: { step: number }) {
         {/* 5 Element Floating Nodes */}
         {celestialElements.map((el, idx) => {
           const isGlowing = step >= 3 || (step === 2 && idx === 2);
-          
+
           return (
             <Box
               key={el.name}
@@ -1540,7 +1542,7 @@ function SajuLoaderOverlay({ step }: { step: number }) {
           {stepsData.map((s) => {
             const isCompleted = step > s.id;
             const isActive = step === s.id;
-            
+
             return (
               <Stack
                 key={s.id}
@@ -1680,6 +1682,7 @@ export function SajuClient() {
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [analysisTab, setAnalysisTab] = useState(0);
   const [showQuickSummary, setShowQuickSummary] = useState(true);
+  const [showBirthTimePicker, setShowBirthTimePicker] = useState(false);
 
 
   const reading = useMemo(() => {
@@ -1696,6 +1699,7 @@ export function SajuClient() {
   const activeSajuAnalysis = reading ? getReadableSajuAnalysis(reading, focus) : null;
   const baseSajuAnalysis = reading ? getReadableSajuAnalysis(reading, "ภาพรวม") : null;
   const quickSummaryItems = reading ? buildQuickSummary(reading) : [];
+  const selectedTimeOption = timeOptions.find((option) => option.value === birthTime) ?? timeOptions[0];
 
   const activeFocus = useMemo(() => {
     return focusOptions.find((opt) => opt.label === focus) || focusOptions[0];
@@ -1761,10 +1765,10 @@ export function SajuClient() {
     });
   }, [birthDate, birthTime, usesCustomTime, customBirthTime, birthGender, focus]);
 return (
-    <Box 
-      sx={{ 
-        pt: { xs: 11, md: 13 }, 
-        pb: 8, 
+    <Box
+      sx={{
+        pt: { xs: 11, md: 13 },
+        pb: 8,
         bgcolor: "#FAF8F2",
         backgroundImage: 'radial-gradient(rgba(45, 37, 32, 0.04) 1.5px, transparent 1.5px), radial-gradient(rgba(255, 142, 158, 0.05) 1.5px, transparent 1.5px)',
         backgroundSize: "48px 48px",
@@ -1776,13 +1780,13 @@ return (
       <Container maxWidth="xl">
 
 
-        <Box 
-          sx={{ 
-            mb: 4, 
-            p: { xs: 3, sm: 4, md: 4.5 }, 
-            borderRadius: "24px", 
-            border: "2.5px solid #2D2520", 
-            bgcolor: "#FFFDF9", 
+        <Box
+          sx={{
+            mb: { xs: 2, md: 4 },
+            p: { xs: 2, sm: 4, md: 4.5 },
+            borderRadius: { xs: "18px", md: "24px" },
+            border: "2.5px solid #2D2520",
+            bgcolor: "#FFFDF9",
             boxShadow: "4px 4px 0px #2D2520",
             position: "relative",
             overflow: "hidden"
@@ -1800,102 +1804,140 @@ return (
               color: "#FF8E9E",
               border: "2px solid #2D2520",
               fontWeight: 800,
-              mb: 2.5,
+              mb: { xs: 1.5, md: 2.5 },
             }}
           >
             <MagicStar size={16} color="#FF8E9E" variant="Bulk" className="pulse-slow" />
-            <Typography component="span" sx={{ color: "#2D2520", fontSize: "0.82rem", fontWeight: 800, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
+            <Typography component="span" sx={{ color: "#2D2520", fontSize: { xs: "0.72rem", md: "0.82rem" }, fontWeight: 800, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
               KOREAN DESTINY ANALYSIS
             </Typography>
           </Box>
-          
-          <Typography sx={{ color: "#FF8E9E", fontSize: "0.76rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", mb: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
+
+          <Typography sx={{ display: { xs: "none", md: "block" }, color: "#FF8E9E", fontSize: "0.76rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", mb: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
             ซาจูเกาหลี
           </Typography>
-          <Typography 
-            component="h1" 
-            sx={{ 
-              color: "#2D2520", 
-              fontSize: { xs: "2rem", sm: "2.35rem", md: "3rem" }, 
-              lineHeight: 1.08, 
-              fontWeight: 800, 
-              mb: 2, 
-              fontFamily: "var(--font-prompt), sans-serif", 
-              letterSpacing: "-0.02em",
+          <Typography
+            component="h1"
+            sx={{
+              color: "#2D2520",
+              fontSize: { xs: "1.45rem", sm: "2.35rem", md: "3rem" },
+              lineHeight: 1.08,
+              fontWeight: 800,
+              mb: { xs: 0, md: 2 },
+              fontFamily: "var(--font-prompt), sans-serif",
             }}
           >
-            วิเคราะห์พื้นดวงชะตา Saju
+            <Box component="span" sx={{ display: { xs: "inline", md: "none" } }}>ดูดวงซาจู</Box>
+            <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>วิเคราะห์พื้นดวงชะตา Saju</Box>
           </Typography>
-          <Typography sx={{ color: "#5A4D43", fontSize: { xs: "0.96rem", md: "1rem" }, maxWidth: 720, lineHeight: 1.7, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
+          <Typography sx={{ display: { xs: "none", md: "block" }, color: "#5A4D43", fontSize: "1rem", maxWidth: 720, lineHeight: 1.7, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
             ถอดรหัสความลับ 4 เสาหลักชีวิต (ปี เดือน วัน เวลาเกิด) ตามศาสตร์แห่งพลังงานเกาหลีโบราณ ค้นพบความสมดุลธาตุประจำกาย และแนวโน้มชีวิตรอบตัวคุณ
           </Typography>
         </Box>
 {/* Input Card */}
-        <Box 
-          sx={{ 
-            bgcolor: "#FFFDF9", 
-            borderRadius: "24px", 
-            p: { xs: 3, sm: 4, md: 4.5 }, 
-            boxShadow: "6px 6px 0px #2D2520", 
-            border: "2.5px solid #2D2520", 
-            mb: 5, 
-            position: "relative", 
-            overflow: "hidden" 
+        <Box
+          sx={{
+            bgcolor: "#FFFDF9",
+            borderRadius: { xs: "18px", md: "24px" },
+            p: { xs: 2, sm: 4, md: 4.5 },
+            boxShadow: { xs: "4px 4px 0px #2D2520", md: "6px 6px 0px #2D2520" },
+            border: "2.5px solid #2D2520",
+            mb: { xs: 3, md: 5 },
+            position: "relative",
+            overflow: "hidden"
           }}
         >
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" }, gap: { xs: 4, lg: 6 }, mb: 4, position: "relative", zIndex: 1 }}>
-            <Box>
-              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(0, 1fr)", lg: "minmax(0, 1fr) minmax(0, 1fr)" }, gap: { xs: 2.25, lg: 6 }, mb: { xs: 2.25, md: 4 }, position: "relative", zIndex: 1, minWidth: 0 }}>
+            <Box sx={{ minWidth: 0 }}>
+              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: { xs: 1.5, md: 3 } }}>
                 <Box sx={{ width: 36, height: 36, borderRadius: "10px", bgcolor: "rgba(114, 150, 248, 0.15)", border: "2.5px solid #2D2520", display: "grid", placeItems: "center" }}>
                   <Calendar size={20} color="#7296F8" variant="Bulk" />
                 </Box>
-                <Typography sx={{ color: "#2D2520", fontSize: "1.2rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>วันและเวลาเกิด</Typography>
+                <Typography sx={{ color: "#2D2520", fontSize: { xs: "1rem", md: "1.2rem" }, fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>วันและเวลาเกิด</Typography>
               </Stack>
-              <Stack spacing={3}>
+              <Stack spacing={{ xs: 2, md: 3 }}>
                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
-                  <DatePicker 
-                    label="วัน เดือน ปีเกิด" 
-                    value={birthDate} 
-                    onChange={setBirthDate} 
-                    maxDate={dayjs()} 
-                    slotProps={{ 
-                      textField: { 
-                        fullWidth: true, 
-                        sx: { 
-                          "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#FFFDF9", border: "2.5px solid #2D2520", fontFamily: "var(--font-prompt), sans-serif", fontWeight: 600, "&.Mui-focused": { borderColor: "#7296F8" } }, 
-                          "& .MuiOutlinedInput-notchedOutline": { border: "none" } 
-                        } 
-                      } 
-                    }} 
+                  <DatePicker
+                    label="วัน เดือน ปีเกิด"
+                    value={birthDate}
+                    onChange={setBirthDate}
+                    maxDate={dayjs()}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        sx: {
+                          width: "100%",
+                          maxWidth: "100%",
+                          minWidth: 0,
+                          boxSizing: "border-box",
+                          "& .MuiInputBase-root": {
+                            width: "100%",
+                            maxWidth: "100%",
+                            minWidth: 0,
+                            boxSizing: "border-box",
+                          },
+                          "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#FFFDF9", border: "2.5px solid #2D2520", fontFamily: "var(--font-prompt), sans-serif", fontWeight: 600, "&.Mui-focused": { borderColor: "#7296F8" } },
+                          "& .MuiOutlinedInput-notchedOutline": { border: "none" }
+                        }
+                      }
+                    }}
                   />
                 </LocalizationProvider>
                 <Box>
-                  <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 800, mb: 1.5, ml: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>ระบุเวลาเกิด (Yam)</Typography>
-                  <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)" }, gap: 1 }}>
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 800, mb: 1, ml: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>เวลาเกิด</Typography>
+                  <Button
+                    type="button"
+                    onClick={() => setShowBirthTimePicker(true)}
+                    sx={{
+                      display: { xs: "flex", md: "none" },
+                      justifyContent: "space-between",
+                      minHeight: 48,
+                      width: "100%",
+                      maxWidth: "100%",
+                      minWidth: 0,
+                      boxSizing: "border-box",
+                      borderRadius: "12px",
+                      border: "1.75px solid #2D2520",
+                      bgcolor: "#FFFDF9",
+                      color: "#2D2520",
+                      px: 1.5,
+                      textTransform: "none",
+                      fontWeight: 900,
+                      fontFamily: "var(--font-prompt), sans-serif",
+                      boxShadow: "2px 2px 0px rgba(45,37,32,0.12)",
+                    }}
+                  >
+                    <Box sx={{ textAlign: "left", minWidth: 0, overflow: "hidden" }}>
+                      <Box sx={{ fontSize: "0.88rem", lineHeight: 1.25, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{selectedTimeOption.label}</Box>
+                      <Box sx={{ fontSize: "0.7rem", color: "#5A4D43", lineHeight: 1.25, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{selectedTimeOption.helper}</Box>
+                    </Box>
+                    <Calendar size={18} variant="Bulk" color="#7296F8" style={{ flexShrink: 0 }} />
+                  </Button>
+                  <Box sx={{ display: { xs: "none", md: "grid" }, gridTemplateColumns: { md: "repeat(3, 1fr)" }, gap: 1 }}>
                     {timeOptions.map((opt) => (
-                      <Button 
-                        key={opt.value} 
-                        onClick={() => { setUsesCustomTime(false); setBirthTime(opt.value); }} 
-                        sx={{ 
-                          borderRadius: "12px", 
-                          border: "2.5px solid #2D2520", 
-                          bgcolor: (!usesCustomTime && birthTime === opt.value) ? "#FF8E9E" : "#FFFDF9", 
-                          color: (!usesCustomTime && birthTime === opt.value) ? "#FFFDF9" : "#2D2520", 
-                          p: 1.2, 
-                          minHeight: 56, 
-                          flexDirection: "column", 
-                          textTransform: "none", 
-                          fontSize: "0.8rem", 
-                          fontWeight: 800, 
-                          lineHeight: 1.2, 
+                      <Button
+                        key={opt.value}
+                        onClick={() => { setUsesCustomTime(false); setBirthTime(opt.value); }}
+                        sx={{
+                          borderRadius: "12px",
+                          border: "2.5px solid #2D2520",
+                          bgcolor: (!usesCustomTime && birthTime === opt.value) ? "#FF8E9E" : "#FFFDF9",
+                          color: (!usesCustomTime && birthTime === opt.value) ? "#FFFDF9" : "#2D2520",
+                          p: 1.2,
+                          minHeight: 56,
+                          flexDirection: "column",
+                          textTransform: "none",
+                          fontSize: "0.8rem",
+                          fontWeight: 800,
+                          lineHeight: 1.2,
                           fontFamily: "var(--font-prompt), sans-serif",
                           boxShadow: (!usesCustomTime && birthTime === opt.value) ? "2px 2px 0px #2D2520" : "none",
-                          transition: "all 0.2s", 
-                          "&:hover": { 
-                            bgcolor: (!usesCustomTime && birthTime === opt.value) ? "#FF8E9E" : "#FAF8F2", 
+                          transition: "all 0.2s",
+                          "&:hover": {
+                            bgcolor: (!usesCustomTime && birthTime === opt.value) ? "#FF8E9E" : "#FAF8F2",
                             borderColor: "#2D2520",
                             transform: "translateY(-1px)"
-                          } 
+                          }
                         }}
                       >
                         <Box>{opt.label.split(" (")[0]}</Box>
@@ -1905,8 +1947,8 @@ return (
                   </Box>
                 </Box>
                 <Box>
-                  <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 800, mb: 1.5, ml: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>เพศสำหรับการคำนวณซาจู</Typography>
-                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1.5 }}>
+                  <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 800, mb: 1, ml: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>เพศ</Typography>
+                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: { xs: 1, md: 1.5 }, minWidth: 0 }}>
                     {genderOptions.map((opt) => {
                       const isActive = birthGender === opt.value;
                       const activeBg = opt.value === "male" ? "#7296F8" : "#FF8E9E";
@@ -1916,12 +1958,15 @@ return (
                           onClick={() => setBirthGender(opt.value)}
                           sx={{
                             borderRadius: "12px",
-                            border: "2.5px solid #2D2520",
+                            border: { xs: "2px solid #2D2520", md: "2.5px solid #2D2520" },
                             bgcolor: isActive ? activeBg : "#FFFDF9",
                             color: isActive ? "#FFFDF9" : "#2D2520",
-                            boxShadow: isActive ? "3px 3px 0px #2D2520" : "none",
-                            p: 1.6,
-                            minHeight: 68,
+                            boxShadow: { xs: "none", md: isActive ? "3px 3px 0px #2D2520" : "none" },
+                            p: { xs: 1.1, md: 1.6 },
+                            minHeight: { xs: 48, md: 68 },
+                            minWidth: 0,
+                            width: "100%",
+                            boxSizing: "border-box",
                             flexDirection: "column",
                             textTransform: "none",
                             fontSize: "0.92rem",
@@ -1929,8 +1974,8 @@ return (
                             lineHeight: 1.25,
                             fontFamily: "var(--font-prompt), sans-serif",
                             transition: "all 0.2s ease-in-out",
-                            "&:hover": { 
-                              bgcolor: isActive ? activeBg : "#FAF8F2", 
+                            "&:hover": {
+                              bgcolor: isActive ? activeBg : "#FAF8F2",
                               borderColor: "#2D2520",
                               transform: "translateY(-2px)"
                             },
@@ -1940,7 +1985,7 @@ return (
                             <Box sx={{ fontSize: "1.25rem", lineHeight: 1, color: isActive ? "#FFFDF9" : "#5A4D43" }}>{opt.symbol}</Box>
                             <Box>{opt.label}</Box>
                           </Stack>
-                          <Box sx={{ fontSize: "0.66rem", opacity: 0.8, fontWeight: 700 }}>{opt.helper}</Box>
+                          <Box sx={{ display: { xs: "none", md: "block" }, fontSize: "0.66rem", opacity: 0.8, fontWeight: 700 }}>{opt.helper}</Box>
                         </Button>
                       );
                     })}
@@ -1948,54 +1993,67 @@ return (
                 </Box>
               </Stack>
             </Box>
-            <Box>
-              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
+            <Box sx={{ minWidth: 0 }}>
+              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: { xs: 1.5, md: 3 } }}>
                 <Box sx={{ width: 36, height: 36, borderRadius: "10px", bgcolor: "rgba(245, 158, 11, 0.15)", border: "2.5px solid #2D2520", display: "grid", placeItems: "center" }}>
                   <Flash size={20} color="#f59e0b" variant="Bulk" />
                 </Box>
-                <Typography sx={{ color: "#2D2520", fontSize: "1.2rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>วิเคราะห์เรื่องที่ต้องการเน้น</Typography>
+                <Typography sx={{ color: "#2D2520", fontSize: { xs: "1rem", md: "1.2rem" }, fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  <Box component="span" sx={{ display: { xs: "inline", md: "none" } }}>เลือกเรื่องที่จะดู</Box>
+                  <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>วิเคราะห์เรื่องที่ต้องการเน้น</Box>
+                </Typography>
               </Stack>
-              <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1.5 }}>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", md: "repeat(2, minmax(0, 1fr))" },
+                  gap: { xs: 1, md: 1.5 },
+                  minWidth: 0,
+                }}
+              >
                 {focusOptions.map((opt) => (
-                  <Button 
-                    key={opt.label} 
-                    onClick={() => setFocus(opt.label)} 
-                    sx={{ 
-                      display: "flex", 
-                      flexDirection: "row", 
-                      justifyContent: "flex-start", 
-                      alignItems: "center", 
-                      gap: 2, 
-                      p: 2.2, 
-                      borderRadius: "12px", 
-                      border: "2.5px solid #2D2520", 
-                      bgcolor: focus === opt.label ? "rgba(255, 142, 158, 0.15)" : "#FFFDF9", 
-                      color: "#2D2520", 
-                      boxShadow: focus === opt.label ? "3px 3px 0px #2D2520" : "none",
-                      transition: "all 0.2s ease-in-out", 
-                      textAlign: "left", 
+                  <Button
+                    key={opt.label}
+                    onClick={() => setFocus(opt.label)}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                      gap: { xs: 0.75, md: 2 },
+                      p: { xs: 1, md: 2.2 },
+                      minWidth: 0,
+                      width: "100%",
+                      minHeight: { xs: 42, md: "auto" },
+                      borderRadius: "12px",
+                      border: { xs: "2px solid #2D2520", md: "2.5px solid #2D2520" },
+                      bgcolor: focus === opt.label ? "rgba(255, 142, 158, 0.15)" : "#FFFDF9",
+                      color: "#2D2520",
+                      boxShadow: { xs: "none", md: focus === opt.label ? "3px 3px 0px #2D2520" : "none" },
+                      transition: "all 0.2s ease-in-out",
+                      textAlign: "left",
                       fontFamily: "var(--font-prompt), sans-serif",
-                      "&:hover": { 
-                        borderColor: "#2D2520", 
+                      "&:hover": {
+                        borderColor: "#2D2520",
                         bgcolor: "rgba(255, 142, 158, 0.08)",
                         transform: "translateY(-2px)"
-                      } 
+                      }
                     }}
                   >
-                    <opt.icon 
-                      size={24} 
-                      variant="Bulk" 
-                      color={focus === opt.label ? "#FF8E9E" : "#5A4D43"} 
-                      style={{ transition: "all 0.3s" }} 
+                    <opt.icon
+                      size={20}
+                      variant="Bulk"
+                      color={focus === opt.label ? "#FF8E9E" : "#5A4D43"}
+                      style={{ transition: "all 0.3s" }}
                     />
-                    <Box>
-                      <Typography sx={{ fontSize: "0.94rem", fontWeight: 800, lineHeight: 1.2 }}>{opt.label}</Typography>
-                      <Typography sx={{ fontSize: "0.68rem", opacity: 0.8, fontWeight: 700 }}>{opt.helper}</Typography>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography sx={{ fontSize: { xs: "0.84rem", md: "0.94rem" }, fontWeight: 800, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{opt.label}</Typography>
+                      <Typography sx={{ display: { xs: "none", md: "block" }, fontSize: "0.68rem", opacity: 0.8, fontWeight: 700 }}>{opt.helper}</Typography>
                     </Box>
                   </Button>
                 ))}
               </Box>
-              <Box sx={{ mt: 3, p: 2.5, borderRadius: "12px", bgcolor: "rgba(114, 150, 248, 0.1)", border: "2px solid #2D2520" }}>
+              <Box sx={{ display: { xs: "none", md: "block" }, mt: 3, p: 2.5, borderRadius: "12px", bgcolor: "rgba(114, 150, 248, 0.1)", border: "2px solid #2D2520" }}>
                 <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
                   <InfoCircle size={20} color="#7296F8" />
                   <Typography sx={{ color: "#2D2520", fontSize: "0.85rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>ระบบ Saju (Four Pillars of Destiny)</Typography>
@@ -2005,51 +2063,124 @@ return (
             </Box>
           </Box>
           <Button
-            fullWidth 
-            onClick={handlePredict} 
-            disabled={isCalculating || !birthDate} 
-            sx={{ 
-              height: 72, 
-              borderRadius: "16px", 
-              background: "linear-gradient(135deg, #2D2520 0%, #FF8E9E 50%, #7296F8 100%)", 
-              color: "#FFFDF9", 
-              fontSize: "1.2rem", 
-              fontWeight: 800, 
-              textTransform: "none", 
-              boxShadow: "4px 4px 0px #2D2520", 
-              border: "2.5px solid #2D2520",
+            fullWidth
+            onClick={handlePredict}
+            disabled={isCalculating || !birthDate}
+            sx={{
+              height: { xs: 56, md: 72 },
+              width: "100%",
+              maxWidth: "100%",
+              minWidth: 0,
+              boxSizing: "border-box",
+              borderRadius: "16px",
+              background: "linear-gradient(135deg, #2D2520 0%, #FF8E9E 50%, #7296F8 100%)",
+              color: "#FFFDF9",
+              fontSize: { xs: "0.98rem", md: "1.2rem" },
+              fontWeight: 800,
+              textTransform: "none",
+              boxShadow: { xs: "none", md: "4px 4px 0px #2D2520" },
+              border: { xs: "2px solid #2D2520", md: "2.5px solid #2D2520" },
               fontFamily: "var(--font-prompt), sans-serif",
-              transition: "all 0.2s ease-in-out", 
-              "&:hover": { 
-                background: "linear-gradient(135deg, #1A1513 0%, #E07D8B 50%, #5E7ECC 100%)", 
-                transform: "translateY(-3px)", 
-                boxShadow: "6px 6px 0px #2D2520" 
-              }, 
-              "&.Mui-disabled": { 
-                background: "#cbd5e1", 
-                color: "#94a3b8", 
+              transition: "all 0.2s ease-in-out",
+              "&:hover": {
+                background: "linear-gradient(135deg, #1A1513 0%, #E07D8B 50%, #5E7ECC 100%)",
+                transform: "translateY(-3px)",
+                boxShadow: "6px 6px 0px #2D2520"
+              },
+              "&.Mui-disabled": {
+                background: "#cbd5e1",
+                color: "#94a3b8",
                 boxShadow: "none",
                 borderColor: "#94a3b8",
-                opacity: 0.8 
-              }, 
-              "&:active": { 
-                transform: "translateY(-1px)" 
-              } 
+                opacity: 0.8
+              },
+              "&:active": {
+                transform: "translateY(-1px)"
+              }
             }}
           >
             {isCalculating ? (
-              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", justifyContent: "center", width: "100%" }}>
+              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", justifyContent: "center", width: "100%", minWidth: 0 }}>
                 <Box sx={{ width: 22, height: 22, border: "3px solid rgba(255,255,255,0.2)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                <Typography sx={{ fontWeight: 800, fontSize: "inherit", letterSpacing: "0.02em", fontFamily: "var(--font-prompt), sans-serif" }}>กำลังวิเคราะห์พื้นดวงชะตา...</Typography>
+                <Typography sx={{ fontWeight: 800, fontSize: "inherit", letterSpacing: "0.02em", fontFamily: "var(--font-prompt), sans-serif" }}>กำลังวิเคราะห์...</Typography>
               </Stack>
             ) : (
-              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", justifyContent: "center", width: "100%" }}>
-                <Gemini size={24} variant="Bulk" color="#FFFDF9" />
-                <Typography sx={{ fontWeight: 800, fontSize: "inherit", letterSpacing: "0.02em", fontFamily: "var(--font-prompt), sans-serif" }}>ทำนายดวงชะตาชีวิต (Read My Destiny)</Typography>
+              <Stack direction="row" spacing={1.2} sx={{ alignItems: "center", justifyContent: "center", width: "100%", minWidth: 0 }}>
+                <Gemini size={22} variant="Bulk" color="#FFFDF9" style={{ flexShrink: 0 }} />
+                <Typography sx={{ fontWeight: 800, fontSize: "inherit", letterSpacing: "0.02em", fontFamily: "var(--font-prompt), sans-serif" }}>
+                  <Box component="span" sx={{ display: { xs: "inline", md: "none" } }}>เริ่มทำนายซาจู</Box>
+                  <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>ทำนายดวงชะตาชีวิต (Read My Destiny)</Box>
+                </Typography>
               </Stack>
             )}
           </Button>
         </Box>
+        <Drawer
+          anchor="bottom"
+          open={showBirthTimePicker}
+          onClose={() => setShowBirthTimePicker(false)}
+          sx={{ display: { xs: "block", md: "none" } }}
+          slotProps={{
+            paper: {
+              sx: {
+                m: 0,
+                width: "100%",
+                maxHeight: "78vh",
+                borderRadius: "22px 22px 0 0",
+                border: "2.5px solid #2D2520",
+                borderBottom: 0,
+                bgcolor: "#FFFDF9",
+                p: 2,
+                boxShadow: "0 -8px 28px rgba(45,37,32,0.18)",
+              }
+            }
+          }}
+        >
+          <Stack spacing={1.5}>
+            <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+              <Box sx={{ width: 42, height: 4, borderRadius: "999px", bgcolor: "rgba(45,37,32,0.28)" }} />
+            </Box>
+            <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
+              <Typography sx={{ color: "#2D2520", fontWeight: 950, fontSize: "1rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                เวลาเกิด
+              </Typography>
+              <IconButton onClick={() => setShowBirthTimePicker(false)} sx={{ color: "#2D2520" }}>
+                ×
+              </IconButton>
+            </Stack>
+            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, overflowY: "auto", pb: 1 }}>
+              {timeOptions.map((opt) => (
+                <Button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => {
+                    setUsesCustomTime(false);
+                    setBirthTime(opt.value);
+                    setShowBirthTimePicker(false);
+                  }}
+                  sx={{
+                    borderRadius: "12px",
+                    border: "2px solid #2D2520",
+                    bgcolor: (!usesCustomTime && birthTime === opt.value) ? "#FF8E9E" : "#FFFDF9",
+                    color: (!usesCustomTime && birthTime === opt.value) ? "#FFFDF9" : "#2D2520",
+                    p: 1.1,
+                    minHeight: 56,
+                    flexDirection: "column",
+                    textTransform: "none",
+                    fontSize: "0.78rem",
+                    fontWeight: 850,
+                    lineHeight: 1.2,
+                    fontFamily: "var(--font-prompt), sans-serif",
+                    boxShadow: (!usesCustomTime && birthTime === opt.value) ? "2px 2px 0px #2D2520" : "none",
+                  }}
+                >
+                  <Box>{opt.label.split(" (")[0]}</Box>
+                  <Box sx={{ fontSize: "0.62rem", opacity: 0.82, fontWeight: 750 }}>{opt.helper}</Box>
+                </Button>
+              ))}
+            </Box>
+          </Stack>
+        </Drawer>
         {/* Results */}
         {showResults && reading ? (
           <Box id="saju-reveal" sx={{ animation: "resultFadeIn 1s cubic-bezier(0.2, 0, 0.2, 1)", fontFamily: "var(--font-prompt), sans-serif" }}>
@@ -2073,7 +2204,7 @@ return (
                   textTransform: "none",
                   fontFamily: "var(--font-prompt), sans-serif",
                   transition: "all 0.2s ease-in-out",
-                  "&:hover": { 
+                  "&:hover": {
                     bgcolor: showQuickSummary ? "#1A1513" : "#FAF8F2",
                     borderColor: "#2D2520"
                   },
@@ -2084,16 +2215,16 @@ return (
             </Stack>
 
             {showQuickSummary && <QuickSummaryPanel items={quickSummaryItems} />}
-            
+
             {/* ========================================================================= */}
             {/* SECTION 1: Unified Destiny Identity & 4 Pillars Chart (Full Width Card)   */}
             {/* ========================================================================= */}
-            <Box 
-              sx={{ 
-                mb: 4, 
-                bgcolor: "#FFFDF9", 
-                borderRadius: "24px", 
-                border: "2.5px solid #2D2520", 
+            <Box
+              sx={{
+                mb: 4,
+                bgcolor: "#FFFDF9",
+                borderRadius: "24px",
+                border: "2.5px solid #2D2520",
                 boxShadow: "5px 5px 0px #2D2520",
                 p: { xs: 3, sm: 4, md: 4.5 },
                 position: "relative",
@@ -2101,7 +2232,7 @@ return (
               }}
             >
               <Stack direction={{ xs: "column", lg: "row" }} spacing={5} sx={{ alignItems: "stretch" }}>
-                
+
                 {/* Day Master (Identity Panel) */}
                 <Box sx={{ flex: { xs: "1", lg: "0.9" }, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                   <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2 }}>
@@ -2112,14 +2243,14 @@ return (
                   </Stack>
 
                   <Stack direction="row" spacing={2.5} sx={{ alignItems: "center", mb: 3 }}>
-                    <Box 
-                      sx={{ 
-                        width: 80, 
-                        height: 80, 
-                        borderRadius: "16px", 
-                        bgcolor: elementMeta[reading.dayMaster.element].color, 
-                        display: "grid", 
-                        placeItems: "center", 
+                    <Box
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: "16px",
+                        bgcolor: elementMeta[reading.dayMaster.element].color,
+                        display: "grid",
+                        placeItems: "center",
                         color: "#FFFDF9",
                         border: "2.5px solid #2D2520",
                         boxShadow: "3px 3px 0px #2D2520",
@@ -2131,11 +2262,11 @@ return (
                       </Typography>
                     </Box>
                     <Box>
-                      <Typography 
-                        sx={{ 
-                          color: "#2D2520", 
-                          fontSize: { xs: "1.4rem", md: "1.6rem" }, 
-                          fontWeight: 800, 
+                      <Typography
+                        sx={{
+                          color: "#2D2520",
+                          fontSize: { xs: "1.4rem", md: "1.6rem" },
+                          fontWeight: 800,
                           fontFamily: "var(--font-prompt), sans-serif",
                           mb: 0.5
                         }}
@@ -2165,7 +2296,7 @@ return (
                 <Box sx={{ flex: { xs: "1", lg: "1.1" }, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                   <Typography sx={{ color: "#2D2520", fontSize: "1.05rem", fontWeight: 800, mb: 0.5, fontFamily: "var(--font-prompt), sans-serif" }}>แผนผังเสาหลักชะตาชีวิต (The 4 Pillars)</Typography>
                   <Typography sx={{ color: "#5A4D43", fontSize: "0.82rem", fontWeight: 500, mb: 3.5, fontFamily: "var(--font-prompt), sans-serif" }}>ปูมหลังเสาหลักกาลเวลาลิขิตพลังงานกำเนิด</Typography>
-                  
+
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.8 }}>
                     {reading.pillars.map((p, i) => (<PillarItem key={p.label} pillar={p} isDayMaster={i === 2} />))}
                     {!reading.hasBirthTime && (
@@ -2183,14 +2314,14 @@ return (
             {/* SECTION 2: Cosmic Balance & Daily Fortune (Balanced 2-Column Grid)         */}
             {/* ========================================================================= */}
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "repeat(2, 1fr)" }, gap: 3, mb: 4 }}>
-              
+
               {/* Element Balance Panel */}
-              <Box 
-                sx={{ 
-                  bgcolor: "#FFFDF9", 
-                  p: { xs: 3, sm: 4 }, 
-                  borderRadius: "24px", 
-                  border: "2.5px solid #2D2520", 
+              <Box
+                sx={{
+                  bgcolor: "#FFFDF9",
+                  p: { xs: 3, sm: 4 },
+                  borderRadius: "24px",
+                  border: "2.5px solid #2D2520",
                   boxShadow: "4px 4px 0px #2D2520",
                   display: "flex",
                   flexDirection: "column",
@@ -2254,12 +2385,12 @@ return (
               </Box>
 
               {/* Daily Horoscope Panel */}
-              <Box 
-                sx={{ 
-                  bgcolor: "#FFFDF9", 
-                  p: { xs: 3, sm: 4 }, 
-                  borderRadius: "24px", 
-                  border: "2.5px solid #2D2520", 
+              <Box
+                sx={{
+                  bgcolor: "#FFFDF9",
+                  p: { xs: 3, sm: 4 },
+                  borderRadius: "24px",
+                  border: "2.5px solid #2D2520",
                   borderTop: "8px solid #f59e0b",
                   boxShadow: "4px 4px 0px #2D2520",
                   display: "flex",
@@ -2299,23 +2430,23 @@ return (
             {/* ========================================================================= */}
             {/* SECTION 3: Deep Readings & Action Plans (2-Column Grid)                  */}
             {/* ========================================================================= */}
-            
+
             {/* Quick Indicator Banner */}
-            <Box 
-              sx={{ 
-                mb: 4, 
-                p: { xs: 3, md: 3.5 }, 
-                borderRadius: "20px", 
-                bgcolor: "#2D2520", 
-                border: "2.5px solid #2D2520", 
-                boxShadow: "4px 4px 0px #2D2520", 
-                display: "flex", 
-                alignItems: "center", 
-                justifyContent: "space-between", 
-                flexWrap: "wrap", 
-                gap: 2, 
-                overflow: "hidden", 
-                position: "relative" 
+            <Box
+              sx={{
+                mb: 4,
+                p: { xs: 3, md: 3.5 },
+                borderRadius: "20px",
+                bgcolor: "#2D2520",
+                border: "2.5px solid #2D2520",
+                boxShadow: "4px 4px 0px #2D2520",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 2,
+                overflow: "hidden",
+                position: "relative"
               }}
             >
               <Stack direction="row" spacing={2} sx={{ alignItems: "center", position: "relative", zIndex: 1 }}>
@@ -2334,33 +2465,33 @@ return (
             </Box>
 
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1.4fr) minmax(300px, 0.6fr)" }, gap: 3, alignItems: "start" }}>
-              
+
               {/* LEFT Column: Detailed Fortune Text Analysis */}
               <Box>
-                
+
                 {/* Main Tab Analysis */}
                 <Box sx={{ bgcolor: "#FFFDF9", borderRadius: "20px", border: "2.5px solid #2D2520", mb: 4, overflow: "hidden", boxShadow: "4px 4px 0px #2D2520" }}>
                   {focus !== "ภาพรวม" ? (
                     <Box sx={{ borderBottom: "2.5px solid #2D2520", background: "#FAF8F2" }}>
-                      <Tabs 
-                        value={analysisTab} 
-                        onChange={(_, v) => setAnalysisTab(v)} 
+                      <Tabs
+                        value={analysisTab}
+                        onChange={(_, v) => setAnalysisTab(v)}
                         variant="fullWidth"
-                        sx={{ 
+                        sx={{
                           '& .MuiTab-root': { py: 2.5, fontWeight: 800, fontSize: '0.95rem', color: '#5A4D43', fontFamily: 'var(--font-prompt), sans-serif' },
                           '& .Mui-selected': { color: '#FF8E9E !important' },
                           '& .MuiTabs-indicator': { height: 4, bgcolor: '#FF8E9E', borderRadius: '4px 4px 0 0' }
                         }}
                       >
-                        <Tab 
-                          icon={<activeFocus.icon size={20} color={analysisTab === 0 ? "#FF8E9E" : "#5A4D43"} variant="Bulk" />} 
-                          iconPosition="start" 
-                          label={`วิเคราะห์เรื่อง${focus}`} 
+                        <Tab
+                          icon={<activeFocus.icon size={20} color={analysisTab === 0 ? "#FF8E9E" : "#5A4D43"} variant="Bulk" />}
+                          iconPosition="start"
+                          label={`วิเคราะห์เรื่อง${focus}`}
                         />
-                        <Tab 
-                          icon={<Profile2User size={20} color={analysisTab === 1 ? "#FF8E9E" : "#5A4D43"} variant="Bulk" />} 
-                          iconPosition="start" 
-                          label="ตัวตนพื้นฐาน (ถาวร)" 
+                        <Tab
+                          icon={<Profile2User size={20} color={analysisTab === 1 ? "#FF8E9E" : "#5A4D43"} variant="Bulk" />}
+                          iconPosition="start"
+                          label="ตัวตนพื้นฐาน (ถาวร)"
                         />
                       </Tabs>
                     </Box>
@@ -2458,7 +2589,7 @@ return (
                       <Typography sx={{ fontSize: "1.1rem", fontWeight: 800, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>โครงสร้างพลังเด่นในชะตาชีวิต (Ten Gods)</Typography>
                       <Chip label="พรสวรรค์หลัก" size="small" sx={{ bgcolor: "rgba(255, 142, 158, 0.15)", color: "#FF8E9E", border: "1.5px solid #2D2520", fontWeight: 800, fontSize: "0.7rem", fontFamily: "var(--font-prompt), sans-serif" }} />
                     </Stack>
-                    
+
                     <Box sx={{ bgcolor: "#FFFDF9", p: { xs: 3, sm: 4 }, borderRadius: "20px", border: "2.5px solid #2D2520", boxShadow: "4px 4px 0px #2D2520" }}>
                       <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", md: "center" }, mb: 3 }}>
                         <Box sx={{ maxWidth: 520 }}>
@@ -2469,7 +2600,7 @@ return (
                         </Box>
                         <Chip label={`เด่นสุด: ${reading.tenGodSummary[0].thaiLabel}`} sx={{ bgcolor: "#FF8E9E", color: "#FFFDF9", border: "2px solid #2D2520", fontSize: "0.88rem", fontWeight: 800, borderRadius: "10px", height: 36, px: 2, fontFamily: "var(--font-prompt), sans-serif" }} />
                       </Stack>
-                      
+
                       <Box sx={{ p: 2.8, mb: 3, borderRadius: "16px", bgcolor: "#FAF8F2", border: "2.5px solid #2D2520", borderLeft: "8px solid #FF8E9E", boxShadow: "2px 2px 0px rgba(0,0,0,0.05)" }}>
                         <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: { xs: "flex-start", sm: "center" } }}>
                           <Box sx={{ minWidth: 140 }}>
@@ -2479,7 +2610,7 @@ return (
                           <Typography sx={{ color: "#2D2520", fontSize: "0.96rem", lineHeight: 1.8, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>{reading.tenGodSummary[0].description}</Typography>
                         </Stack>
                       </Box>
-                      
+
                       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" }, gap: 2 }}>
                         {reading.tenGodSummary.slice(1, 5).map((god) => (
                           <Box key={god.key} sx={{ p: 2, borderRadius: "12px", bgcolor: "#FFFDF9", border: "2px solid #2D2520" }}>
@@ -2532,7 +2663,7 @@ return (
 
               {/* RIGHT Column: Remedy Action Plan & Lucky Products */}
               <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                
+
                 {/* Lifelong Lucky Element permanent card */}
                 <Box sx={{ p: 3, bgcolor: "#FFFDF9", borderRadius: "16px", border: "2.5px solid #2D2520", borderLeft: `8px solid ${elementMeta[reading.luckyElement].color}`, boxShadow: "3px 3px 0px #2D2520" }}>
                   <Stack direction="row" spacing={2} sx={{ alignItems: "flex-start" }}>
@@ -2549,14 +2680,14 @@ return (
                 </Box>
 
                 {/* Affiliate Products Card (Moved immediately below Lucky Element for higher CTR/conversion) */}
-                <Box 
-                  sx={{ 
-                    bgcolor: "#FFFDF9", 
-                    p: 3, 
-                    borderRadius: "20px", 
-                    border: "2.5px solid #2D2520", 
-                    borderTop: `8px solid ${elementMeta[reading.luckyElement].color}`, 
-                    boxShadow: "4px 4px 0px #2D2520" 
+                <Box
+                  sx={{
+                    bgcolor: "#FFFDF9",
+                    p: 3,
+                    borderRadius: "20px",
+                    border: "2.5px solid #2D2520",
+                    borderTop: `8px solid ${elementMeta[reading.luckyElement].color}`,
+                    boxShadow: "4px 4px 0px #2D2520"
                   }}
                 >
                   <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2.5 }}>
@@ -2567,7 +2698,7 @@ return (
                       ของมงคลนำโชคแนะนำ (เสริมธาตุ{elementMeta[reading.luckyElement].label})
                     </Typography>
                   </Stack>
-                  
+
                   {isProductsLoading ? (
                     <Box sx={{ py: 4, textAlign: "center" }}>
                       <CircularProgress size={24} sx={{ color: elementMeta[reading.luckyElement].color }} />
@@ -2613,7 +2744,7 @@ return (
                       </Typography>
                     </Box>
                   )}
-                  
+
                   {affiliateProducts.length > 0 ? (
                     <Typography sx={{ color: "#5A4D43", fontSize: "0.65rem", textAlign: "center", mt: 2.5, fontStyle: "italic", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
                       * แนะนำของมงคลตามพลังงานธาตุ{elementMeta[reading.luckyElement].label} เพื่อปรับหนุนและเสริมจุดบกพร่องของชะตาชีวิตคุณ
@@ -2637,7 +2768,7 @@ return (
                     </Box>
 
                     <Box sx={{ p: 3 }}>
-                      
+
                       {/* Basis chips */}
                       <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", rowGap: 1, mb: 2.5 }}>
                         {remedyPlan.basis.map((item) => (
@@ -2652,13 +2783,13 @@ return (
                           { label: "✅ สิ่งที่ควรปฏิบัติ (Action)", text: remedyPlan.action, color: "#059669", bg: "#FFFDF9", border: "#2D2520" },
                           { label: "❌ สิ่งที่ควรหลีกเลี่ยง (Avoid)", text: remedyPlan.avoid, color: "#e11d48", bg: "#FFFDF9", border: "#2D2520" },
                         ].map((item) => (
-                          <Box 
-                            key={item.label} 
-                            sx={{ 
-                              p: 2.2, 
-                              borderRadius: "12px", 
-                              bgcolor: item.bg, 
-                              border: "2px solid " + item.border, 
+                          <Box
+                            key={item.label}
+                            sx={{
+                              p: 2.2,
+                              borderRadius: "12px",
+                              bgcolor: item.bg,
+                              border: "2px solid " + item.border,
                               borderLeft: "8px solid " + item.color,
                             }}
                           >

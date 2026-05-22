@@ -11,9 +11,9 @@ import React from "react";
 export function Footer() {
   return (
     <Box sx={{
-      py: 6,
+      py: { xs: 2.5, md: 6 },
       bgcolor: "#FAF8F2", // Cozy Ghibli watercolor cream background
-      borderTop: "3px solid #2D2520", // Solid comic boundary line
+      borderTop: { xs: "2px solid #2D2520", md: "3px solid #2D2520" }, // Solid comic boundary line
       position: "relative",
       overflow: "hidden"
     }}>
@@ -26,7 +26,8 @@ export function Footer() {
         fontSize: "1.2rem",
         opacity: 0.35,
         userSelect: "none",
-        pointerEvents: "none"
+        pointerEvents: "none",
+        display: { xs: "none", md: "block" }
       }}>🍀</Box>
       <Box sx={{
         position: "absolute",
@@ -35,7 +36,8 @@ export function Footer() {
         fontSize: "1.2rem",
         opacity: 0.35,
         userSelect: "none",
-        pointerEvents: "none"
+        pointerEvents: "none",
+        display: { xs: "none", md: "block" }
       }}>✨</Box>
 
       <Container maxWidth="xl">
@@ -45,7 +47,7 @@ export function Footer() {
             flexDirection: { xs: "column", md: "row" },
             justifyContent: "space-between",
             alignItems: "center",
-            gap: 4
+            gap: { xs: 1, md: 4 }
           }}
         >
           {/* Logo stamp sticker */}
@@ -55,8 +57,8 @@ export function Footer() {
             alt="mulamoon"
             sx={{
               display: "block",
-              width: { xs: 166, md: 190 },
-              height: { xs: 48, md: 56 },
+              width: { xs: 118, md: 190 },
+              height: { xs: 34, md: 56 },
               objectFit: "contain",
             }}
           />
@@ -66,6 +68,7 @@ export function Footer() {
             direction="row"
             spacing={{ xs: 2.5, md: 4 }}
             sx={{
+              display: { xs: "none", md: "flex" },
               flexWrap: "wrap",
               justifyContent: "center",
               "& .footer-link": {
@@ -92,13 +95,14 @@ export function Footer() {
           {/* Copyright Stamp */}
           <Box sx={{ textAlign: { xs: "center", md: "right" } }}>
             <Typography sx={{
-              fontSize: "0.8rem",
+              fontSize: { xs: "0.68rem", md: "0.8rem" },
               fontWeight: 700,
               color: "#8B7E74", // Cozy warm taupe
-              letterSpacing: "0.04em",
+              letterSpacing: { xs: 0, md: "0.04em" },
               fontFamily: "var(--font-prompt), sans-serif"
             }}>
-              © 2026 mulamoon. ALL RIGHTS RESERVED.
+              <Box component="span" sx={{ display: { xs: "inline", md: "none" } }}>© 2026 mulamoon</Box>
+              <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>© 2026 mulamoon. ALL RIGHTS RESERVED.</Box>
             </Typography>
           </Box>
         </Box>

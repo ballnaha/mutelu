@@ -12,7 +12,70 @@ export type TarotCard = {
   advice: string;
 };
 
-const genericTarotImage = "/images/tarot/generic-tarot.png";
+export const minorArcanaImagePaths: Record<string, string> = {
+  "ace-of-wands": "/images/tarot/1wand.png",
+  "two-of-wands": "/images/tarot/2wands.png",
+  "three-of-wands": "/images/tarot/3wands.png",
+  "four-of-wands": "/images/tarot/4wands.png",
+  "five-of-wands": "/images/tarot/5wands.png",
+  "six-of-wands": "/images/tarot/6wands.png",
+  "seven-of-wands": "/images/tarot/7wands.png",
+  "eight-of-wands": "/images/tarot/8wands.png",
+  "nine-of-wands": "/images/tarot/9wands.png",
+  "ten-of-wands": "/images/tarot/10wands.png",
+  "page-of-wands": "/images/tarot/page-of-wands.png",
+  "knight-of-wands": "/images/tarot/knight-of-wands.png",
+  "queen-of-wands": "/images/tarot/queen-of-wands.png",
+  "king-of-wands": "/images/tarot/king-of-wands.png",
+  "ace-of-cups": "/images/tarot/1cup.png",
+  "two-of-cups": "/images/tarot/2cups.png",
+  "three-of-cups": "/images/tarot/3cups.png",
+  "four-of-cups": "/images/tarot/4cups.png",
+  "five-of-cups": "/images/tarot/5cups.png",
+  "six-of-cups": "/images/tarot/6cups.png",
+  "seven-of-cups": "/images/tarot/7cups.png",
+  "eight-of-cups": "/images/tarot/8cups.png",
+  "nine-of-cups": "/images/tarot/9cups.png",
+  "ten-of-cups": "/images/tarot/10cups.png",
+  "page-of-cups": "/images/tarot/page-of-cups.png",
+  "knight-of-cups": "/images/tarot/knight-of-cups.png",
+  "queen-of-cups": "/images/tarot/queen-of-cups.png",
+  "king-of-cups": "/images/tarot/king-of-cups.png",
+  "ace-of-swords": "/images/tarot/1sword.png",
+  "two-of-swords": "/images/tarot/2swords.png",
+  "three-of-swords": "/images/tarot/3swords.png",
+  "four-of-swords": "/images/tarot/4swords.png",
+  "five-of-swords": "/images/tarot/5swords.png",
+  "six-of-swords": "/images/tarot/6swords.png",
+  "seven-of-swords": "/images/tarot/7swords.png",
+  "eight-of-swords": "/images/tarot/8swords.png",
+  "nine-of-swords": "/images/tarot/9swords.png",
+  "ten-of-swords": "/images/tarot/10swords.png",
+  "page-of-swords": "/images/tarot/page-of-swords.png",
+  "knight-of-swords": "/images/tarot/knight-of-swords.png",
+  "queen-of-swords": "/images/tarot/queen-of-swords.png",
+  "king-of-swords": "/images/tarot/king-of-swords.png",
+  "ace-of-pentacles": "/images/tarot/1pentacle.png",
+  "two-of-pentacles": "/images/tarot/2pentacles.png",
+  "three-of-pentacles": "/images/tarot/3pentacles.png",
+  "four-of-pentacles": "/images/tarot/4pentacles.png",
+  "five-of-pentacles": "/images/tarot/5pentacles.png",
+  "six-of-pentacles": "/images/tarot/6pentacles.png",
+  "seven-of-pentacles": "/images/tarot/7pentacles.png",
+  "eight-of-pentacles": "/images/tarot/8pentacles.png",
+  "nine-of-pentacles": "/images/tarot/9pentacles.png",
+  "ten-of-pentacles": "/images/tarot/10pentacles.png",
+  "page-of-pentacles": "/images/tarot/page-of-pentacles.png",
+  "knight-of-pentacles": "/images/tarot/knight-of-pentacles.png",
+  "queen-of-pentacles": "/images/tarot/queen-of-pentacles.png",
+  "king-of-pentacles": "/images/tarot/king-of-pentacles.png",
+};
+
+function getMinorArcanaImagePath(rankId: string, suitId: string) {
+  const cardId = `${rankId}-of-${suitId}`;
+
+  return minorArcanaImagePaths[cardId] ?? "";
+}
 
 export const positions = ["ภาพรวมของวันนี้", "สิ่งที่ควรระวัง", "คำแนะนำจากไพ่"];
 
@@ -613,7 +676,7 @@ const minorArcanaCards: TarotCard[] = suitProfiles.flatMap((suit) =>
     id: `${rank.id}-of-${suit.id}`,
     name: `${rank.name} of ${suit.name}`,
     thaiName: `${rank.thaiName} ${suit.thaiName}`,
-    imagePath: genericTarotImage,
+    imagePath: getMinorArcanaImagePath(rank.id, suit.id),
     theme: `${rank.theme} - ${suit.theme}`,
     overview: rank.overview.replace("{suiteTheme}", suit.theme),
     love: suit.love,

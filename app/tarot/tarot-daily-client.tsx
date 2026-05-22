@@ -14,6 +14,7 @@ import {
   Tabs,
   Tab,
   Dialog,
+  Drawer,
   IconButton,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -904,6 +905,9 @@ export function TarotDailyClient() {
   const [isShuffling, setIsShuffling] = useState(false);
   const [hasShuffled, setHasShuffled] = useState(false);
   const [revealAllCards, setRevealAllCards] = useState(false);
+  const [mobileConfigStep, setMobileConfigStep] = useState(0);
+  const [showBirthTimePicker, setShowBirthTimePicker] = useState(false);
+  const [showIntentPicker, setShowIntentPicker] = useState(false);
   const [shuffleKey, setShuffleKey] = useState(0);
   const [popupCard, setPopupCard] = useState<{ card: TarotCard; isReversed: boolean } | null>(null);
 
@@ -961,7 +965,8 @@ export function TarotDailyClient() {
       setSelectedCardsState(prev => prev.filter(cardItem => cardItem.id !== id));
     } else if (selectedCardsState.length < 3) {
       // 28% chance of reversed
-      const isReversed = Math.random() < 0.28;
+      const reversalSeed = stringToSeed(`${id}-${shuffleKey}-${selectedCardsState.length}-${userName}-${birthDate}`);
+      const isReversed = reversalSeed % 100 < 28;
       setSelectedCardsState(prev => [...prev, { id, isReversed }]);
     }
   };
@@ -984,6 +989,7 @@ export function TarotDailyClient() {
     setHasShuffled(false);
     setRevealAllCards(false);
     setShowConfig(true);
+    setMobileConfigStep(0);
   };
 
   // Spread Synthesis & Score Gauge Calculation
@@ -1012,6 +1018,21 @@ export function TarotDailyClient() {
   const recommendedProducts = getRecommendedProducts();
   const activeFocusOption = focusCategoryOptions.find((option) => option.value === focusCategory) ?? focusCategoryOptions[0];
   const activeFocusColor = activeFocusOption.color;
+  const selectedTimeOption = timeOptions.find((option) => option.value === birthTime) ?? timeOptions[0];
+  const mobileConfigSteps = ["ข้อมูล", "เจตนา"] as const;
+
+  const goToMobileIntentStep = () => {
+    if (!userName.trim()) {
+      setValidationError("โปรดระบุชื่อของคุณ เพื่อสร้างรหัสเหนี่ยวนำ");
+      return;
+    }
+    if (!birthDate) {
+      setValidationError("โปรดเลือกวันเกิดของคุณ เพื่อระบุธาตุเกิดและไพ่ประจำตัว");
+      return;
+    }
+    setValidationError("");
+    setMobileConfigStep(1);
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
@@ -1029,8 +1050,8 @@ export function TarotDailyClient() {
           {/* Hero Section */}
           <Box
             sx={{
-              mb: 4,
-              p: { xs: 3, sm: 4, md: 4.5 },
+              mb: { xs: 2, md: 4 },
+              p: { xs: 2, sm: 4, md: 4.5 },
               borderRadius: "24px",
               border: "2.5px solid #2D2520",
               bgcolor: "#FFFDF9",
@@ -1051,33 +1072,33 @@ export function TarotDailyClient() {
                 color: "#FF8E9E",
                 border: "2px solid #2D2520",
                 fontWeight: 800,
-                mb: 2.5,
+                mb: { xs: 1.5, md: 2.5 },
               }}
             >
               <MagicStar size={16} color="#FF8E9E" variant="Bulk" className="pulse-slow" />
-              <Typography component="span" sx={{ color: "#2D2520", fontSize: "0.82rem", fontWeight: 800, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
+              <Typography component="span" sx={{ color: "#2D2520", fontSize: { xs: "0.72rem", md: "0.82rem" }, fontWeight: 800, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
                 DAILY TAROT DIVINATION
               </Typography>
             </Box>
 
-            <Typography sx={{ color: "#FF8E9E", fontSize: "0.76rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", mb: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
+            <Typography sx={{ display: { xs: "none", md: "block" }, color: "#FF8E9E", fontSize: "0.76rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", mb: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
               ศาสตร์พยากรณ์ไพ่ยิปซี
             </Typography>
             <Typography
               component="h1"
               sx={{
                 color: "#2D2520",
-                fontSize: { xs: "2rem", sm: "2.35rem", md: "3rem" },
+                fontSize: { xs: "1.45rem", sm: "2.35rem", md: "3rem" },
                 lineHeight: 1.08,
                 fontWeight: 800,
-                mb: 2,
+                mb: { xs: 0, md: 2 },
                 fontFamily: "var(--font-prompt), sans-serif",
-                letterSpacing: "-0.02em",
               }}
             >
-              ศาสตร์พยากรณ์ไพ่ยิปซีอธิษฐานจิตรายวัน
+              <Box component="span" sx={{ display: { xs: "inline", md: "none" } }}>ไพ่ยิปซีรายวัน</Box>
+              <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>ศาสตร์พยากรณ์ไพ่ยิปซีอธิษฐานจิตรายวัน</Box>
             </Typography>
-            <Typography sx={{ color: "#5A4D43", fontSize: { xs: "0.96rem", md: "1rem" }, maxWidth: 720, lineHeight: 1.7, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
+            <Typography sx={{ display: { xs: "none", md: "block" }, color: "#5A4D43", fontSize: "1rem", maxWidth: 720, lineHeight: 1.7, fontWeight: 500, fontFamily: "var(--font-prompt), sans-serif" }}>
               สอดประสานพลังแห่งดวงดาว รหัสพลังชีวิต และจิตวิญญาณแห่งธรรมชาติรายวัน เลือกเจตนานำทางแล้วเปิดไพ่ 3 ใบเพื่อค้นพบคำทำนายภาพรวม ความรัก การงาน การเงิน และสุขภาพกายใจของคุณ
             </Typography>
           </Box>
@@ -1088,14 +1109,14 @@ export function TarotDailyClient() {
               <Paper
                 elevation={0}
                 sx={{
-                  p: { xs: 3, md: 5 },
-                  borderRadius: "24px",
-                  border: "3px solid #2D2520",
+                  p: { xs: 2, md: 5 },
+                  borderRadius: { xs: "18px", md: "24px" },
+                  border: { xs: "2.5px solid #2D2520", md: "3px solid #2D2520" },
                   background: "#FFFDF9",
                   color: "#2D2520",
                   position: "relative",
                   overflow: "hidden",
-                  boxShadow: "8px 8px 0px 0px #2D2520",
+                  boxShadow: { xs: "4px 4px 0px 0px #2D2520", md: "8px 8px 0px 0px #2D2520" },
                   "&:before": {
                     content: '""',
                     position: "absolute",
@@ -1105,7 +1126,7 @@ export function TarotDailyClient() {
                   }
                 }}
               >
-                <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 2 }}>
+                <Stack direction="row" spacing={1.5} sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", mb: 2 }}>
                   <Box
                     sx={{
                       width: 40,
@@ -1124,12 +1145,37 @@ export function TarotDailyClient() {
                   </Typography>
                 </Stack>
 
-                <Typography variant="h4" sx={{ color: "#2D2520", fontWeight: 950, mb: 1.5, fontSize: { xs: "1.5rem", md: "2.1rem" }, fontFamily: "var(--font-prompt), sans-serif" }}>
-                  ตั้งสมาธิของท่านก่อนสลับไพ่
+                <Typography variant="h4" sx={{ color: "#2D2520", fontWeight: 950, mb: { xs: 1.5, md: 1.5 }, fontSize: { xs: "1.08rem", md: "2.1rem" }, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  <Box component="span" sx={{ display: { xs: "inline", md: "none" } }}>ตั้งค่าก่อนเปิดไพ่</Box>
+                  <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>ตั้งสมาธิของท่านก่อนสลับไพ่</Box>
                 </Typography>
-                <Typography sx={{ color: "#5A4D43", mb: 4, fontSize: { xs: "0.85rem", md: "0.95rem" }, lineHeight: 1.7, fontFamily: "var(--font-prompt), sans-serif" }}>
-                  กรอกข้อมูลเบื้องต้นเพื่อใช้เป็น "ข้อมูลกระแสพลังธรรมชาติ" ให้ชุดสำรับไพ่สอดประสานกับราศีเกิดของท่านอย่างสมบูรณ์แบบ
+                <Typography sx={{ display: { xs: "none", md: "block" }, color: "#5A4D43", mb: 4, fontSize: "0.95rem", lineHeight: 1.7, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  กรอกข้อมูลเบื้องต้นเพื่อใช้เป็น &ldquo;ข้อมูลกระแสพลังธรรมชาติ&rdquo; ให้ชุดสำรับไพ่สอดประสานกับราศีเกิดของท่านอย่างสมบูรณ์แบบ
                 </Typography>
+
+                <Box sx={{ display: { xs: "grid", md: "none" }, gridTemplateColumns: "1fr 1fr", gap: 1, mb: 2 }}>
+                  {mobileConfigSteps.map((step, index) => (
+                    <Button
+                      key={step}
+                      type="button"
+                      onClick={() => setMobileConfigStep(index)}
+                      sx={{
+                        minHeight: 44,
+                        borderRadius: "12px",
+                        border: "2px solid #2D2520",
+                        bgcolor: mobileConfigStep === index ? "#2D2520" : "#FFFDF9",
+                        color: mobileConfigStep === index ? "#FFFDF9" : "#2D2520",
+                        fontSize: "0.82rem",
+                        fontWeight: 950,
+                        fontFamily: "var(--font-prompt), sans-serif",
+                        textTransform: "none",
+                        boxShadow: mobileConfigStep === index ? "2px 2px 0px #FF8E9E" : "none",
+                      }}
+                    >
+                      {index + 1}. {step}
+                    </Button>
+                  ))}
+                </Box>
 
                 {validationError && (
                   <Box sx={{ mb: 3, p: 2, bgcolor: "#FFF0F2", border: "2.5px solid #E76161", borderRadius: "12px" }}>
@@ -1144,20 +1190,24 @@ export function TarotDailyClient() {
                   {/* 1. Core Destiny Data */}
                   <Box
                     sx={{
-                      p: { xs: 3, md: 4 },
+                      p: { xs: 2, md: 4 },
                       bgcolor: "#FAF8F2",
                       border: "2.5px solid #2D2520",
-                      borderRadius: "20px",
-                      boxShadow: "4px 4px 0px 0px #2D2520",
-                      display: "flex",
+                      borderRadius: { xs: "16px", md: "20px" },
+                      boxShadow: { xs: "3px 3px 0px 0px #2D2520", md: "4px 4px 0px 0px #2D2520" },
+                      display: { xs: mobileConfigStep === 0 ? "flex" : "none", md: "flex" },
                       flexDirection: "column",
-                      gap: 3,
+                      gap: { xs: 2, md: 3 },
+                      width: "100%",
+                      minWidth: 0,
+                      boxSizing: "border-box",
                     }}
                   >
                     <Stack direction="row" spacing={1} sx={{ alignItems: "center", pb: 1, borderBottom: "2px solid #2D2520" }}>
                       <User size={20} variant="Bulk" color="#FF8E9E" />
                       <Typography sx={{ fontWeight: 950, fontSize: "0.95rem", color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>
-                        ข้อมูลดวงดาวและราศี (Destiny Coordinates)
+                        <Box component="span" sx={{ display: { xs: "inline", md: "none" } }}>ข้อมูลของคุณ</Box>
+                        <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>ข้อมูลดวงดาวและราศี (Destiny Coordinates)</Box>
                       </Typography>
                     </Stack>
 
@@ -1165,9 +1215,9 @@ export function TarotDailyClient() {
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                       <Stack direction="row" spacing={1} sx={{ justifyContent: "space-between", alignItems: "center" }}>
                         <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }}>
-                          ชื่อของคุณ / นามสมมติ
+                          ชื่อ
                         </Typography>
-                        <Box sx={{ fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#FFF0F2", color: "#E76161", border: "1.5px solid #E76161", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
+                        <Box sx={{ display: { xs: "none", md: "block" }, fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#FFF0F2", color: "#E76161", border: "1.5px solid #E76161", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
                           จำเป็น
                         </Box>
                       </Stack>
@@ -1182,7 +1232,7 @@ export function TarotDailyClient() {
                           bgcolor: "#ffffff",
                           border: "2.5px solid #2D2520",
                           borderRadius: "12px",
-                          p: "14px",
+                          p: { xs: "12px", md: "14px" },
                           color: "#2D2520",
                           fontSize: "0.95rem",
                           fontWeight: 700,
@@ -1199,9 +1249,9 @@ export function TarotDailyClient() {
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                       <Stack direction="row" spacing={1} sx={{ justifyContent: "space-between", alignItems: "center" }}>
                         <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }}>
-                          วันเดือนปีเกิดของคุณ (ค.ศ.)
+                          วันเกิด
                         </Typography>
-                        <Box sx={{ fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#FFF0F2", color: "#E76161", border: "1.5px solid #E76161", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
+                        <Box sx={{ display: { xs: "none", md: "block" }, fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#FFF0F2", color: "#E76161", border: "1.5px solid #E76161", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
                           จำเป็น
                         </Box>
                       </Stack>
@@ -1230,7 +1280,7 @@ export function TarotDailyClient() {
                                 },
                               },
                               "& .MuiInputBase-input": {
-                                p: "14px",
+                                p: { xs: "12px", md: "14px" },
                                 color: "#2D2520",
                                 fontSize: "0.95rem",
                                 fontWeight: 700,
@@ -1246,13 +1296,37 @@ export function TarotDailyClient() {
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                       <Stack direction="row" spacing={1} sx={{ justifyContent: "space-between", alignItems: "center" }}>
                         <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }}>
-                          ระบุเวลาเกิด (Yam)
+                          เวลาเกิด
                         </Typography>
-                        <Box sx={{ fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#E6F3FF", color: "#7296F8", border: "1.5px solid #7296F8", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
+                        <Box sx={{ display: { xs: "none", md: "block" }, fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#E6F3FF", color: "#7296F8", border: "1.5px solid #7296F8", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
                           ทางเลือก
                         </Box>
                       </Stack>
-                      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)" }, gap: 1 }}>
+                      <Button
+                        type="button"
+                        onClick={() => setShowBirthTimePicker(true)}
+                        sx={{
+                          display: { xs: "flex", md: "none" },
+                          justifyContent: "space-between",
+                          minHeight: 48,
+                          borderRadius: "12px",
+                          border: "1.75px solid #2D2520",
+                          bgcolor: "#ffffff",
+                          color: "#2D2520",
+                          px: 1.5,
+                          textTransform: "none",
+                          fontWeight: 900,
+                          fontFamily: "var(--font-prompt), sans-serif",
+                          boxShadow: "2px 2px 0px rgba(45,37,32,0.12)",
+                        }}
+                      >
+                        <Box sx={{ textAlign: "left", minWidth: 0 }}>
+                          <Box sx={{ fontSize: "0.88rem", lineHeight: 1.25 }}>{selectedTimeOption.label}</Box>
+                          <Box sx={{ fontSize: "0.7rem", color: "#5A4D43", lineHeight: 1.25 }}>{selectedTimeOption.helper}</Box>
+                        </Box>
+                        <Clock size={18} variant="Bulk" color="#7296F8" />
+                      </Button>
+                      <Box sx={{ display: { xs: "none", md: "grid" }, gridTemplateColumns: { md: "repeat(3, 1fr)" }, gap: 1 }}>
                         {timeOptions.map((opt) => (
                           <Button
                             key={opt.value}
@@ -1290,20 +1364,24 @@ export function TarotDailyClient() {
                   {/* 2. Intent & Intention Focus */}
                   <Box
                     sx={{
-                      p: { xs: 3, md: 4 },
+                      p: { xs: 2, md: 4 },
                       bgcolor: "#FAF8F2",
                       border: "2.5px solid #2D2520",
-                      borderRadius: "20px",
-                      boxShadow: "4px 4px 0px 0px #2D2520",
-                      display: "flex",
+                      borderRadius: { xs: "16px", md: "20px" },
+                      boxShadow: { xs: "3px 3px 0px 0px #2D2520", md: "4px 4px 0px 0px #2D2520" },
+                      display: { xs: mobileConfigStep === 1 ? "flex" : "none", md: "flex" },
                       flexDirection: "column",
-                      gap: 3,
+                      gap: { xs: 2, md: 3 },
+                      width: "100%",
+                      minWidth: 0,
+                      boxSizing: "border-box",
                     }}
                   >
                     <Stack direction="row" spacing={1} sx={{ alignItems: "center", pb: 1, borderBottom: "2px solid #2D2520" }}>
                       <Category size={20} variant="Bulk" color="#7296F8" />
                       <Typography sx={{ fontWeight: 950, fontSize: "0.95rem", color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif" }}>
-                        แรงกระเพื่อมสมาธิและสิ่งที่กังวล (Intention Aura)
+                        <Box component="span" sx={{ display: { xs: "inline", md: "none" } }}>เลือกเรื่องที่จะถาม</Box>
+                        <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>แรงกระเพื่อมสมาธิและสิ่งที่กังวล (Intention Aura)</Box>
                       </Typography>
                     </Stack>
 
@@ -1311,13 +1389,21 @@ export function TarotDailyClient() {
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1, flexGrow: 1 }}>
                       <Stack direction="row" spacing={1} sx={{ justifyContent: "space-between", alignItems: "center" }}>
                         <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }}>
-                          เลือกโฟกัสหลักของวันนี้
+                          โฟกัส
                         </Typography>
-                        <Box sx={{ fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#E6F3FF", color: "#7296F8", border: "1.5px solid #7296F8", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
+                        <Box sx={{ display: { xs: "none", md: "block" }, fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#E6F3FF", color: "#7296F8", border: "1.5px solid #7296F8", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
                           เริ่มอ่านจากมุมนี้
                         </Box>
                       </Stack>
-                      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 1 }}>
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", sm: "1fr 1fr" },
+                          gap: 1,
+                          width: "100%",
+                          minWidth: 0,
+                        }}
+                      >
                         {focusCategoryOptions.map((option) => {
                           const Icon = option.icon;
                           const selected = focusCategory === option.value;
@@ -1330,14 +1416,16 @@ export function TarotDailyClient() {
                               startIcon={<Icon size={18} variant="Bulk" color={selected ? "#FFFDF9" : option.color} />}
                               sx={{
                                 justifyContent: "flex-start",
-                                minHeight: 46,
-                                px: 1.5,
-                                py: 1,
+                                minHeight: { xs: 40, md: 46 },
+                                minWidth: 0,
+                                width: "100%",
+                                px: { xs: 1.15, md: 1.5 },
+                                py: { xs: 0.75, md: 1 },
                                 borderRadius: "12px",
-                                border: "2px solid #2D2520",
+                                border: { xs: "2px solid #2D2520", md: "2px solid #2D2520" },
                                 bgcolor: selected ? option.color : "#ffffff",
                                 color: selected ? "#FFFDF9" : "#2D2520",
-                                fontSize: "0.83rem",
+                                fontSize: { xs: "0.78rem", md: "0.83rem" },
                                 fontWeight: 900,
                                 fontFamily: "var(--font-prompt), sans-serif",
                                 boxShadow: selected ? "2px 2px 0px 0px #2D2520" : "none",
@@ -1348,7 +1436,9 @@ export function TarotDailyClient() {
                                 },
                               }}
                             >
-                              {option.label}
+                              <Box component="span" sx={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                {option.label}
+                              </Box>
                             </Button>
                           );
                         })}
@@ -1358,16 +1448,77 @@ export function TarotDailyClient() {
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1, flexGrow: 1 }}>
                       <Stack direction="row" spacing={1} sx={{ justifyContent: "space-between", alignItems: "center" }}>
                         <Typography sx={{ color: "#5A4D43", fontSize: "0.85rem", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }}>
-                          เลือกเจตนาที่อยากให้ไพ่นำทาง
+                          เจตนา
                         </Typography>
-                        <Box sx={{ fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#FFF0F2", color: "#E76161", border: "1.5px solid #E76161", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
+                        <Box sx={{ display: { xs: "none", md: "block" }, fontSize: "0.72rem", fontWeight: 900, px: 1, py: 0.25, bgcolor: "#FFF0F2", color: "#E76161", border: "1.5px solid #E76161", borderRadius: "100px", fontFamily: "var(--font-prompt), sans-serif" }}>
                           มีตัวเลือกอื่น ๆ
                         </Box>
                       </Stack>
-                      <Typography sx={{ color: "#5A4D43", fontSize: "0.78rem", fontWeight: 650, lineHeight: 1.6, fontFamily: "var(--font-prompt), sans-serif" }}>
+                      <Typography sx={{ display: { xs: "none", md: "block" }, color: "#5A4D43", fontSize: "0.78rem", fontWeight: 650, lineHeight: 1.6, fontFamily: "var(--font-prompt), sans-serif" }}>
                         เลือกคำถามที่ใกล้กับความรู้สึกตอนนี้ที่สุด ไพ่จะใช้เจตนานี้เป็นแกนหลักในการอ่านทั้ง 3 ใบ
                       </Typography>
-                      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" }, gap: 1 }}>
+                      <Button
+                        type="button"
+                        onClick={() => setShowIntentPicker(true)}
+                        sx={{
+                          display: { xs: "flex", md: "none" },
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 1,
+                          minHeight: 48,
+                          px: 1,
+                          py: 0.75,
+                          borderRadius: "12px",
+                          border: "1.75px solid #2D2520",
+                          bgcolor: "#FFFDF9",
+                          color: "#2D2520",
+                          fontFamily: "var(--font-prompt), sans-serif",
+                          textTransform: "none",
+                          boxShadow: "2px 2px 0px rgba(45,37,32,0.12)",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <Stack direction="row" spacing={1} sx={{ alignItems: "center", minWidth: 0 }}>
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: "10px",
+                              display: "grid",
+                              placeItems: "center",
+                              bgcolor: `${activeFocusColor}18`,
+                              border: "1.5px solid #2D2520",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <MessageQuestion size={17} variant="Bulk" color={activeFocusColor} />
+                          </Box>
+                          <Box sx={{ textAlign: "left", minWidth: 0 }}>
+                            <Typography sx={{ display: { xs: "none", md: "block" }, color: "#8A7A6F", fontSize: "0.62rem", fontWeight: 900, lineHeight: 1, mb: 0.25, fontFamily: "var(--font-prompt), sans-serif" }}>
+                              เจตนา
+                            </Typography>
+                            <Typography
+                              sx={{
+                                color: "#2D2520",
+                                fontSize: "0.82rem",
+                                fontWeight: 900,
+                                lineHeight: 1.25,
+                                fontFamily: "var(--font-prompt), sans-serif",
+                                display: "-webkit-box",
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: "vertical",
+                                overflow: "hidden",
+                              }}
+                            >
+                              {question}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                        <Box sx={{ color: activeFocusColor, fontSize: "0.72rem", fontWeight: 950, flexShrink: 0, fontFamily: "var(--font-prompt), sans-serif" }}>
+                          เปลี่ยน
+                        </Box>
+                      </Button>
+                      <Box sx={{ display: { xs: "none", md: "grid" }, gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 1 }}>
                         {getIntentOptions(focusCategory).map((intent) => {
                           const selected = question === intent;
 
@@ -1409,8 +1560,7 @@ export function TarotDailyClient() {
                   </Box>
                 </Box>
 
-                {/* Explanatory callout about necessity */}
-                <Box sx={{ p: 2.5, bgcolor: "#E6F3FF", border: "2.5px solid #2D2520", borderRadius: "16px", mb: 4, boxShadow: "4px 4px 0px 0px #2D2520" }}>
+                <Box sx={{ display: { xs: "none", md: "block" }, p: 2.5, bgcolor: "#E6F3FF", border: "2.5px solid #2D2520", borderRadius: "16px", mb: 4, boxShadow: "4px 4px 0px 0px #2D2520" }}>
                   <Stack direction="row" spacing={1.5}>
                     <Magicpen size={20} variant="Bold" color="#FF8E9E" style={{ marginTop: 2, flexShrink: 0 }} />
                     <Box>
@@ -1425,12 +1575,61 @@ export function TarotDailyClient() {
                 </Box>
 
                 <Box sx={{ textAlign: "center" }}>
+                  <Stack direction="row" spacing={1.25} sx={{ display: { xs: "flex", md: "none" } }}>
+                    {mobileConfigStep === 1 && (
+                      <Button
+                        type="button"
+                        variant="outlined"
+                        onClick={() => setMobileConfigStep(0)}
+                        sx={{
+                          flex: 0.42,
+                          color: "#2D2520",
+                          borderColor: "#2D2520",
+                          borderWidth: "2px",
+                          borderRadius: "14px",
+                          fontWeight: 900,
+                          fontFamily: "var(--font-prompt), sans-serif",
+                          textTransform: "none",
+                        }}
+                      >
+                        ย้อนกลับ
+                      </Button>
+                    )}
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={mobileConfigStep === 0 ? goToMobileIntentStep : shuffleDeck}
+                      startIcon={mobileConfigStep === 0 ? <MagicStar size={20} variant="Bold" color="currentColor" /> : <Cards size={20} variant="Bold" color="currentColor" />}
+                      sx={{
+                        flex: 1,
+                        bgcolor: "#FF8E9E",
+                        color: "#ffffff",
+                        py: 1.45,
+                        borderRadius: "16px",
+                        border: "2.5px solid #2D2520",
+                        fontSize: "0.95rem",
+                        fontWeight: 950,
+                        fontFamily: "var(--font-prompt), sans-serif",
+                        boxShadow: "4px 4px 0px 0px #2D2520",
+                        textTransform: "none",
+                        "&:hover": {
+                          bgcolor: "#FF8E9E",
+                          transform: "translate(2px, 2px)",
+                          boxShadow: "2px 2px 0px 0px #2D2520",
+                        },
+                        transition: "all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)"
+                      }}
+                    >
+                      {mobileConfigStep === 0 ? "ถัดไป" : "เริ่มเปิดไพ่"}
+                    </Button>
+                  </Stack>
                   <Button
                     variant="contained"
                     size="large"
                     onClick={shuffleDeck}
                     startIcon={<Cards size={20} variant="Bold" color="currentColor" />}
                     sx={{
+                      display: { xs: "none", md: "inline-flex" },
                       bgcolor: "#FF8E9E",
                       color: "#ffffff",
                       px: { xs: 4, md: 6 },
@@ -1455,6 +1654,154 @@ export function TarotDailyClient() {
               </Paper>
             </Box>
           )}
+
+          <Drawer
+            anchor="bottom"
+            open={showBirthTimePicker}
+            onClose={() => setShowBirthTimePicker(false)}
+            sx={{ display: { xs: "block", md: "none" } }}
+            slotProps={{
+              paper: {
+                sx: {
+                  m: 0,
+                  width: "100%",
+                  maxHeight: "78vh",
+                  borderRadius: "22px 22px 0 0",
+                  border: "2.5px solid #2D2520",
+                  borderBottom: 0,
+                  bgcolor: "#FFFDF9",
+                  p: 2,
+                  boxShadow: "0 -8px 28px rgba(45,37,32,0.18)",
+                }
+              }
+            }}
+          >
+            <Stack spacing={1.5}>
+              <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                <Box sx={{ width: 42, height: 4, borderRadius: "999px", bgcolor: "rgba(45,37,32,0.28)" }} />
+              </Box>
+              <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
+                <Typography sx={{ color: "#2D2520", fontWeight: 950, fontSize: "1rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                  เวลาเกิด
+                </Typography>
+                <IconButton onClick={() => setShowBirthTimePicker(false)} sx={{ color: "#2D2520" }}>
+                  ×
+                </IconButton>
+              </Stack>
+              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, overflowY: "auto", pb: 1 }}>
+                {timeOptions.map((opt) => (
+                  <Button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      setBirthTime(opt.value);
+                      setShowBirthTimePicker(false);
+                    }}
+                    sx={{
+                      borderRadius: "12px",
+                      border: "2px solid #2D2520",
+                      bgcolor: birthTime === opt.value ? "#FF8E9E" : "#FFFDF9",
+                      color: birthTime === opt.value ? "#FFFDF9" : "#2D2520",
+                      p: 1.1,
+                      minHeight: 56,
+                      flexDirection: "column",
+                      textTransform: "none",
+                      fontSize: "0.78rem",
+                      fontWeight: 850,
+                      lineHeight: 1.2,
+                      fontFamily: "var(--font-prompt), sans-serif",
+                      boxShadow: birthTime === opt.value ? "2px 2px 0px #2D2520" : "none",
+                    }}
+                  >
+                    <Box>{opt.label.split(" (")[0]}</Box>
+                    <Box sx={{ fontSize: "0.62rem", opacity: 0.82, fontWeight: 750 }}>{opt.helper}</Box>
+                  </Button>
+                ))}
+              </Box>
+            </Stack>
+          </Drawer>
+
+          <Drawer
+            anchor="bottom"
+            open={showIntentPicker}
+            onClose={() => setShowIntentPicker(false)}
+            sx={{ display: { xs: "block", md: "none" } }}
+            slotProps={{
+              paper: {
+                sx: {
+                  m: 0,
+                  width: "100%",
+                  maxHeight: "78vh",
+                  borderRadius: "22px 22px 0 0",
+                  border: "2.5px solid #2D2520",
+                  borderBottom: 0,
+                  bgcolor: "#FFFDF9",
+                  p: 2,
+                  boxShadow: "0 -8px 28px rgba(45,37,32,0.18)",
+                }
+              }
+            }}
+          >
+            <Stack spacing={1.5}>
+              <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                <Box sx={{ width: 42, height: 4, borderRadius: "999px", bgcolor: "rgba(45,37,32,0.28)" }} />
+              </Box>
+              <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
+                <Typography sx={{ color: "#2D2520", fontWeight: 950, fontSize: "1rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                  เลือกเจตนา
+                </Typography>
+                <IconButton onClick={() => setShowIntentPicker(false)} sx={{ color: "#2D2520" }}>
+                  ×
+                </IconButton>
+              </Stack>
+              <Stack spacing={1} sx={{ overflowY: "auto", pb: 1 }}>
+                {getIntentOptions(focusCategory).map((intent) => {
+                  const selected = question === intent;
+
+                  return (
+                    <Button
+                      key={intent}
+                      type="button"
+                      onClick={() => {
+                        setQuestion(intent);
+                        setShowIntentPicker(false);
+                      }}
+                      sx={{
+                        justifyContent: "flex-start",
+                        textAlign: "left",
+                        minHeight: 44,
+                        px: 1.25,
+                        py: 0.8,
+                        borderRadius: "10px",
+                        border: selected ? "2px solid #2D2520" : "1.5px solid rgba(45,37,32,0.24)",
+                        bgcolor: selected ? activeFocusColor : "#ffffff",
+                        color: selected ? "#FFFDF9" : "#2D2520",
+                        fontSize: "0.82rem",
+                        fontWeight: 850,
+                        fontFamily: "var(--font-prompt), sans-serif",
+                        whiteSpace: "normal",
+                        lineHeight: 1.25,
+                        textTransform: "none",
+                        boxShadow: selected ? "2px 2px 0px 0px #2D2520" : "none",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: "999px",
+                          bgcolor: selected ? "#FFFDF9" : activeFocusColor,
+                          mr: 1,
+                          flexShrink: 0,
+                        }}
+                      />
+                      {intent}
+                    </Button>
+                  );
+                })}
+              </Stack>
+            </Stack>
+          </Drawer>
 
           {/* Shuffling Phase */}
           {isShuffling && <ShufflingPile />}
@@ -1649,20 +1996,30 @@ export function TarotDailyClient() {
               </Box>
 
               {/* Oracle Grid Panel */}
-              <Box sx={{ position: "relative", width: '100%', minWidth: 0 }} key={shuffleKey}>
+              <Box
+                sx={{
+                  position: "relative",
+                  width: "100%",
+                  minWidth: 0,
+                  px: 0,
+                  boxSizing: "border-box",
+                }}
+                key={shuffleKey}
+              >
                 <Box
                   sx={{
                     display: "grid",
                     gridTemplateColumns: {
-                      xs: "repeat(6, 44px)",
+                      xs: "repeat(6, minmax(0, 1fr))",
                       sm: "repeat(8, 52px)",
                       md: "repeat(10, 58px)",
                       lg: "repeat(10, 64px)",
                       xl: "repeat(13, 68px)"
                     },
-                    columnGap: 0,
+                    columnGap: { xs: 0.35, sm: 0 },
                     rowGap: { xs: 0.5, md: 1, lg: 1.25 },
                     justifyContent: "center",
+                    justifyItems: "center",
                     alignItems: "start",
                     overflow: "visible",
                     pb: { xs: 16, lg: 8 },
@@ -1676,12 +2033,33 @@ export function TarotDailyClient() {
                       sx={{
                         visibility: selectedCardsState.find(c => c.id === card.id) ? "hidden" : "visible",
                         pointerEvents: selectedCardsState.find(c => c.id === card.id) ? "none" : "auto",
-                        width: { xs: 76, sm: 88, md: 96, lg: 106, xl: 112 },
-                        mb: { xs: "-34px", sm: "-40px", md: "-44px", lg: "-50px", xl: "-52px" },
+                        width: { xs: "100%", sm: 88, md: 96, lg: 106, xl: 112 },
+                        maxWidth: { xs: 60, sm: "none" },
+                        mb: { xs: "-28px", sm: "-40px", md: "-44px", lg: "-50px", xl: "-52px" },
                         position: "relative",
+                        p: { xs: "2px", sm: 0 },
+                        border: { xs: "1.5px solid #2D2520", sm: "none" },
+                        borderRadius: { xs: "10px", sm: 0 },
+                        bgcolor: { xs: "#FFFDF9", sm: "transparent" },
+                        boxShadow: {
+                          xs: "0 3px 0 rgba(45,37,32,0.28), 0 0 0 1px rgba(255,253,249,0.9) inset",
+                          sm: "none",
+                        },
                         zIndex: selectedCardsState.find(c => c.id === card.id) ? 300 : idx + 1,
                         transformOrigin: "center bottom",
                         transition: "transform 0.18s ease, z-index 0s",
+                        "&:before": {
+                          content: { xs: '""', sm: "none" },
+                          position: "absolute",
+                          top: 4,
+                          left: 8,
+                          right: 8,
+                          height: 2,
+                          borderRadius: "999px",
+                          bgcolor: idx % 2 === 0 ? "rgba(255,142,158,0.88)" : "rgba(114,150,248,0.88)",
+                          zIndex: 2,
+                          pointerEvents: "none",
+                        },
                         "&:hover": {
                           zIndex: 400,
                           transform: { xs: "translateY(-4px)", md: "translateY(-10px)" },

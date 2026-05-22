@@ -16,6 +16,8 @@ function softAccent(hexColor: string) {
 export async function GET(request: NextRequest) {
   const warning = getFortuneWarning(request.nextUrl.searchParams.get("id") ?? undefined);
   const batch = new Date().toISOString().slice(5, 10).replace("-", "");
+  const headlineSize = warning.warning.length > 34 ? "42px" : "48px";
+  const detailSize = warning.detail.length > 90 ? "24px" : "27px";
 
   return new ImageResponse(
     (
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
           height: "100%",
           backgroundColor: warning.background,
           display: "flex",
-          padding: "42px 54px",
+          padding: "54px 70px",
           position: "relative",
           fontFamily: "Mali",
           overflow: "hidden",
@@ -57,13 +59,13 @@ export async function GET(request: NextRequest) {
 
         <div
           style={{
-            width: "1092px",
-            height: "546px",
+            width: "1060px",
+            height: "522px",
             backgroundColor: "#FFFDF9",
             border: "6px solid #2D2520",
             borderRadius: "24px",
             display: "flex",
-            padding: "38px 42px",
+            padding: "34px 40px",
             position: "relative",
             overflow: "hidden",
           }}
@@ -82,10 +84,10 @@ export async function GET(request: NextRequest) {
           <div
             style={{
               position: "absolute",
-              right: "84px",
-              bottom: "66px",
-              width: "236px",
-              height: "318px",
+              right: "76px",
+              bottom: "82px",
+              width: "196px",
+              height: "268px",
               border: "5px solid #2D2520",
               borderRadius: "28px",
               backgroundColor: warning.accent,
@@ -98,7 +100,7 @@ export async function GET(request: NextRequest) {
             <div
               style={{
                 width: "100%",
-                height: "56px",
+                height: "48px",
                 borderRadius: "18px",
                 backgroundColor: "#FFFDF9",
                 border: "4px solid #2D2520",
@@ -106,7 +108,7 @@ export async function GET(request: NextRequest) {
                 alignItems: "center",
                 justifyContent: "center",
                 color: "#2D2520",
-                fontSize: "26px",
+                fontSize: "22px",
                 fontWeight: 700,
               }}
             >
@@ -114,17 +116,17 @@ export async function GET(request: NextRequest) {
             </div>
             <div
               style={{
-                width: "126px",
-                height: "126px",
-                borderRadius: "63px",
+                width: "104px",
+                height: "104px",
+                borderRadius: "52px",
                 backgroundColor: "#FFFDF9",
                 border: "5px solid #2D2520",
-                marginTop: "34px",
+                marginTop: "28px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: warning.accent,
-                fontSize: "78px",
+                fontSize: "62px",
                 fontWeight: 700,
               }}
             >
@@ -132,46 +134,46 @@ export async function GET(request: NextRequest) {
             </div>
             <div
               style={{
-                marginTop: "30px",
+                marginTop: "24px",
                 width: "100%",
                 borderTop: "4px dashed #2D2520",
               }}
             />
-            <div style={{ marginTop: "16px", color: "#FFFDF9", fontSize: "28px", fontWeight: 700 }}>
+            <div style={{ marginTop: "14px", color: "#FFFDF9", fontSize: "22px", fontWeight: 700 }}>
               MOON-{batch}
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", width: "690px", height: "100%" }}>
+          <div style={{ display: "flex", flexDirection: "column", width: "650px", height: "100%" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
               <div
                 style={{
                   backgroundColor: warning.accent,
                   border: "4px solid #2D2520",
                   borderRadius: "999px",
-                  padding: "8px 24px",
+                  padding: "7px 20px",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
               >
-                <span style={{ color: "#FFFDF9", fontSize: "30px", fontWeight: 700 }}>
+                <span style={{ color: "#FFFDF9", fontSize: "25px", fontWeight: 700 }}>
                   {warning.label}
                 </span>
               </div>
-              <span style={{ color: "#2D2520", fontSize: "28px", fontWeight: 700 }}>
+              <span style={{ color: "#2D2520", fontSize: "23px", fontWeight: 700 }}>
                 mulamoon
               </span>
             </div>
 
-            <div style={{ marginTop: "42px", display: "flex", flexDirection: "column" }}>
-              <span style={{ color: warning.accent, fontSize: "34px", fontWeight: 700 }}>
+            <div style={{ marginTop: "26px", display: "flex", flexDirection: "column" }}>
+              <span style={{ color: warning.accent, fontSize: "28px", fontWeight: 700 }}>
                 คำเตือนประจำวันนี้
               </span>
-              <span style={{ color: "#2D2520", fontSize: "58px", lineHeight: 1.12, fontWeight: 700, marginTop: "10px" }}>
+              <span style={{ color: "#2D2520", fontSize: headlineSize, lineHeight: 1.16, fontWeight: 700, marginTop: "8px" }}>
                 {warning.warning}
               </span>
-              <span style={{ color: "#5A4D43", fontSize: "31px", lineHeight: 1.42, fontWeight: 700, marginTop: "24px" }}>
+              <span style={{ color: "#5A4D43", fontSize: detailSize, lineHeight: 1.34, fontWeight: 700, marginTop: "16px" }}>
                 {warning.detail}
               </span>
             </div>
@@ -180,17 +182,16 @@ export async function GET(request: NextRequest) {
               style={{
                 marginTop: "auto",
                 borderTop: "4px dashed #2D2520",
-                paddingTop: "20px",
+                paddingTop: "12px",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 color: "#5A4D43",
-                fontSize: "25px",
+                fontSize: "18px",
                 fontWeight: 700,
               }}
             >
               <span>แชร์คำเตือนดวงให้เพื่อนเช็กต่อ</span>
-              <span>SCAN YOUR LUCK</span>
             </div>
           </div>
         </div>
