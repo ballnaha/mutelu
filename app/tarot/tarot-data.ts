@@ -12,6 +12,10 @@ export type TarotCard = {
   advice: string;
 };
 
+function getWebpImagePath(imagePath: string) {
+  return imagePath.replace(/\.[a-z0-9]+$/i, ".webp");
+}
+
 export const minorArcanaImagePaths: Record<string, string> = {
   "ace-of-wands": "/images/tarot/1wand.png",
   "two-of-wands": "/images/tarot/2wands.png",
@@ -687,4 +691,7 @@ const minorArcanaCards: TarotCard[] = suitProfiles.flatMap((suit) =>
   }))
 );
 
-export const tarotCards: TarotCard[] = [...majorArcanaCards, ...minorArcanaCards];
+export const tarotCards: TarotCard[] = [...majorArcanaCards, ...minorArcanaCards].map((card) => ({
+  ...card,
+  imagePath: getWebpImagePath(card.imagePath),
+}));

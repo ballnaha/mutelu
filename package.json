@@ -10,7 +10,10 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "node prisma/seed.js"
+    "prisma:seed": "node prisma/seed.js",
+    "tarot:images": "node scripts/tarot-images.mjs",
+    "tarot:images:dry-run": "node scripts/tarot-images.mjs --dry-run",
+    "tarot:images:cleanup": "node scripts/tarot-images.mjs --delete-png"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",

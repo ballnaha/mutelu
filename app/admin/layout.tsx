@@ -19,6 +19,7 @@ import {
   Element4,
   Hierarchy,
   Magicpen,
+  Cards,
   DocumentText,
   Shop,
   Star,
@@ -53,6 +54,7 @@ const ADMIN_MENU_GROUPS: { title: string; items: AdminMenuItem[] }[] = [
     items: [
       { text: "จัดการหน้าแรก (Hero)", Icon: Star, path: "/admin/featured", color: "#fbbf24" }, // Amber
       { text: "คำทำนายราศี (Horoscopes)", Icon: Magicpen, path: "/admin/horoscopes", color: "#f472b6" }, // Pink
+      { text: "รูปไพ่ทาโร่", Icon: Cards, path: "/admin/tarot", color: "#a78bfa" }, // Violet
       { text: "บทความ/เคล็ดลับ", Icon: DocumentText, path: "/admin/blog", color: "#38bdf8" }, // Sky
       { text: "หมวดหมู่บทความ", Icon: Hierarchy, path: "/admin/categories", color: "#c084fc" }, // Purple
     ],

@@ -527,6 +527,11 @@ function ShufflingPile() {
 
 const fixedRots = [-1.2, 0.5, -0.8, 1.1, -0.3, 0.9, -1.1, 0.4, -0.6, 1.2, -0.9, 0.7, -0.5, 1.0, -1.0, 0.3, -0.4, 0.8, -0.7, 1.1, -1.2];
 
+function getPreferredTarotImagePath(imagePath: string) {
+  if (!imagePath || imagePath.includes("generic-tarot.png")) return imagePath;
+  return imagePath.replace(/\.[a-z0-9]+$/i, ".webp");
+}
+
 function TarotImage({
   card,
   faceDown = false,
@@ -550,7 +555,10 @@ function TarotImage({
 }) {
   const rot = isSmall ? 0 : fixedRots[index % fixedRots.length];
   const [frontFailed, setFrontFailed] = useState(false);
-  const [backFailed, setBackFailed] = useState(!card.imagePath || card.imagePath.includes("generic-tarot.png"));
+  const [failedImagePaths, setFailedImagePaths] = useState<Set<string>>(() => new Set());
+  const preferredImagePath = getPreferredTarotImagePath(card.imagePath);
+  const imagePath = failedImagePaths.has(preferredImagePath) ? card.imagePath : preferredImagePath;
+  const backFailed = !card.imagePath || card.imagePath.includes("generic-tarot.png") || failedImagePaths.has(card.imagePath);
 
   return (
     <Box
@@ -630,8 +638,10 @@ function TarotImage({
           {!backFailed ? (
             <Box
               component="img"
-              src={card.imagePath}
-              onError={() => setBackFailed(true)}
+              src={imagePath}
+              onError={() => {
+                setFailedImagePaths((current) => new Set(current).add(imagePath));
+              }}
               sx={{
                 width: "100%",
                 height: "100%",
