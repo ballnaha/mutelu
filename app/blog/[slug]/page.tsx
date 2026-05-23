@@ -180,9 +180,6 @@ export default async function BlogPostPage(props: PageProps) {
       sx={{
         minHeight: "100vh",
         bgcolor: "#FAF8F2",
-        backgroundImage: 'radial-gradient(rgba(45, 37, 32, 0.04) 1.5px, transparent 1.5px), radial-gradient(rgba(255, 142, 158, 0.05) 1.5px, transparent 1.5px)',
-        backgroundSize: "48px 48px",
-        backgroundPosition: "0 0, 24px 24px",
         color: "#2D2520",
         fontFamily: "var(--font-prompt), sans-serif"
       }}
