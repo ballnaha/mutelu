@@ -524,6 +524,84 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
             {error && (
               <Alert severity="error" sx={{ mt: 3, borderRadius: "12px", border: "2px solid #ef4444" }}>{error}</Alert>
             )}
+
+            {/* Retargeting CTA — shown after any check */}
+            {matches !== null && (
+              <Box
+                sx={{
+                  mt: 3,
+                  p: { xs: 2.5, md: 3 },
+                  borderRadius: "20px",
+                  border: "2.5px solid #2D2520",
+                  bgcolor: "#FAF8F2",
+                  boxShadow: "4px 4px 0px #2D2520",
+                }}
+              >
+                <Typography sx={{
+                  color: "#5A4D43",
+                  fontSize: "0.72rem",
+                  fontWeight: 900,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  mb: 1.5,
+                  fontFamily: "var(--font-prompt), sans-serif",
+                }}>
+                  {matches.length > 0 ? "✦ ต่อยอดดวงของคุณ" : "✦ เสริมโชคก่อนงวดหน้า"}
+                </Typography>
+
+                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" }, gap: 1.25 }}>
+                  {(matches.length > 0
+                    ? [
+                        { emoji: "📿", label: "ของมงคลเสริมทรัพย์", desc: "เลือกตามสิ่งที่อยากดึงดูด", href: "/lucky-items?aspect=wealth", color: "#FFAF45", bg: "#FFF5E4" },
+                        { emoji: "🔮", label: "ดูดวงซาจูของคุณ", desc: "วิเคราะห์ดวงจากวันเกิด", href: "/saju", color: "#7296F8", bg: "#EBF3FF" },
+                        { emoji: "🌈", label: "สีมงคลประจำวัน", desc: "เช็กสีเสริมพลังวันนี้", href: "/lucky-colors", color: "#FF8E9E", bg: "#FFF0F2" },
+                      ]
+                    : [
+                        { emoji: "🌈", label: "เช็กสีมงคลวันนี้", desc: "เสริมพลังก่อนงวดหน้า", href: "/lucky-colors", color: "#FF8E9E", bg: "#FFF0F2" },
+                        { emoji: "🃏", label: "ดูดวงไพ่ยิปซี", desc: "เช็กจังหวะโชคลาภ", href: "/tarot", color: "#8B5CF6", bg: "#F4EEFF" },
+                        { emoji: "📿", label: "ของมงคลเสริมโชค", desc: "สินค้าหนุนดวงการเงิน", href: "/lucky-items?aspect=wealth", color: "#FFAF45", bg: "#FFF5E4" },
+                      ]
+                  ).map((item) => (
+                    <Box
+                      key={item.href}
+                      component="a"
+                      href={item.href}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        textDecoration: "none",
+                        bgcolor: item.bg,
+                        border: "2px solid #2D2520",
+                        borderRadius: "14px",
+                        p: 1.5,
+                        boxShadow: "2.5px 2.5px 0px #2D2520",
+                        transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                        "&:hover": {
+                          transform: "translate(-2px, -2px)",
+                          boxShadow: "4.5px 4.5px 0px #2D2520",
+                        },
+                        "&:active": {
+                          transform: "translate(1px, 1px)",
+                          boxShadow: "1px 1px 0px #2D2520",
+                        },
+                      }}
+                    >
+                      <Box sx={{ fontSize: "1.5rem", flexShrink: 0 }}>{item.emoji}</Box>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography sx={{ color: "#2D2520", fontSize: "0.84rem", fontWeight: 900, lineHeight: 1.2, fontFamily: "var(--font-prompt), sans-serif" }}>
+                          {item.label}
+                        </Typography>
+                        <Typography sx={{ color: "#5A4D43", fontSize: "0.72rem", fontWeight: 600, fontFamily: "var(--font-prompt), sans-serif" }}>
+                          {item.desc}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ ml: "auto", color: item.color, fontWeight: 800, fontSize: "1rem", flexShrink: 0 }}>→</Box>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            )}
           </Box>
 
           {/* Side Info Cards */}
@@ -713,10 +791,13 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
                   price={product.price}
                   originalPrice={product.originalPrice}
                   image={product.image}
+                  images={product.images}
                   link={product.url}
                   platform={product.platform}
                   platformLabel={product.platform}
                   productSlug={product.productSlug}
+                  productType={product.productType}
+                  internalSlug={product.internalSlug}
                   rating={product.rating}
                   reviewCount={product.reviewCount}
                   variant="sidebar"

@@ -143,7 +143,10 @@ model MasterAffiliateProduct {
   price       String
   originalPrice String?
   image       String   @db.Text
+  images      Json?
   url         String   @db.Text
+  productType ProductType @default(AFFILIATE)
+  internalSlug String?  @unique(map: "MasterAffiliateProduct_internalSlug_key")
   platform    String   @default("shopee")
   productSlug String?
   element     Element  @default(NONE)
@@ -160,6 +163,7 @@ model MasterAffiliateProduct {
   @@index([category])
   @@index([aspect])
   @@index([isActive])
+  @@index([productType])
   @@index([platform, productSlug], map: "MasterAffiliateProduct_platform_productSlug_idx")
 }
 
@@ -183,6 +187,11 @@ enum Element {
   METAL
   WATER
   NONE
+}
+
+enum ProductType {
+  AFFILIATE
+  OWN_PRODUCT
 }
 
 enum blogpost_status {

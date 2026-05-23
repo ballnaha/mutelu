@@ -1,11 +1,25 @@
 import type { MetadataRoute } from "next";
+import { ProductType } from "@prisma/client";
 import { getPublishedBlogCategories, getPublishedBlogSitemapEntries } from "@/lib/blog-posts";
+import { prisma } from "@/lib/prisma";
 import { absoluteUrl, siteUrl } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const blogPosts = await getPublishedBlogSitemapEntries();
   const blogCategories = await getPublishedBlogCategories();
+  const shopProducts = await prisma.masterAffiliateProduct.findMany({
+    where: {
+      productType: ProductType.OWN_PRODUCT,
+      isActive: true,
+      internalSlug: { not: null },
+    },
+    select: {
+      internalSlug: true,
+      updatedAt: true,
+      image: true,
+    },
+  });
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: siteUrl, lastModified: now, changeFrequency: "daily", priority: 1 },
@@ -30,6 +44,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly",
     priority: 0.65,
   }));
+  const shopRoutes: MetadataRoute.Sitemap = shopProducts.map((product) => ({
+    url: absoluteUrl(`/shop/${product.internalSlug}`),
+    lastModified: product.updatedAt,
+    changeFrequency: "weekly",
+    priority: 0.72,
+    images: product.image ? [absoluteUrl(product.image)] : undefined,
+  }));
 
-  return [...staticRoutes, ...blogCategoryRoutes, ...blogRoutes];
+  return [...staticRoutes, ...blogCategoryRoutes, ...blogRoutes, ...shopRoutes];
 }

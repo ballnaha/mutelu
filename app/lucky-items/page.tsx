@@ -245,66 +245,68 @@ export default async function LuckyItemsPage({
         <Container maxWidth="xl">
           <Box
             sx={{
-              mb: 2.5,
-              p: { xs: 2, md: 2.5 },
-              borderRadius: "18px",
-              border: "2.5px solid #2D2520",
+              mb: { xs: 1.2, md: 2.5 },
+              p: { xs: 1.15, md: 2.5 },
+              borderRadius: { xs: "10px", md: "18px" },
+              border: { xs: "2px solid #2D2520", md: "2.5px solid #2D2520" },
               bgcolor: "#FFFDF9",
-              boxShadow: "4px 4px 0px 0px #2D2520",
+              boxShadow: { xs: "2px 2px 0px 0px #2D2520", md: "4px 4px 0px 0px #2D2520" },
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "auto minmax(0, 1fr) auto" },
-              gap: { xs: 1.5, md: 2 },
+              gridTemplateColumns: { xs: "34px minmax(0, 1fr) auto", md: "auto minmax(0, 1fr) auto" },
+              gap: { xs: 0.85, md: 2 },
               alignItems: "center",
             }}
           >
             <Box
               sx={{
-                width: 42,
-                height: 42,
-                borderRadius: "10px",
+                width: { xs: 34, md: 42 },
+                height: { xs: 34, md: 42 },
+                borderRadius: { xs: "8px", md: "10px" },
                 display: "grid",
                 placeItems: "center",
                 bgcolor: "rgba(255, 142, 158, 0.15)",
-                border: "2px solid #2D2520",
-                boxShadow: "2px 2px 0px #2D2520",
+                border: { xs: "1.5px solid #2D2520", md: "2px solid #2D2520" },
+                boxShadow: { xs: "1.5px 1.5px 0px #2D2520", md: "2px 2px 0px #2D2520" },
               }}
             >
-              <Shop size={24} variant="Bulk" color="#FF8E9E" />
+              <Shop size={20} variant="Bulk" color="#FF8E9E" />
             </Box>
             <Box sx={{ minWidth: 0 }}>
-              <Stack direction="row" spacing={1} sx={{ alignItems: "baseline", flexWrap: "wrap", rowGap: 0.4 }}>
-                <Typography component="h1" sx={{ color: "#2D2520", fontSize: { xs: "1.45rem", md: "1.85rem" }, lineHeight: 1.12, fontWeight: 950, fontFamily: "var(--font-prompt), sans-serif" }}>
+              <Stack direction="row" spacing={{ xs: 0.6, md: 1 }} sx={{ alignItems: "baseline", flexWrap: "wrap", rowGap: 0.2 }}>
+                <Typography component="h1" sx={{ color: "#2D2520", fontSize: { xs: "1rem", md: "1.85rem" }, lineHeight: { xs: 1.1, md: 1.12 }, fontWeight: 950, fontFamily: "var(--font-prompt), sans-serif" }}>
                   สินค้ามงคลแนะนำ
                 </Typography>
-                <Typography sx={{ color: "#FF8E9E", fontSize: "0.72rem", fontWeight: 900, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
+                <Typography sx={{ display: { xs: "none", sm: "block" }, color: "#FF8E9E", fontSize: "0.72rem", fontWeight: 900, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
                   LUCKY ITEMS
                 </Typography>
               </Stack>
-              <Typography sx={{ color: "#5A4D43", fontSize: { xs: "0.82rem", md: "0.9rem" }, lineHeight: 1.55, fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
+              <Typography sx={{ display: { xs: "none", sm: "block" }, color: "#5A4D43", fontSize: { xs: "0.82rem", md: "0.9rem" }, lineHeight: 1.55, fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
                 เลือกด้านที่อยากหนุน กรองตามธาตุและประเภทสินค้า แล้วดูรายการที่ตรงเจตนาได้ทันที
               </Typography>
             </Box>
-            <Typography sx={{ justifySelf: { xs: "start", md: "end" }, color: "#2D2520", bgcolor: "#FAF8F2", border: "2px solid #2D2520", borderRadius: "999px", px: 1.5, py: 0.5, fontSize: "0.82rem", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }}>
+            <Typography sx={{ justifySelf: "end", color: "#2D2520", bgcolor: "#FAF8F2", border: { xs: "1.5px solid #2D2520", md: "2px solid #2D2520" }, borderRadius: "999px", px: { xs: 0.9, md: 1.5 }, py: { xs: 0.28, md: 0.5 }, fontSize: { xs: "0.68rem", md: "0.82rem" }, fontWeight: 900, whiteSpace: "nowrap", fontFamily: "var(--font-prompt), sans-serif" }}>
               {products.length} รายการ
             </Typography>
           </Box>
 
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "280px minmax(0, 1fr)" }, gap: 3, alignItems: "start" }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "280px minmax(0, 1fr)" }, gap: { xs: 1.8, lg: 3 }, alignItems: "start" }}>
             <Box
               component="aside"
               sx={{
-                position: { lg: "sticky" },
-                top: { lg: 96 },
-                p: 2,
+                position: { xs: "sticky", lg: "sticky" },
+                top: { xs: 72, md: 84, lg: 96 },
+                zIndex: { xs: 4, lg: 1 },
+                p: { xs: 1, lg: 2 },
                 borderRadius: "8px",
                 border: "2.5px solid #2D2520",
                 bgcolor: "#FAF8F2",
-                boxShadow: "4px 4px 0px 0px #2D2520",
+                boxShadow: { xs: "2px 2px 0px 0px #2D2520", lg: "4px 4px 0px 0px #2D2520" },
+                overflow: "hidden",
               }}
             >
-              <Stack spacing={2.2}>
+              <Stack spacing={{ xs: 1, lg: 2.2 }}>
                 <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-                  <Typography sx={{ color: "#2D2520", fontWeight: 950, fontSize: "1rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                  <Typography sx={{ color: "#2D2520", fontWeight: 950, fontSize: { xs: "0.9rem", lg: "1rem" }, fontFamily: "var(--font-prompt), sans-serif" }}>
                     ตัวกรองสินค้า
                   </Typography>
                   {(aspect !== "all" || element !== "all" || category !== "all") && (
@@ -314,13 +316,22 @@ export default async function LuckyItemsPage({
                   )}
                 </Stack>
 
-                <Divider sx={{ borderColor: "rgba(45, 37, 32, 0.22)", borderStyle: "dashed" }} />
+                <Divider sx={{ display: { xs: "none", lg: "block" }, borderColor: "rgba(45, 37, 32, 0.22)", borderStyle: "dashed" }} />
 
-                <Box role="group" aria-label="กรองตามด้านเสริมดวง">
-                  <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.86rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                <Box role="group" aria-label="กรองตามด้านเสริมดวง" sx={{ display: { xs: "grid", lg: "block" }, gridTemplateColumns: { xs: "66px minmax(0, 1fr)", lg: "1fr" }, alignItems: "center", gap: { xs: 0.75, lg: 0 } }}>
+                  <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: { xs: 0, lg: 1 }, fontSize: { xs: "0.72rem", lg: "0.86rem" }, lineHeight: 1.15, fontFamily: "var(--font-prompt), sans-serif" }}>
                     ด้านเสริมดวง
                   </Typography>
-                  <Stack spacing={0.75}>
+                  <Box
+                    sx={{
+                      display: { xs: "flex", lg: "grid" },
+                      gap: 0.75,
+                      overflowX: { xs: "auto", lg: "visible" },
+                      pb: { xs: 0.25, lg: 0 },
+                      scrollbarWidth: "none",
+                      "&::-webkit-scrollbar": { display: "none" },
+                    }}
+                  >
                     {aspectFilters.map((item) => {
                       const Icon = item.icon;
                       const active = aspect === item.value;
@@ -332,17 +343,20 @@ export default async function LuckyItemsPage({
                           aria-pressed={active}
                           startIcon={<Icon size={16} variant="Bulk" color={active ? "#FFFDF9" : item.color} />}
                           sx={{
+                            flex: { xs: "0 0 auto", lg: "initial" },
+                            width: { xs: "auto", lg: "100%" },
                             justifyContent: "flex-start",
                             color: active ? "#FFFDF9" : "#2D2520",
                             bgcolor: active ? item.color : "#FFFDF9",
                             border: "2px solid #2D2520",
                             borderRadius: "7px",
                             boxShadow: active ? "2px 2px 0px 0px #2D2520" : "none",
-                            px: 1.2,
-                            py: 0.75,
-                            minHeight: 38,
-                            fontSize: "0.82rem",
+                            px: { xs: 1, lg: 1.2 },
+                            py: { xs: 0.55, lg: 0.75 },
+                            minHeight: { xs: 34, lg: 38 },
+                            fontSize: { xs: "0.76rem", lg: "0.82rem" },
                             fontWeight: 900,
+                            whiteSpace: "nowrap",
                             textTransform: "none",
                             fontFamily: "var(--font-prompt), sans-serif",
                             "&:hover": { bgcolor: active ? item.color : "#FFFDF9", boxShadow: "2px 2px 0px 0px #2D2520" },
@@ -352,14 +366,24 @@ export default async function LuckyItemsPage({
                         </Button>
                       );
                     })}
-                  </Stack>
+                  </Box>
                 </Box>
 
-                <Box role="group" aria-label="กรองตามธาตุ">
-                  <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.86rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                <Box role="group" aria-label="กรองตามธาตุ" sx={{ display: { xs: "grid", lg: "block" }, gridTemplateColumns: { xs: "66px minmax(0, 1fr)", lg: "1fr" }, alignItems: "center", gap: { xs: 0.75, lg: 0 } }}>
+                  <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: { xs: 0, lg: 1 }, fontSize: { xs: "0.72rem", lg: "0.86rem" }, lineHeight: 1.15, fontFamily: "var(--font-prompt), sans-serif" }}>
                     ธาตุ
                   </Typography>
-                  <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0.75 }}>
+                  <Box
+                    sx={{
+                      display: { xs: "flex", lg: "grid" },
+                      gridTemplateColumns: { lg: "1fr 1fr" },
+                      gap: 0.75,
+                      overflowX: { xs: "auto", lg: "visible" },
+                      pb: { xs: 0.25, lg: 0 },
+                      scrollbarWidth: "none",
+                      "&::-webkit-scrollbar": { display: "none" },
+                    }}
+                  >
                     {elementFilters.map((item) => {
                       const active = element === item.value;
                       return (
@@ -369,16 +393,18 @@ export default async function LuckyItemsPage({
                           href={buildHref(aspect, item.value, activeCategoryValue)}
                           aria-pressed={active}
                           sx={{
+                            flex: { xs: "0 0 auto", lg: "initial" },
                             minWidth: "auto",
                             color: active ? "#FFFDF9" : "#2D2520",
                             bgcolor: active ? "#2D2520" : "#FFFDF9",
                             border: "2px solid #2D2520",
                             borderRadius: "7px",
-                            px: 0.9,
-                            py: 0.62,
-                            minHeight: 36,
-                            fontSize: "0.78rem",
+                            px: { xs: 1.05, lg: 0.9 },
+                            py: { xs: 0.5, lg: 0.62 },
+                            minHeight: { xs: 32, lg: 36 },
+                            fontSize: { xs: "0.74rem", lg: "0.78rem" },
                             fontWeight: 900,
+                            whiteSpace: "nowrap",
                             textTransform: "none",
                             fontFamily: "var(--font-prompt), sans-serif",
                             "&:hover": { bgcolor: active ? "#2D2520" : "#FFFDF9", boxShadow: "2px 2px 0px 0px #2D2520" },
@@ -391,11 +417,21 @@ export default async function LuckyItemsPage({
                   </Box>
                 </Box>
 
-                <Box role="group" aria-label="กรองตามประเภทสินค้า">
-                  <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: 1, fontSize: "0.86rem", fontFamily: "var(--font-prompt), sans-serif" }}>
+                <Box role="group" aria-label="กรองตามประเภทสินค้า" sx={{ display: { xs: "grid", lg: "block" }, gridTemplateColumns: { xs: "66px minmax(0, 1fr)", lg: "1fr" }, alignItems: "center", gap: { xs: 0.75, lg: 0 } }}>
+                  <Typography sx={{ color: "#2D2520", fontWeight: 900, mb: { xs: 0, lg: 1 }, fontSize: { xs: "0.72rem", lg: "0.86rem" }, lineHeight: 1.15, fontFamily: "var(--font-prompt), sans-serif" }}>
                     ประเภทสินค้า
                   </Typography>
-                  <Stack direction="row" spacing={0.75} sx={{ flexWrap: "wrap", rowGap: 0.75 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 0.75,
+                      flexWrap: { xs: "nowrap", lg: "wrap" },
+                      overflowX: { xs: "auto", lg: "visible" },
+                      pb: { xs: 0.25, lg: 0 },
+                      scrollbarWidth: "none",
+                      "&::-webkit-scrollbar": { display: "none" },
+                    }}
+                  >
                     {dynamicCategoryFilters.map((item) => {
                       const active = activeCategoryValue === item.value;
                       return (
@@ -405,17 +441,19 @@ export default async function LuckyItemsPage({
                           href={buildHref(aspect, element, item.value)}
                           aria-pressed={active}
                           sx={{
+                            flex: { xs: "0 0 auto", lg: "initial" },
                             minWidth: "auto",
                             color: active ? "#FFFDF9" : "#2D2520",
                             bgcolor: active ? "#FF8E9E" : "#FFFDF9",
                             border: "2px solid #2D2520",
                             borderRadius: "999px",
                             boxShadow: active ? "2px 2px 0px 0px #2D2520" : "none",
-                            px: 1.15,
-                            py: 0.5,
-                            minHeight: 32,
-                            fontSize: "0.76rem",
+                            px: { xs: 1, lg: 1.15 },
+                            py: { xs: 0.42, lg: 0.5 },
+                            minHeight: { xs: 30, lg: 32 },
+                            fontSize: { xs: "0.72rem", lg: "0.76rem" },
                             fontWeight: 900,
+                            whiteSpace: "nowrap",
                             textTransform: "none",
                             fontFamily: "var(--font-prompt), sans-serif",
                             "&:hover": { bgcolor: active ? "#FF8E9E" : "#FFFDF9", boxShadow: "2px 2px 0px 0px #2D2520" },
@@ -425,7 +463,7 @@ export default async function LuckyItemsPage({
                         </Button>
                       );
                     })}
-                  </Stack>
+                  </Box>
                 </Box>
               </Stack>
             </Box>
@@ -468,7 +506,10 @@ export default async function LuckyItemsPage({
                         price: product.price,
                         originalPrice: product.originalPrice,
                         image: product.image,
+                        images: product.images,
                         url: product.url,
+                        productType: product.productType,
+                        internalSlug: product.internalSlug,
                         platform: product.platform,
                         productSlug: product.productSlug,
                         element: product.element,

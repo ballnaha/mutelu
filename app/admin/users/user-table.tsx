@@ -31,7 +31,7 @@ import { More, Edit2, Trash } from "iconsax-react";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { updateUser, deleteUser } from "./actions";
-import { uploadImage } from "../blog/actions";
+import { deleteImage, uploadImage } from "../blog/actions";
 import ImageUpload from "../blog/_components/image-upload";
 
 type User = {
@@ -91,6 +91,10 @@ export function UserTable({ users }: { users: User[] }) {
         const formData = new FormData();
         formData.append("file", selectedImage);
         imageUrl = await uploadImage(formData);
+
+        if (selectedUser.image && selectedUser.image !== imageUrl) {
+          await deleteImage(selectedUser.image);
+        }
       }
 
       await updateUser(selectedUser.id, { 
@@ -104,6 +108,20 @@ export function UserTable({ users }: { users: User[] }) {
       console.error("Failed to update user:", error);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleRemoveProfileImage = async (url: string) => {
+    if (!selectedUser) return;
+
+    try {
+      await deleteImage(url);
+      await updateUser(selectedUser.id, { image: null });
+      setSelectedImage(null);
+      setSelectedUser({ ...selectedUser, image: null });
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to remove profile image:", error);
     }
   };
 
@@ -220,6 +238,7 @@ export function UserTable({ users }: { users: User[] }) {
               <ImageUpload 
                 value={selectedImage || ""} 
                 onChange={setSelectedImage} 
+                onRemove={handleRemoveProfileImage}
               />
             </Box>
 

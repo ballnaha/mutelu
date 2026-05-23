@@ -7,6 +7,7 @@ import { Footer } from "./components/footer";
 import { LuckyNumbers } from "./components/lucky-numbers";
 import { CategoryTabs } from "./components/category-tabs";
 import { getLuckyNumbersData } from "@/lib/lucky-numbers";
+import { getHomepageHeroPosts } from "@/lib/blog-posts";
 import { getMonthlyLuckyColors } from "@/lib/lucky-colors";
 import { absoluteUrl } from "@/lib/site";
 
@@ -169,8 +170,11 @@ const homepageJsonLd = {
 };
 
 export default async function Home() {
-  const luckyNumbersData = await getLuckyNumbersData();
-  const luckyColorsData = getMonthlyLuckyColors();
+  const [luckyNumbersData, heroPosts, luckyColorsData] = await Promise.all([
+    getLuckyNumbersData(),
+    getHomepageHeroPosts(3),
+    Promise.resolve(getMonthlyLuckyColors()),
+  ]);
 
   return (
     <Box sx={{ bgcolor: "#242b32", minHeight: "100vh" }}>
@@ -181,10 +185,62 @@ export default async function Home() {
       <Header />
 
       <Hero
+        heroPosts={heroPosts}
         todayLuckyColor={luckyColorsData?.today ?? null}
         luckyColorMonthLabel={luckyColorsData?.monthLabel}
         luckyColorYearBE={luckyColorsData?.yearBE}
       />
+
+      {/* Social Proof Trust Bar */}
+      <Box
+        sx={{
+          bgcolor: "#2D2520",
+          borderBottom: "3px solid #2D2520",
+          py: { xs: 1.5, md: 2 },
+          px: 2,
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          sx={{
+            maxWidth: 1200,
+            mx: "auto",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: { xs: 1.5, md: 0 },
+          }}
+        >
+          {[
+            { emoji: "👁️", value: "50,000+", label: "คนต่อเดือน", color: "#FF8E9E" },
+            { emoji: "📅", value: "อัปเดต", label: "ทุกวัน", color: "#FFF066" },
+            { emoji: "🔮", value: "4 เครื่องมือ", label: "ดูดวงฟรี", color: "#B3D9FF" },
+            { emoji: "🇹🇭", value: "ภาษาไทย", label: "100%", color: "#C9F5D3" },
+          ].map((stat, i) => (
+            <Box
+              key={i}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                px: { xs: 2, md: 3.5 },
+                py: 0.5,
+                borderRight: { xs: "none", md: i < 3 ? "1.5px solid rgba(255,255,255,0.12)" : "none" },
+              }}
+            >
+              <Box component="span" sx={{ fontSize: "1rem" }}>{stat.emoji}</Box>
+              <Box>
+                <Box component="span" sx={{ color: stat.color, fontWeight: 900, fontSize: { xs: "0.88rem", md: "0.95rem" }, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  {stat.value}
+                </Box>
+                <Box component="span" sx={{ color: "rgba(255,255,255,0.6)", fontWeight: 600, fontSize: { xs: "0.82rem", md: "0.88rem" }, ml: 0.75, fontFamily: "var(--font-prompt), sans-serif" }}>
+                  {stat.label}
+                </Box>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      </Box>
 
       <Box id="lucky-numbers" sx={{ scrollMarginTop: { xs: "80px", md: "96px" } }}>
         <LuckyNumbers data={luckyNumbersData} />

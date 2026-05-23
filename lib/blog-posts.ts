@@ -22,6 +22,9 @@ export type BlogAffiliateItem = {
   badge: string;
   accent: string;
   sortOrder: number;
+  productType?: string | null;
+  internalSlug?: string | null;
+  images?: any;
 };
 
 export type BlogContentBlock = BlogArticleSection | BlogAffiliateItem;
@@ -122,6 +125,8 @@ type BlogPostSectionRow = {
 type BlogAffiliateProductRow = {
   title: string;
   platform: string;
+  productType?: "AFFILIATE" | "OWN_PRODUCT" | string | null;
+  internalSlug?: string | null;
   productSlug: string;
   image: string | null;
   priceLabel: string | null;
@@ -132,6 +137,7 @@ type BlogAffiliateProductRow = {
   badge: string | null;
   accent: string;
   sortOrder: number;
+  images?: any;
 };
 
 type BlogSlugRow = {
@@ -230,6 +236,9 @@ function mapBlogPost(
     badge: product.badge ?? getPlatformLabel(product.platform),
     accent: product.accent,
     sortOrder: product.sortOrder,
+    productType: product.productType,
+    internalSlug: product.internalSlug,
+    images: product.images,
   }));
 
   // Merge and sort all content by sortOrder
@@ -297,6 +306,8 @@ export async function getPublishedBlogPostBySlug(slug: string) {
         SELECT
           COALESCE(m.name, b.title) AS title,
           COALESCE(m.platform, b.platform) AS platform,
+          m.productType AS productType,
+          m.internalSlug AS internalSlug,
           COALESCE(m.productSlug, b.productSlug) AS productSlug,
           COALESCE(m.image, b.image) AS image,
           COALESCE(b.priceLabel, m.price) AS priceLabel,
@@ -306,7 +317,8 @@ export async function getPublishedBlogPostBySlug(slug: string) {
           b.highlights,
           b.badge,
           b.accent,
-          b.sortOrder
+          b.sortOrder,
+          m.images AS images
         FROM blogaffiliateproduct b
         LEFT JOIN MasterAffiliateProduct m ON b.masterProductId = m.id
         WHERE b.postId = ${post.id}

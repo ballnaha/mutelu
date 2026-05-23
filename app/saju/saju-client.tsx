@@ -53,6 +53,9 @@ type SajuAffiliateProduct = {
   productSlug?: string | null;
   rating?: number | null;
   reviewCount?: number | null;
+  images?: any;
+  productType?: string | null;
+  internalSlug?: string | null;
 };
 
 const elementMeta: Record<ElementKey, { label: string; color: string; desc: string; bg: string }> = {
@@ -2713,10 +2716,13 @@ return (
                           description={product.description}
                           price={product.price}
                           image={product.image}
+                          images={product.images}
                           link={product.url}
                           platform={product.platform}
                           platformLabel={product.platform}
                           productSlug={product.productSlug}
+                          productType={product.productType}
+                          internalSlug={product.internalSlug}
                           rating={product.rating}
                           reviewCount={product.reviewCount}
                           originalPrice={product.originalPrice}

@@ -34,16 +34,27 @@ function isProductUpload(imageUrl: string) {
   return imageUrl.startsWith("/api/uploads/product/") || imageUrl.startsWith("/uploads/product/");
 }
 
+const formatPrice = (priceVal: string | null | undefined) => {
+  if (!priceVal) return "";
+  const trimmed = priceVal.trim();
+  if (!trimmed) return "";
+  if (/^\d/.test(trimmed)) {
+    return `฿${trimmed}`;
+  }
+  return trimmed;
+};
+
 const ELEMENTS = [
   { value: "WOOD", label: "ไม้", detail: "Wood", color: "#10b981" },
   { value: "FIRE", label: "ไฟ", detail: "Fire", color: "#f43f5e" },
   { value: "EARTH", label: "ดิน", detail: "Earth", color: "#f59e0b" },
-  { value: "METAL", label: "ทอง", detail: "Metal", color: "#94a3b8" },
+  { value: "METAL", label: "ทอง", detail: "Metal", color: "#d4af37" },
   { value: "WATER", label: "น้ำ", detail: "Water", color: "#3b82f6" },
   { value: "NONE", label: "ทั่วไป", detail: "General", color: "#64748b" },
 ];
 
 const PLATFORMS = [
+  { value: "mulamoon", label: "mulamoon." },
   { value: "shopee", label: "Shopee" },
   { value: "lazada", label: "Lazada" },
   { value: "tiktok-shop", label: "TikTok Shop" },
@@ -82,7 +93,10 @@ interface Product {
   price: string;
   originalPrice: string | null;
   image: string;
+  images?: unknown;
   url: string;
+  productType?: "AFFILIATE" | "OWN_PRODUCT";
+  internalSlug: string | null;
   platform: string;
   productSlug: string | null;
   element: string;
@@ -110,7 +124,10 @@ type ProductFormData = {
   price: string;
   originalPrice: string;
   image: string | File | null;
+  images: (string | File)[];
   url: string;
+  productType: "AFFILIATE" | "OWN_PRODUCT";
+  internalSlug: string;
   platform: string;
   productSlug: string;
   element: string;
@@ -122,6 +139,7 @@ type ProductFormData = {
 
 type ProductFilters = {
   query: string;
+  productType: string;
   platform: string;
   category: string;
   element: string;
@@ -136,7 +154,10 @@ const emptyForm: ProductFormData = {
   price: "",
   originalPrice: "",
   image: "",
+  images: ["", "", "", ""],
   url: "",
+  productType: "AFFILIATE",
+  internalSlug: "",
   platform: "shopee",
   productSlug: "",
   element: "NONE",
@@ -148,6 +169,7 @@ const emptyForm: ProductFormData = {
 
 const emptyProductFilters: ProductFilters = {
   query: "",
+  productType: "all",
   platform: "all",
   category: "all",
   element: "all",
@@ -164,6 +186,32 @@ function platformLabel(platform: string) {
   return PLATFORMS.find((item) => item.value === platform)?.label ?? platform;
 }
 
+function createProductSlug(name: string) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\u0E00-\u0E7F\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+function parseProductImages(images: unknown) {
+  if (Array.isArray(images)) {
+    return images.filter((img): img is string => typeof img === "string" && img.trim() !== "");
+  }
+
+  if (typeof images === "string") {
+    try {
+      const parsed = JSON.parse(images);
+      return Array.isArray(parsed) ? parsed.filter((img): img is string => typeof img === "string" && img.trim() !== "") : [];
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
 export default function AdminAffiliatePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -176,6 +224,8 @@ export default function AdminAffiliatePage() {
   const [categoryName, setCategoryName] = useState("");
   const [editingCategory, setEditingCategory] = useState<AffiliateCategory | null>(null);
   const [categoryEditName, setCategoryEditName] = useState("");
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [isProductDeleting, setIsProductDeleting] = useState(false);
   const [deletingCategory, setDeletingCategory] = useState<AffiliateCategory | null>(null);
   const [isCategorySaving, setIsCategorySaving] = useState(false);
   const [productFilters, setProductFilters] = useState<ProductFilters>(emptyProductFilters);
@@ -256,13 +306,26 @@ export default function AdminAffiliatePage() {
   const handleOpen = (product: Product | null = null) => {
     if (product) {
       setEditingProduct(product);
+      const isMulamoon = product.productType === "OWN_PRODUCT" || product.platform === "mulamoon";
+      
+      const parsedImages: (string | File)[] = ["", "", "", ""];
+      if (product.images) {
+        const dbImages = parseProductImages(product.images);
+        dbImages.forEach((img, idx) => {
+          if (idx < 4) parsedImages[idx] = img;
+        });
+      }
+
       setFormData({
         name: product.name,
         description: product.description,
         price: product.price,
         originalPrice: product.originalPrice ?? "",
         image: product.image,
-        url: product.url,
+        images: parsedImages,
+        url: isMulamoon && (!product.url || product.url === "#" || product.url === "") ? "https://line.me/R/ti/p/%40877xivsv" : product.url,
+        productType: product.productType ?? "AFFILIATE",
+        internalSlug: product.internalSlug ?? "",
         platform: product.platform,
         productSlug: product.productSlug ?? "",
         element: product.element,
@@ -293,9 +356,37 @@ export default function AdminAffiliatePage() {
         imageUrl = await uploadProductImage(uploadData);
       }
 
+      const uploadedImages: string[] = [];
+      const activeImages = formData.images.filter((img) => img !== null && img !== "");
+      for (const img of activeImages) {
+        if (img instanceof File) {
+          const uploadData = new globalThis.FormData();
+          uploadData.append("file", img);
+          const serverUrl = await uploadProductImage(uploadData);
+          uploadedImages.push(serverUrl);
+        } else if (typeof img === "string" && img.trim() !== "") {
+          uploadedImages.push(img);
+        }
+      }
+
+      if (editingProduct && editingProduct.images) {
+        const oldImages = parseProductImages(editingProduct.images);
+        for (const oldImg of oldImages) {
+          if (isProductUpload(oldImg) && !uploadedImages.includes(oldImg)) {
+            await deleteImage(oldImg);
+          }
+        }
+      }
+
+      const isMulamoon = formData.productType === "OWN_PRODUCT" || formData.platform === "mulamoon";
       const payload = {
         ...formData,
         image: typeof imageUrl === "string" ? imageUrl : "",
+        images: uploadedImages,
+        url: isMulamoon ? (formData.url && formData.url !== "#" && formData.url.trim() !== "" ? formData.url : "https://line.me/R/ti/p/%40877xivsv") : (formData.url || "#"),
+        platform: formData.productType === "OWN_PRODUCT" ? "mulamoon" : formData.platform,
+        productSlug: formData.productType === "OWN_PRODUCT" ? "" : formData.productSlug,
+        internalSlug: formData.productType === "OWN_PRODUCT" ? formData.internalSlug : "",
         rating: formData.rating ? parseFloat(formData.rating) : 4.9,
         reviewCount: formData.reviewCount ? parseInt(formData.reviewCount, 10) : 120,
         originalPrice: formData.originalPrice || null,
@@ -325,24 +416,35 @@ export default function AdminAffiliatePage() {
     }
   };
 
-  const handleDelete = async (product: Product) => {
-    if ((product._count?.blogaffiliateproduct ?? 0) > 0) {
-      alert("สินค้านี้ถูกใช้ในบทความอยู่ ให้ปิดสถานะแทนการลบ หรือถอดออกจากบทความก่อน");
-      return;
-    }
+  const handleOpenDeleteProduct = (product: Product) => {
+    setDeletingProduct(product);
+  };
 
-    if (!confirm("ยืนยันการลบสินค้านี้?")) return;
+  const handleCloseDeleteProduct = () => {
+    if (isProductDeleting) return;
+    setDeletingProduct(null);
+  };
 
+  const handleConfirmDeleteProduct = async () => {
+    if (!deletingProduct || isProductDeleting || (deletingProduct._count?.blogaffiliateproduct ?? 0) > 0) return;
+
+    setIsProductDeleting(true);
     try {
-      const res = await fetch(`/api/affiliate/${product.id}`, { method: "DELETE" });
+      const res = await fetch(`/api/affiliate/${deletingProduct.id}`, { method: "DELETE" });
       if (res.ok) {
-        if (isProductUpload(product.image)) {
-          await deleteImage(product.image);
+        const uploadImages = Array.from(new Set([deletingProduct.image, ...parseProductImages(deletingProduct.images)]))
+          .filter((imageUrl) => isProductUpload(imageUrl));
+
+        for (const imageUrl of uploadImages) {
+          await deleteImage(imageUrl);
         }
-        fetchProducts();
+        setDeletingProduct(null);
+        await fetchProducts();
       }
     } catch (error) {
       console.error("Delete error:", error);
+    } finally {
+      setIsProductDeleting(false);
     }
   };
 
@@ -483,8 +585,10 @@ export default function AdminAffiliatePage() {
         product.platform,
         product.category,
         product.productSlug ?? "",
+        product.internalSlug ?? "",
       ].some((value) => value.toLowerCase().includes(query));
 
+      const matchesProductType = productFilters.productType === "all" || (product.productType ?? "AFFILIATE") === productFilters.productType;
       const matchesPlatform = productFilters.platform === "all" || product.platform === productFilters.platform;
       const matchesCategory = productFilters.category === "all" || product.category === productFilters.category;
       const matchesElement = productFilters.element === "all" || product.element === productFilters.element;
@@ -497,7 +601,7 @@ export default function AdminAffiliatePage() {
         productFilters.usage === "all" ||
         (productFilters.usage === "used" ? blogCount > 0 : blogCount === 0);
 
-      return matchesQuery && matchesPlatform && matchesCategory && matchesElement && matchesAspect && matchesStatus && matchesUsage;
+      return matchesQuery && matchesProductType && matchesPlatform && matchesCategory && matchesElement && matchesAspect && matchesStatus && matchesUsage;
     });
   }, [productFilters, tableProducts]);
 
@@ -696,6 +800,19 @@ export default function AdminAffiliatePage() {
             <TextField
               select
               size="small"
+              label="ประเภทลิงก์"
+              value={productFilters.productType}
+              slotProps={STABLE_SELECT_SLOT_PROPS}
+              onChange={(e) => setProductFilters((prev) => ({ ...prev, productType: e.target.value }))}
+              sx={{ gridColumn: { xs: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+            >
+              <MenuItem value="all">ทั้งหมด</MenuItem>
+              <MenuItem value="AFFILIATE">Affiliate</MenuItem>
+              <MenuItem value="OWN_PRODUCT">สินค้าเราเอง</MenuItem>
+            </TextField>
+            <TextField
+              select
+              size="small"
               label="Platform"
               value={productFilters.platform}
               slotProps={STABLE_SELECT_SLOT_PROPS}
@@ -797,11 +914,11 @@ export default function AdminAffiliatePage() {
             <Typography sx={{ mt: 2, color: "#64748b" }}>กำลังโหลดข้อมูลสินค้า...</Typography>
           </Box>
         ) : (
-          <ProductTable products={filteredProducts} onEdit={handleOpen} onDelete={handleDelete} onToggle={toggleStatus} />
+          <ProductTable products={filteredProducts} onEdit={handleOpen} onDelete={handleOpenDeleteProduct} onToggle={toggleStatus} />
         )}
       </Paper>
 
-      <Dialog open={open} onClose={() => !isSaving && setOpen(false)} maxWidth="md" fullWidth>
+      <Dialog open={open} onClose={() => !isSaving && setOpen(false)} maxWidth="lg" fullWidth>
         <DialogTitle sx={{ px: 3, pt: 3, pb: 1 }}>
           <Typography sx={{ fontWeight: 900, fontSize: "1.25rem", color: "#0f172a" }}>
             {editingProduct ? "แก้ไขสินค้า" : "เพิ่มสินค้าใหม่"}
@@ -811,12 +928,12 @@ export default function AdminAffiliatePage() {
           </Typography>
         </DialogTitle>
         <DialogContent dividers sx={{ p: 0 }}>
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "280px 1fr" }, minHeight: 520 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "360px 1fr" }, minHeight: 520 }}>
             <Box sx={{ p: 3, bgcolor: "#f8fafc", borderRight: { md: "1px solid #e2e8f0" } }}>
               <Stack spacing={2.5}>
                 <Box>
                   <Typography sx={{ fontWeight: 900, color: "#0f172a", mb: 0.5 }}>
-                    รูปสินค้า
+                    รูปหลักสินค้า
                   </Typography>
                   <Typography sx={{ color: "#64748b", fontSize: "0.78rem" }}>
                     อัปโหลดรูปพื้นหลังโปร่งหรือรูปสินค้าเต็มชิ้นได้
@@ -830,20 +947,85 @@ export default function AdminAffiliatePage() {
                   size="compact"
                 />
                 <TextField
-                  label="URL รูปภาพภายนอก"
+                  label="URL รูปภาพหลักภายนอก"
                   fullWidth
                   size="small"
                   value={typeof formData.image === "string" ? formData.image : ""}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  helperText="ใช้เมื่อไม่อัปโหลดไฟล์"
+                  helperText="ใช้เมื่อไม่อัปโหลดไฟล์รูปหลัก"
                   sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
                 />
+                <Box>
+                  <Typography sx={{ fontWeight: 900, color: "#0f172a", mb: 0.5 }}>
+                    รูปภาพเพิ่มเติม (สูงสุด 4 รูป)
+                  </Typography>
+                  <Typography sx={{ color: "#64748b", fontSize: "0.78rem", mb: 1.5 }}>
+                    ใช้แสดงในแกลเลอรีภาพประกอบสินค้า
+                  </Typography>
+                  <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
+                    {[0, 1, 2, 3].map((index) => {
+                      const imgVal = formData.images?.[index] || null;
+                      return (
+                        <Box key={index} sx={{ textAlign: "center" }}>
+                          <ImageUpload
+                            value={imgVal}
+                            onChange={(value) => {
+                              const newImages = [...(formData.images || ["", "", "", ""])];
+                              if (value === null) {
+                                newImages[index] = "";
+                              } else {
+                                newImages[index] = value;
+                              }
+                              setFormData({ ...formData, images: newImages });
+                            }}
+                            onRemove={async (url) => {
+                              await deleteImage(url);
+                              const newImages = [...(formData.images || ["", "", "", ""])];
+                              newImages[index] = "";
+                              setFormData({ ...formData, images: newImages });
+                            }}
+                            previewMode="contain"
+                            size="compact"
+                          />
+                          <Typography sx={{ fontSize: "0.7rem", color: "#64748b", mt: 0.5, fontWeight: 700 }}>
+                            รูปที่ {index + 1}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
                 <TextField
-                  label="Affiliate Link"
+                  select
+                  label="ประเภทสินค้า"
                   fullWidth
-                  required
+                  value={formData.productType}
+                  slotProps={STABLE_SELECT_SLOT_PROPS}
+                  onChange={(e) => {
+                    const isOwn = e.target.value === "OWN_PRODUCT";
+                    setFormData((prev) => {
+                      const generatedSlug = createProductSlug(prev.name);
+                      return {
+                        ...prev,
+                        productType: e.target.value as ProductFormData["productType"],
+                        platform: isOwn ? "mulamoon" : (prev.platform === "mulamoon" ? "shopee" : prev.platform),
+                        url: (isOwn || prev.platform === "mulamoon") && (!prev.url || prev.url === "#" || prev.url === "") ? "https://line.me/R/ti/p/%40877xivsv" : prev.url,
+                        internalSlug: isOwn && !prev.internalSlug ? (prev.productSlug || generatedSlug) : prev.internalSlug,
+                      };
+                    });
+                  }}
+                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+                >
+                  <MenuItem value="AFFILIATE">Affiliate - กดออกไปร้านค้า</MenuItem>
+                  <MenuItem value="OWN_PRODUCT">สินค้าเราเอง - มีหน้า SEO ในเว็บ</MenuItem>
+                </TextField>
+                <TextField
+                  label={(formData.productType === "OWN_PRODUCT" || formData.platform === "mulamoon") ? "ลิงก์สั่งซื้อ/LINE (ค่าเริ่มต้น: @877xivsv)" : "Affiliate Link"}
+                  fullWidth
+                  required={formData.productType === "AFFILIATE" && formData.platform !== "mulamoon"}
                   value={formData.url}
                   onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                  helperText={(formData.productType === "OWN_PRODUCT" || formData.platform === "mulamoon") ? "ลิงก์ LINE สำหรับสั่งซื้อสินค้า mulamoon (เช่น LINE @877xivsv)" : undefined}
                   sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
                 />
               </Stack>
@@ -861,7 +1043,16 @@ export default function AdminAffiliatePage() {
                       fullWidth
                       required
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) => {
+                        const nameVal = e.target.value;
+                        const generatedSlug = createProductSlug(nameVal);
+                        setFormData((prev) => ({
+                          ...prev,
+                          name: nameVal,
+                          productSlug: !editingProduct ? generatedSlug : prev.productSlug,
+                          internalSlug: !editingProduct && (prev.productType === "OWN_PRODUCT" || !prev.internalSlug) ? generatedSlug : prev.internalSlug,
+                        }));
+                      }}
                       sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
                     />
                     <TextField
@@ -917,16 +1108,25 @@ export default function AdminAffiliatePage() {
                       select
                       label="Platform"
                       value={formData.platform}
+                      disabled={formData.productType === "OWN_PRODUCT"}
                       slotProps={STABLE_SELECT_SLOT_PROPS}
-                      onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
+                      onChange={(e) => {
+                        const isMulamoon = e.target.value === "mulamoon";
+                        setFormData({
+                          ...formData,
+                          platform: e.target.value,
+                          url: isMulamoon && (!formData.url || formData.url === "#" || formData.url === "") ? "https://line.me/R/ti/p/%40877xivsv" : formData.url
+                        });
+                      }}
                     >
                       {PLATFORMS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}
                     </TextField>
                     <TextField
                       sx={{ gridColumn: { xs: "span 12", md: "span 6" }, "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
-                      label="Product Slug/ID"
-                      value={formData.productSlug}
-                      onChange={(e) => setFormData({ ...formData, productSlug: e.target.value })}
+                      label={formData.productType === "OWN_PRODUCT" ? "Slug สำหรับหน้า /shop/[slug]" : "Product Slug/ID"}
+                      value={formData.productType === "OWN_PRODUCT" ? formData.internalSlug : formData.productSlug}
+                      helperText={formData.productType === "OWN_PRODUCT" ? "ต้องไม่ซ้ำกับสินค้าเราเองอื่น ๆ ใช้สร้าง URL เช่น /shop/lucky-bracelet-pink" : undefined}
+                      onChange={(e) => setFormData({ ...formData, productSlug: e.target.value, internalSlug: formData.productType === "OWN_PRODUCT" ? e.target.value : formData.internalSlug })}
                     />
                     <TextField
                       sx={{ gridColumn: { xs: "span 12", md: "span 6" }, "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
@@ -969,12 +1169,70 @@ export default function AdminAffiliatePage() {
           <Button
             variant="contained"
             onClick={handleSubmit}
-            disabled={isSaving || !formData.name || !formData.url || !formData.image}
+            disabled={
+              isSaving ||
+              !formData.name ||
+              !formData.image ||
+              (formData.productType === "AFFILIATE" && !formData.url) ||
+              (formData.productType === "OWN_PRODUCT" && !formData.internalSlug)
+            }
             startIcon={isSaving ? <CircularProgress size={16} sx={{ color: "#fff" }} /> : undefined}
             sx={{ borderRadius: "10px", px: 4, bgcolor: "var(--primary)", fontWeight: 700 }}
           >
             {isSaving ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(deletingProduct)}
+        onClose={handleCloseDeleteProduct}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ px: 3, pt: 3, pb: 1 }}>
+          <Typography sx={{ fontWeight: 900, fontSize: "1.1rem", color: "#0f172a" }}>
+            ลบสินค้า?
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ px: 3, pb: 1 }}>
+          <Typography sx={{ color: "#475569", lineHeight: 1.7 }}>
+            {deletingProduct ? `ยืนยันลบ "${deletingProduct.name}" ออกจากคลังสินค้า Affiliate` : ""}
+          </Typography>
+          {(deletingProduct?._count?.blogaffiliateproduct ?? 0) > 0 ? (
+            <Box sx={{ mt: 2, p: 1.5, borderRadius: "12px", bgcolor: "#fff1f2", border: "1px solid #fecdd3" }}>
+              <Typography sx={{ color: "#be123c", fontSize: "0.86rem", fontWeight: 900, lineHeight: 1.6 }}>
+                สินค้านี้ถูกใช้ในบทความอยู่ {(deletingProduct?._count?.blogaffiliateproduct ?? 0)} บทความ
+              </Typography>
+              <Typography sx={{ color: "#9f1239", fontSize: "0.82rem", fontWeight: 700, lineHeight: 1.6, mt: 0.4 }}>
+                ให้ปิดสถานะแทนการลบ หรือถอดสินค้าออกจากบทความก่อน
+              </Typography>
+            </Box>
+          ) : (
+            <Typography sx={{ color: "#e11d48", fontSize: "0.82rem", fontWeight: 800, mt: 1 }}>
+              การลบนี้จะนำสินค้าออกจากระบบและไม่สามารถกู้คืนจากหน้านี้ได้
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3, pt: 1, gap: 1 }}>
+          <Button
+            disabled={isProductDeleting}
+            onClick={handleCloseDeleteProduct}
+            sx={{ borderRadius: "10px", color: "#64748b", fontWeight: 800 }}
+          >
+            {(deletingProduct?._count?.blogaffiliateproduct ?? 0) > 0 ? "รับทราบ" : "ยกเลิก"}
+          </Button>
+          {(deletingProduct?._count?.blogaffiliateproduct ?? 0) === 0 && (
+            <Button
+              variant="contained"
+              disabled={isProductDeleting}
+              onClick={handleConfirmDeleteProduct}
+              startIcon={isProductDeleting ? <CircularProgress size={16} sx={{ color: "#fff" }} /> : <Trash size={16} color="white" />}
+              sx={{ borderRadius: "10px", bgcolor: "#e11d48", fontWeight: 900, "&:hover": { bgcolor: "#be123c" } }}
+            >
+              {isProductDeleting ? "กำลังลบ..." : "ลบสินค้า"}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
 
@@ -991,7 +1249,7 @@ export default function AdminAffiliatePage() {
         </DialogTitle>
         <DialogContent sx={{ px: 3, pb: 1 }}>
           <Typography sx={{ color: "#475569", lineHeight: 1.7 }}>
-            ยืนยันลบประเภท "{deletingCategory?.name}" ออกจากรายการหมวดสินค้า Affiliate
+            {deletingCategory ? `ยืนยันลบประเภท "${deletingCategory.name}" ออกจากรายการหมวดสินค้า Affiliate` : ""}
           </Typography>
           <Typography sx={{ color: "#e11d48", fontSize: "0.82rem", fontWeight: 800, mt: 1 }}>
             ถ้าประเภทนี้ถูกใช้อยู่ในสินค้า ระบบจะไม่อนุญาตให้ลบ
@@ -1088,13 +1346,18 @@ function ProductTable({
                       <Box sx={{ minWidth: 0 }}>
                         <Typography sx={{ fontWeight: 800, fontSize: "0.95rem" }}>{product.name}</Typography>
                         <Typography noWrap sx={{ fontSize: "0.8rem", color: "#64748b", maxWidth: 260 }}>{product.description}</Typography>
-                        <Typography sx={{ fontSize: "0.8rem", color: "var(--primary)", fontWeight: 800 }}>{product.price}</Typography>
+                        <Typography sx={{ fontSize: "0.8rem", color: "var(--primary)", fontWeight: 800 }}>{formatPrice(product.price)}</Typography>
+                        <Chip
+                          label={(product.productType ?? "AFFILIATE") === "OWN_PRODUCT" ? "สินค้าเราเอง" : "Affiliate"}
+                          size="small"
+                          sx={{ mt: 0.6, height: 20, bgcolor: (product.productType ?? "AFFILIATE") === "OWN_PRODUCT" ? "#ecfdf5" : "#eff2ff", color: (product.productType ?? "AFFILIATE") === "OWN_PRODUCT" ? "#047857" : "#4f46e5", fontWeight: 800, fontSize: "0.68rem" }}
+                        />
                       </Box>
                     </Stack>
                   </TableCell>
                   <TableCell>
                     <Typography sx={{ fontWeight: 800, fontSize: "0.85rem" }}>{platformLabel(product.platform)}</Typography>
-                    <Typography sx={{ color: "#94a3b8", fontSize: "0.75rem" }}>{product.productSlug || "-"}</Typography>
+                    <Typography sx={{ color: "#94a3b8", fontSize: "0.75rem" }}>{product.internalSlug || product.productSlug || "-"}</Typography>
                   </TableCell>
                   <TableCell>
                     <Chip label={meta.label} size="small" sx={{ fontWeight: 800, bgcolor: `${meta.color}15`, color: meta.color, border: `1px solid ${meta.color}30` }} />

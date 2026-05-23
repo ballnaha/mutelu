@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { Element, Prisma } from "@prisma/client";
+import { Element, Prisma, ProductType } from "@prisma/client";
 
 // GET: ดึงข้อมูลสินค้าทั้งหมด
 export async function GET(request: Request) {
@@ -38,7 +38,26 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, description, price, originalPrice, image, url, platform, productSlug, element, category, aspect, rating, reviewCount } = body;
+    const {
+      name,
+      description,
+      price,
+      originalPrice,
+      image,
+      images,
+      url,
+      productType,
+      internalSlug,
+      platform,
+      productSlug,
+      element,
+      category,
+      aspect,
+      rating,
+      reviewCount,
+    } = body;
+    const resolvedProductType = productType === "OWN_PRODUCT" ? ProductType.OWN_PRODUCT : ProductType.AFFILIATE;
+    const resolvedInternalSlug = resolvedProductType === ProductType.OWN_PRODUCT ? internalSlug || productSlug || null : null;
 
     const product = await prisma.masterAffiliateProduct.create({
       data: {
@@ -47,9 +66,12 @@ export async function POST(request: Request) {
         price,
         originalPrice: originalPrice || null,
         image,
-        url,
+        images: images || null,
+        url: url || "#",
+        productType: resolvedProductType,
+        internalSlug: resolvedInternalSlug,
         platform: platform || "shopee",
-        productSlug: productSlug || null,
+        productSlug: resolvedProductType === ProductType.AFFILIATE ? productSlug || null : null,
         element: element || "NONE",
         category: category || "เครื่องประดับ",
         aspect: aspect || "general",

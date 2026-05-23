@@ -17,8 +17,39 @@ import {
   resolveUploadPath,
 } from "@/lib/upload-storage";
 
-const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
+const MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+
+function getUploadOutputExtension(mimeType: string) {
+  switch (mimeType) {
+    case "image/png":
+      return ".png";
+    case "image/webp":
+      return ".webp";
+    case "image/avif":
+      return ".avif";
+    default:
+      return ".jpg";
+  }
+}
+
+async function writeOptimizedUpload(buffer: Buffer, mimeType: string, filePath: string) {
+  const image = sharp(buffer).resize(1600, 1600, { fit: "inside", withoutEnlargement: true });
+
+  switch (mimeType) {
+    case "image/png":
+      await image.png({ compressionLevel: 9 }).toFile(filePath);
+      return;
+    case "image/webp":
+      await image.webp({ quality: 85 }).toFile(filePath);
+      return;
+    case "image/avif":
+      await image.avif({ quality: 80 }).toFile(filePath);
+      return;
+    default:
+      await image.jpeg({ quality: 85 }).toFile(filePath);
+  }
+}
 
 export type BlogBlockInput =
   | { type: "section"; heading: string; paragraphs: string[]; sortOrder: number }
@@ -276,14 +307,14 @@ async function uploadImageToFolder(formData: FormData, folder = "") {
   const file = formData.get("file") as File;
   if (!file) throw new Error("No file provided");
   if (!ALLOWED_IMAGE_TYPES.has(file.type)) throw new Error("Unsupported image type");
-  if (file.size > MAX_UPLOAD_SIZE) throw new Error("Image size must be 5MB or less");
+  if (file.size > MAX_UPLOAD_SIZE) throw new Error("Image size must be 10MB or less");
 
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
   // Create unique filename
   const hash = crypto.createHash("md5").update(buffer).digest("hex");
-  const ext = ".jpg";
+  const ext = getUploadOutputExtension(file.type);
   const fileName = `${hash}${ext}`;
   const relativePath = folder ? `${folder}/${fileName}` : fileName;
 
@@ -298,11 +329,7 @@ async function uploadImageToFolder(formData: FormData, folder = "") {
 
   const filePath = path.join(uploadDir, fileName);
 
-  // Process with sharp (resize/optimize)
-  await sharp(buffer)
-    .resize(1600, 1600, { fit: "inside", withoutEnlargement: true })
-    .jpeg({ quality: 85 })
-    .toFile(filePath);
+  await writeOptimizedUpload(buffer, file.type, filePath);
 
   return getUploadUrl(relativePath);
 }

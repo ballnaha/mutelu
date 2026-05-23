@@ -63,11 +63,14 @@ type TarotAffiliateProduct = {
   url: string;
   platform?: string;
   productSlug?: string | null;
+  productType?: string | null;
+  internalSlug?: string | null;
   category?: string | null;
   aspect?: string | null;
   element?: string | null;
   rating?: number | null;
   reviewCount?: number | null;
+  images?: any;
 };
 
 const tarotIntentOptions = {
@@ -2516,10 +2519,13 @@ export function TarotDailyClient() {
                       price={product.price}
                       originalPrice={product.originalPrice}
                       image={product.image}
+                      images={product.images}
                       link={product.url}
                       platform={product.platform}
                       platformLabel={product.platform}
                       productSlug={product.productSlug}
+                      productType={product.productType}
+                      internalSlug={product.internalSlug}
                       rating={product.rating}
                       reviewCount={product.reviewCount}
                       variant="sidebar"
@@ -2555,6 +2561,46 @@ export function TarotDailyClient() {
                       </Typography>
                     </Box>
                   )}
+                </Box>
+
+                {/* Deep-link CTA → lucky-items filtered by focusCategory */}
+                <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
+                  <Box
+                    component="a"
+                    href={`/lucky-items?aspect=${
+                      focusCategory === "love" ? "love"
+                      : focusCategory === "finance" ? "wealth"
+                      : focusCategory === "career" ? "career"
+                      : focusCategory === "health" ? "health"
+                      : "general"
+                    }`}
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 1,
+                      textDecoration: "none",
+                      px: 3.5,
+                      py: 1.25,
+                      borderRadius: "14px",
+                      bgcolor: "#FFFDF9",
+                      border: "2.5px solid #2D2520",
+                      boxShadow: "3px 3px 0px #2D2520",
+                      fontWeight: 900,
+                      fontSize: "0.88rem",
+                      color: "#2D2520",
+                      fontFamily: "var(--font-prompt), sans-serif",
+                      transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      "&:hover": {
+                        transform: "translate(-2px, -2px)",
+                        boxShadow: "5px 5px 0px #2D2520",
+                        bgcolor: "#FF8E9E",
+                      },
+                      "&:active": { transform: "translate(1px, 1px)", boxShadow: "1px 1px 0px #2D2520" },
+                    }}
+                  >
+                    <Box component="span" sx={{ fontSize: "1rem" }}>🛍️</Box>
+                    ดูของมงคลทั้งหมดในหมวดนี้ →
+                  </Box>
                 </Box>
               </Paper>
 

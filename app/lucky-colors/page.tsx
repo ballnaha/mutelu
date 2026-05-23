@@ -460,10 +460,13 @@ export default async function LuckyColorsPage() {
                       price={product.price}
                       originalPrice={product.originalPrice}
                       image={product.image}
+                      images={product.images}
                       link={product.url}
                       platform={product.platform}
                       platformLabel={product.platform}
                       productSlug={product.productSlug}
+                      productType={product.productType}
+                      internalSlug={product.internalSlug}
                       rating={product.rating}
                       reviewCount={product.reviewCount}
                       variant="sidebar"

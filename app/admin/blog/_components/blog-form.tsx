@@ -57,6 +57,8 @@ type MasterAffiliateProduct = {
   price: string;
   image: string;
   url: string;
+  productType?: "AFFILIATE" | "OWN_PRODUCT";
+  internalSlug?: string | null;
   platform: string;
   productSlug: string | null;
   category: string;
@@ -88,6 +90,7 @@ function getPlatformLabel(platform: string) {
     shopee: "Shopee",
     lazada: "Lazada",
     "tiktok-shop": "TikTok Shop",
+    mulamoon: "mulamoon.",
     other: "อื่นๆ",
   };
 
@@ -195,7 +198,7 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
       masterProductId: product.id,
       title: product.name,
       platform: product.platform,
-      productSlug: product.productSlug || product.id,
+      productSlug: product.productType === "OWN_PRODUCT" ? product.internalSlug || product.id : product.productSlug || product.id,
       image: product.image,
       priceLabel: product.price,
       targetUrl: product.url,

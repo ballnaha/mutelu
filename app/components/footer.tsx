@@ -50,59 +50,87 @@ export function Footer() {
             gap: { xs: 1, md: 4 }
           }}
         >
-          {/* Logo stamp sticker */}
+          {/* Logo */}
           <Box
-            component="img"
-            src="/images/logo-mulamoon.png"
-            alt="mulamoon"
-            sx={{
-              display: "block",
-              width: { xs: 118, md: 190 },
-              height: { xs: 34, md: 56 },
-              objectFit: "contain",
-            }}
-          />
+            component="a"
+            href="/"
+            sx={{ display: "block", flexShrink: 0 }}
+          >
+            <Box
+              component="img"
+              src="/images/logo-mulamoon.png"
+              alt="mulamoon"
+              sx={{
+                display: "block",
+                width: { xs: 118, md: 190 },
+                height: { xs: 34, md: 56 },
+                objectFit: "contain",
+              }}
+            />
+          </Box>
 
-          {/* Minimal Links styled as cozy planner labels */}
+          {/* Nav links — real working links */}
           <Stack
             direction="row"
-            spacing={{ xs: 2.5, md: 4 }}
+            spacing={{ xs: 2.5, md: 3 }}
             sx={{
               display: { xs: "none", md: "flex" },
               flexWrap: "wrap",
               justifyContent: "center",
-              "& .footer-link": {
-                fontSize: "0.9rem",
-                fontWeight: 800,
-                color: "#5A4D43", // Warm chocolate cocoa instead of dark gray
-                cursor: "pointer",
-                transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                textDecoration: "none",
-                fontFamily: "var(--font-prompt), sans-serif",
-                "&:hover": {
-                  color: "#7296F8", // Soft blue highlighter
-                  transform: "translateY(-1.5px)"
-                }
-              }
             }}
           >
-            <Typography className="footer-link">หน้าแรก</Typography>
-            <Typography className="footer-link">เกี่ยวกับเรา</Typography>
-            <Typography className="footer-link">นโยบายความเป็นส่วนตัว</Typography>
-            <Typography className="footer-link">ติดต่อเรา</Typography>
+            {[
+              { label: "หน้าแรก", href: "/" },
+              { label: "บทความ", href: "/blog" },
+              { label: "สินค้ามงคล", href: "/lucky-items" },
+              { label: "ไพ่ยิปซี", href: "/tarot" },
+              { label: "สีมงคล", href: "/lucky-colors" },
+              { label: "ตรวจลอตเตอรี่", href: "/lottery" },
+              { label: "ซาจู", href: "/saju" },
+            ].map((item) => (
+              <Box
+                key={item.href}
+                component="a"
+                href={item.href}
+                sx={{
+                  fontSize: "0.88rem",
+                  fontWeight: 800,
+                  color: "#5A4D43",
+                  textDecoration: "none",
+                  fontFamily: "var(--font-prompt), sans-serif",
+                  transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  "&:hover": {
+                    color: "#7296F8",
+                    transform: "translateY(-1.5px)",
+                  },
+                }}
+              >
+                {item.label}
+              </Box>
+            ))}
           </Stack>
 
-          {/* Copyright Stamp */}
+          {/* Copyright */}
           <Box sx={{ textAlign: { xs: "center", md: "right" } }}>
             <Typography sx={{
               fontSize: { xs: "0.68rem", md: "0.8rem" },
               fontWeight: 700,
-              color: "#8B7E74", // Cozy warm taupe
+              color: "#8B7E74",
               letterSpacing: { xs: 0, md: "0.04em" },
               fontFamily: "var(--font-prompt), sans-serif"
             }}>
               <Box component="span" sx={{ display: { xs: "inline", md: "none" } }}>© 2026 mulamoon</Box>
               <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>© 2026 mulamoon. ALL RIGHTS RESERVED.</Box>
+            </Typography>
+            <Typography sx={{
+              display: { xs: "none", md: "block" },
+              fontSize: "0.72rem",
+              fontWeight: 600,
+              color: "#A89A8E",
+              mt: 0.5,
+              fontFamily: "var(--font-prompt), sans-serif"
+            }}>
+              บางบทความมีลิงก์ affiliate — คัดสรรด้วยความตั้งใจ
             </Typography>
           </Box>
         </Box>

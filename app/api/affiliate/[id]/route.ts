@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ProductType } from "@prisma/client";
 
 export async function PATCH(
   request: Request,
@@ -8,9 +9,13 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
+    const resolvedProductType = body.productType === "OWN_PRODUCT" ? ProductType.OWN_PRODUCT : ProductType.AFFILIATE;
     const data = {
       ...body,
-      productSlug: body.productSlug || null,
+      url: body.url || "#",
+      productType: resolvedProductType,
+      internalSlug: resolvedProductType === ProductType.OWN_PRODUCT ? body.internalSlug || body.productSlug || null : null,
+      productSlug: resolvedProductType === ProductType.AFFILIATE ? body.productSlug || null : null,
     };
     
     const product = await prisma.masterAffiliateProduct.update({

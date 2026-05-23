@@ -27,6 +27,7 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
   const [digit1, setDigit1] = useState<string>("?");
   const [digit2, setDigit2] = useState<string>("?");
   const [isRolling, setIsRolling] = useState(false);
+  const [luckyHint, setLuckyHint] = useState<{ label: string; aspect: string; emoji: string } | null>(null);
   const threeDigits = Array.from(new Set(data.threeDigits));
   const twoDigits = Array.from(new Set(data.twoDigits));
 
@@ -49,10 +50,22 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
       setDigit1(Math.floor(Math.random() * 10).toString());
     }, 1200);
 
+    const HINTS = [
+      { label: "หนุนดวงการเงินและโชคลาภ", aspect: "wealth", emoji: "🪙" },
+      { label: "หนุนดวงความรักและความสัมพันธ์", aspect: "love", emoji: "💕" },
+      { label: "หนุนดวงการงานและความก้าวหน้า", aspect: "career", emoji: "💼" },
+      { label: "หนุนดวงสุขภาพกายและใจ", aspect: "health", emoji: "🌿" },
+    ];
+
     setTimeout(() => {
       clearInterval(interval2);
-      setDigit2(Math.floor(Math.random() * 10).toString());
+      const finalD2 = Math.floor(Math.random() * 10);
+      setDigit2(finalD2.toString());
       setIsRolling(false);
+      // derive hint from sum of both digits
+      const d1 = Math.floor(Math.random() * 10);
+      const hintIdx = (d1 + finalD2) % HINTS.length;
+      setLuckyHint(HINTS[hintIdx]);
     }, 2400);
   };
 
@@ -400,6 +413,39 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
               >
                 {isRolling ? "กำลังสุ่ม..." : "สุ่มเลขนำโชค ✦"}
               </Button>
+
+              {/* Lucky hint — shown after roll completes */}
+              {!isRolling && luckyHint && digit1 !== "?" && digit2 !== "?" && (
+                <Box
+                  sx={{
+                    mt: 2,
+                    px: 2,
+                    py: 1.25,
+                    borderRadius: "12px",
+                    bgcolor: "#FFF5E4",
+                    border: "2px solid #2D2520",
+                    boxShadow: "2px 2px 0px #2D2520",
+                    textAlign: "center",
+                  }}
+                >
+                  <Typography sx={{ fontSize: "0.8rem", fontWeight: 900, color: "#2D2520", fontFamily: "var(--font-prompt), sans-serif", mb: 0.5 }}>
+                    {luckyHint.emoji} {luckyHint.label}
+                  </Typography>
+                  <Box
+                    component="a"
+                    href={`/lucky-items?aspect=${luckyHint.aspect}`}
+                    sx={{
+                      fontSize: "0.72rem",
+                      fontWeight: 800,
+                      color: "#FFAF45",
+                      textDecoration: "none",
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    ดูสินค้ามงคลที่เกี่ยว →
+                  </Box>
+                </Box>
+              )}
             </Box>
           </Box>
         </Box>
