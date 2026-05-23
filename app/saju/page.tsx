@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: "ดูดวงซาจูเกาหลี | mulamoon.",
   description:
     "ดูดวง Saju เกาหลีจากวัน เดือน ปี และเวลาเกิด วิเคราะห์เสา 4 ต้น ธาตุเด่น ธาตุเสริม และแนวโน้มชีวิตแบบอ่านง่าย",
+  alternates: {
+    canonical: "/saju",
+  },
 };
 
 export default function SajuPage() {

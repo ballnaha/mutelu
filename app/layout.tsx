@@ -14,15 +14,9 @@ const mali = Mali({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: {
-    default: "mulamoon | เว็บดูดวงออนไลน์",
-    template: `%s | ${siteName}`,
-  },
+  title: "mulamoon | เว็บดูดวงออนไลน์",
   description:
     "เว็บไซต์ดูดวงออนไลน์โทนพาสเทลสำหรับเช็กดวงรายวัน ไพ่ยิปซี ฤกษ์มงคล และจองคิวปรึกษาแบบส่วนตัว",
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     siteName,
     locale: "th_TH",

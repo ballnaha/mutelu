@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Box, Button, Chip, Container, Divider, Stack, Typography } from "@mui/material";
-import { ArrowRight, Briefcase, Heart, MagicStar, MoneyRecive, Shop, ShieldTick } from "iconsax-react";
+import { Briefcase, Heart, MagicStar, MoneyRecive, Shop, ShieldTick } from "iconsax-react";
 import { Element, Prisma } from "@prisma/client";
 import { cache } from "react";
 
 import { Footer } from "@/app/components/footer";
 import { Header } from "@/app/components/header";
+import { LuckyItemCard } from "@/app/lucky-items/lucky-item-card";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -38,16 +39,6 @@ type FilterOption = {
   value: string;
   label: string;
 };
-
-const aspectLabels: Record<string, string> = {
-  love: "หนุนดวงความรัก",
-  career: "เสริมการงานและการเรียน",
-  wealth: "ดึงดูดทรัพย์เสี่ยงดวง",
-  health: "หนุนสุขภาพกายใจ",
-  general: "ของมงคลนำโชคดวงดี",
-};
-
-type ShopProduct = Prisma.MasterAffiliateProductGetPayload<Record<string, never>>;
 
 type LuckyItemsSearchParams = Promise<{
   aspect?: string | string[];
@@ -145,204 +136,13 @@ const resolveLuckyItemsData = cache(async (selectedAspect: string, selectedEleme
 
 function buildLuckyItemsTitle(summary: string[]) {
   const filterText = summary.filter((item) => item !== "ทั้งหมด" && item !== "ทุกธาตุ" && item !== "ทุกประเภท").join(" ");
-  return filterText ? `ของมงคล${filterText} | mulamoon.` : "ของมงคลแนะนำ | mulamoon.";
+  return filterText ? `ของมงคล${filterText} | mulamoon.` : "สินค้ามงคลแนะนำ | mulamoon.";
 }
 
 function buildLuckyItemsDescription(summary: string[], productCount: number) {
   const filterText = summary.filter((item) => item !== "ทั้งหมด" && item !== "ทุกธาตุ" && item !== "ทุกประเภท").join(" ");
   const scopedText = filterText ? `${filterText} ` : "";
   return `รวมสินค้าและไอเทมมงคล${scopedText}คัดตามด้านเสริมดวง ธาตุ และประเภทสินค้า มี ${productCount} รายการให้เลือกดูใน mulamoon.`;
-}
-
-function normalizePlatform(platform: string) {
-  return platform.toLowerCase().replaceAll(" ", "-");
-}
-
-function productHref(product: Pick<ShopProduct, "platform" | "productSlug" | "url">) {
-  if (product.productSlug) {
-    return `/go/${normalizePlatform(product.platform)}/${product.productSlug}`;
-  }
-
-  return product.url;
-}
-
-function getDiscount(price: string, originalPrice?: string | null) {
-  if (!originalPrice) return null;
-
-  const sale = Number(price.replace(/[^0-9]/g, ""));
-  const original = Number(originalPrice.replace(/[^0-9]/g, ""));
-  if (!sale || !original || original <= sale) return null;
-
-  return `-${Math.round((1 - sale / original) * 100)}%`;
-}
-
-function platformTheme(platform: string) {
-  const key = platform.toLowerCase();
-  if (key.includes("shopee")) return { color: "#f05d3b", bg: "#fff0ec", label: "Shopee" };
-  if (key.includes("lazada")) return { color: "#1d2aa7", bg: "#eef0ff", label: "Lazada" };
-  if (key.includes("tiktok")) return { color: "#111827", bg: "#f1f5f9", label: "TikTok Shop" };
-  return { color: "#2D2520", bg: "#F5EFE6", label: platform };
-}
-
-function ProductCard({ product }: { product: ShopProduct }) {
-  const href = productHref(product);
-  const discount = getDiscount(product.price, product.originalPrice);
-  const platform = platformTheme(product.platform);
-  const rating = product.rating?.toFixed(1) ?? "4.9";
-  const reviewCount = product.reviewCount ?? 120;
-
-  return (
-    <Box
-      sx={{
-        bgcolor: "#FFFFFF",
-        border: "2px solid #2D2520",
-        borderRadius: "8px",
-        overflow: "hidden",
-        boxShadow: "4px 4px 0px #2D2520",
-        minWidth: 0,
-        display: "flex",
-        flexDirection: "column",
-        transition: "transform 0.16s ease, box-shadow 0.16s ease",
-        "&:hover": {
-          transform: "translate(-2px, -2px)",
-          boxShadow: "6px 6px 0px #2D2520",
-        },
-        "&:hover img": {
-          transform: "scale(1.035)",
-        },
-      }}
-    >
-      <Box
-        component="a"
-        href={href}
-        target="_blank"
-        rel="nofollow sponsored noopener"
-        sx={{
-          position: "relative",
-          aspectRatio: "1/1",
-          bgcolor: "#FAF8F2",
-          borderBottom: "2px solid #2D2520",
-          display: "grid",
-          placeItems: "center",
-          overflow: "hidden",
-        }}
-      >
-        <Box
-          component="img"
-          src={product.image}
-          alt={product.name}
-          sx={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            p: 1.25,
-            transition: "transform 0.35s ease",
-          }}
-        />
-        <Stack direction="row" spacing={0.75} sx={{ position: "absolute", top: 10, left: 10, right: 10, justifyContent: "space-between", alignItems: "flex-start" }}>
-          <Chip
-            label={aspectLabels[product.aspect] ?? aspectLabels.general}
-            size="small"
-            sx={{ height: 24, maxWidth: "72%", bgcolor: "#FFF066", color: "#2D2520", border: "1.5px solid #2D2520", borderRadius: "6px", fontWeight: 900, fontSize: "0.66rem", fontFamily: "var(--font-prompt), sans-serif" }}
-          />
-          {discount && (
-            <Chip
-              label={discount}
-              size="small"
-              sx={{ height: 24, bgcolor: "#FFE6EA", color: "#E11D48", border: "1.5px solid #E11D48", borderRadius: "6px", fontWeight: 950, fontSize: "0.68rem", fontFamily: "var(--font-prompt), sans-serif" }}
-            />
-          )}
-        </Stack>
-      </Box>
-
-      <Stack spacing={1.1} sx={{ p: 1.6, flex: 1 }}>
-        <Stack direction="row" spacing={0.75} sx={{ alignItems: "center", justifyContent: "space-between" }}>
-          <Chip
-            label={platform.label}
-            size="small"
-            sx={{ height: 22, bgcolor: platform.bg, color: platform.color, border: `1.5px solid ${platform.color}`, borderRadius: "5px", fontWeight: 900, fontSize: "0.64rem", fontFamily: "var(--font-prompt), sans-serif" }}
-          />
-          <Typography sx={{ color: "#5A4D43", fontSize: "0.72rem", fontWeight: 800, whiteSpace: "nowrap", fontFamily: "var(--font-prompt), sans-serif" }}>
-            ★ {rating} ({reviewCount})
-          </Typography>
-        </Stack>
-
-        <Typography
-          component="h2"
-          sx={{
-            color: "#2D2520",
-            fontSize: "0.98rem",
-            fontWeight: 950,
-            lineHeight: 1.34,
-            minHeight: "2.65em",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-            fontFamily: "var(--font-prompt), sans-serif",
-          }}
-        >
-          {product.name}
-        </Typography>
-
-        <Typography
-          sx={{
-            color: "#6B625A",
-            fontSize: "0.78rem",
-            lineHeight: 1.45,
-            minHeight: "2.9em",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-            fontWeight: 550,
-            fontFamily: "var(--font-prompt), sans-serif",
-          }}
-        >
-          {product.description}
-        </Typography>
-
-        <Box sx={{ flex: 1 }} />
-
-        <Stack direction="row" spacing={1} sx={{ alignItems: "flex-end", justifyContent: "space-between" }}>
-          <Stack spacing={0.2} sx={{ minWidth: 0 }}>
-            {product.originalPrice && (
-              <Typography sx={{ color: "#9CA3AF", fontSize: "0.74rem", textDecoration: "line-through", fontWeight: 700, lineHeight: 1, fontFamily: "var(--font-prompt), sans-serif" }}>
-                {product.originalPrice}
-              </Typography>
-            )}
-            <Typography sx={{ color: "#FF4F73", fontSize: "1.18rem", fontWeight: 950, lineHeight: 1.05, fontFamily: "var(--font-prompt), sans-serif" }}>
-              {product.price}
-            </Typography>
-          </Stack>
-          <Button
-            component="a"
-            href={href}
-            target="_blank"
-            rel="nofollow sponsored noopener"
-            variant="contained"
-            endIcon={<ArrowRight size={15} color="currentColor" />}
-            sx={{
-              bgcolor: "#2D2520",
-              color: "#FFFDF9",
-              borderRadius: "7px",
-              minWidth: 92,
-              px: 1.4,
-              py: 0.75,
-              fontWeight: 950,
-              fontSize: "0.78rem",
-              textTransform: "none",
-              boxShadow: "none",
-              fontFamily: "var(--font-prompt), sans-serif",
-              "&:hover": { bgcolor: "#1F1916" },
-            }}
-          >
-            ดูสินค้า
-          </Button>
-        </Stack>
-      </Stack>
-    </Box>
-  );
 }
 
 export async function generateMetadata({
@@ -427,7 +227,6 @@ export default async function LuckyItemsPage({
         "@type": "ListItem",
         position: index + 1,
         name: product.name,
-        url: product.productSlug ? `${siteUrl}/go/${product.platform.toLowerCase().replaceAll(" ", "-")}/${product.productSlug}` : product.url,
       })),
     },
   };
@@ -475,7 +274,7 @@ export default async function LuckyItemsPage({
             <Box sx={{ minWidth: 0 }}>
               <Stack direction="row" spacing={1} sx={{ alignItems: "baseline", flexWrap: "wrap", rowGap: 0.4 }}>
                 <Typography component="h1" sx={{ color: "#2D2520", fontSize: { xs: "1.45rem", md: "1.85rem" }, lineHeight: 1.12, fontWeight: 950, fontFamily: "var(--font-prompt), sans-serif" }}>
-                  ของมงคลแนะนำ
+                  สินค้ามงคลแนะนำ
                 </Typography>
                 <Typography sx={{ color: "#FF8E9E", fontSize: "0.72rem", fontWeight: 900, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
                   LUCKY ITEMS
@@ -660,7 +459,25 @@ export default async function LuckyItemsPage({
               {products.length > 0 ? (
                 <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", md: "repeat(3, minmax(0, 1fr))", xl: "repeat(4, minmax(0, 1fr))" }, gap: { xs: 1.8, md: 2.4 } }}>
                   {products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                    <LuckyItemCard
+                      key={product.id}
+                      product={{
+                        id: product.id,
+                        name: product.name,
+                        description: product.description,
+                        price: product.price,
+                        originalPrice: product.originalPrice,
+                        image: product.image,
+                        url: product.url,
+                        platform: product.platform,
+                        productSlug: product.productSlug,
+                        element: product.element,
+                        category: product.category,
+                        aspect: product.aspect,
+                        rating: product.rating,
+                        reviewCount: product.reviewCount,
+                      }}
+                    />
                   ))}
                 </Box>
               ) : (

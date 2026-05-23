@@ -45,20 +45,26 @@ type HeroStory = {
 
 const STORIES: HeroStory[] = [
   { 
-    id: "desk-decor",
-    category: "Lifestyle", 
+    id: "lucky-items",
+    category: "Lucky Items", 
     bgcolor: "#FFF0F2", 
     color: "#E88D9C", 
-    title: "5 ไอเทมจัดโต๊ะทำงาน เพิ่มพลังบวกให้ทุกวัน", 
-    image: "/images/ghibli_desk_decor.png" 
+    title: "เลือกสินค้ามงคลให้ตรงเรื่องที่อยากเสริม", 
+    image: "/images/ghibli_desk_decor.png",
+    href: "/lucky-items",
+    author: "mulamoon guide",
+    date: "เลือกตามเจตนา",
   },
   { 
-    id: "mindfulness",
-    category: "Mindfulness", 
+    id: "blog-index",
+    category: "Articles", 
     bgcolor: "#EBF3FF", 
     color: "#7296F8", 
-    title: "เริ่มต้นวันใหม่ด้วยการจัดระเบียบความคิด", 
-    image: "/images/ghibli_mindfulness.png" 
+    title: "อ่านบทความสายมูทั้งหมดในที่เดียว", 
+    image: "/images/ghibli_mindfulness.png",
+    href: "/blog",
+    author: "ทีมบรรณาธิการ",
+    date: "อัปเดตล่าสุด",
   },
 ];
 
@@ -142,14 +148,15 @@ export function Hero({ heroPosts = [], todayLuckyColor = null, luckyColorMonthLa
   const heroStories = heroPostsToStories(heroPosts);
   const storiesBySlot = new Map(heroStories.map((story) => [story.slot ?? 1, story]));
   const mainStory = storiesBySlot.get(1) ?? {
-    id: "life-balance",
-    category: "Editor's Pick",
+    id: "home-guide",
+    category: "MULAMOON GUIDE",
     bgcolor: "#EBF3FF",
     color: "#7296F8",
-    title: "จัดสมดุลชีวิตให้ลงตัวเพื่อความสุขในทุกๆ วัน",
+    title: "เริ่มจากดวงวันนี้ แล้วค่อยเลือกสิ่งมงคลที่เข้ากับคุณ",
     image: "/images/ghibli_life_balance.png",
-    author: "กองบรรณาธิการ",
-    date: "อ่าน 5 นาที",
+    href: "/blog",
+    author: "mulamoon.",
+    date: "สายมูอย่างมีเหตุผล",
   };
   const sideStories = [
     storiesBySlot.get(2) ?? STORIES[0],
@@ -229,6 +236,35 @@ export function Hero({ heroPosts = [], todayLuckyColor = null, luckyColorMonthLa
       }}>🍀</Box>
 
       <Container maxWidth="xl" sx={{ position: "relative", zIndex: 1 }}>
+        <Box sx={{ maxWidth: 980, mb: { xs: 3.5, md: 4.5 } }}>
+          <Typography
+            component="h1"
+            sx={{
+              color: "#2D2520",
+              fontWeight: 950,
+              fontSize: { xs: "1.82rem", md: "2.65rem" },
+              lineHeight: 1.12,
+              mb: 1.5,
+              fontFamily: "var(--font-prompt), sans-serif",
+            }}
+          >
+            บทความสายมู ดูดวง สีมงคล ไพ่ยิปซี และสินค้ามงคลแนะนำ
+          </Typography>
+          <Typography
+            component="p"
+            sx={{
+              color: "#5A4D43",
+              fontSize: { xs: "0.98rem", md: "1.12rem" },
+              fontWeight: 700,
+              lineHeight: 1.8,
+              maxWidth: 780,
+              m: 0,
+              fontFamily: "var(--font-prompt), sans-serif",
+            }}
+          >
+            รวมเครื่องมือดูดวงออนไลน์และบทความสายมูที่ช่วยให้เลือกสี เลข ไพ่ และไอเทมมงคลได้เข้ากับจังหวะชีวิตของคุณ
+          </Typography>
+        </Box>
         <Box sx={{ 
           display: "grid", 
           gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "2.1fr 1.02fr 1.08fr" },
@@ -284,7 +320,7 @@ export function Hero({ heroPosts = [], todayLuckyColor = null, luckyColorMonthLa
                 letterSpacing: "0.1em",
                 fontFamily: "var(--font-prompt), sans-serif",
               }}>
-                ✦ {heroStories.length > 0 ? "FEATURED STORY" : "EDITOR'S PICK"}
+                ✦ {heroStories.length > 0 ? "FEATURED STORY" : "START HERE"}
               </Typography>
             </Box>
 

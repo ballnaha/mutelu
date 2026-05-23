@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 import { getAffiliateTargetUrl } from "@/lib/blog-posts";
 
 type RouteProps = {
@@ -10,8 +10,23 @@ type RouteProps = {
 
 export async function GET(_request: Request, props: RouteProps) {
   const { platform, productSlug } = await props.params;
-  const fallbackUrl = "https://www.google.com/search?q=shopping+app";
-  const targetUrl = (await getAffiliateTargetUrl(platform, productSlug)) ?? fallbackUrl;
+  const targetUrl = await getAffiliateTargetUrl(platform, productSlug);
 
-  redirect(targetUrl);
+  if (!targetUrl) {
+    return NextResponse.redirect(new URL("/lucky-items", _request.url), {
+      status: 302,
+      headers: {
+        "X-Robots-Tag": "noindex, nofollow",
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  return NextResponse.redirect(targetUrl, {
+    status: 302,
+    headers: {
+      "X-Robots-Tag": "noindex, nofollow",
+      "Cache-Control": "no-store",
+    },
+  });
 }

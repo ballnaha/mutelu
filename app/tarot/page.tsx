@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "ดูดวงไพ่ยิปซีรายวัน | mulamoon.",
   description:
     "เปิดไพ่ยิปซีรายวันแบบ 3 ใบ พร้อมคำทำนายภาพรวม ความรัก การงาน การเงิน และคำแนะนำประจำวัน",
+  alternates: {
+    canonical: "/tarot",
+  },
 };
 
 export default function TarotPage() {

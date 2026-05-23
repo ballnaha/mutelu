@@ -239,7 +239,7 @@ export function AffiliateCard({
               component="a"
               href={href}
               target="_blank"
-              rel="nofollow sponsored noopener"
+              rel="sponsored nofollow noopener"
               sx={{
                 borderRadius: "8px",
                 bgcolor: accent,
@@ -430,7 +430,7 @@ export function AffiliateCard({
               component="a"
               href={href}
               target="_blank"
-              rel="nofollow sponsored noopener"
+              rel="sponsored nofollow noopener"
               variant="contained"
               sx={{
                 bgcolor: accent,
@@ -499,7 +499,7 @@ export function AffiliateCard({
           component="a"
           href={href}
           target="_blank"
-          rel="nofollow sponsored noopener"
+          rel="sponsored nofollow noopener"
           variant="contained"
           endIcon={<ArrowRight size={16} variant="Outline" />}
           sx={{

@@ -12,6 +12,9 @@ import { AffiliateCard } from "@/app/components/affiliate-card";
 export const metadata: Metadata = {
   title: "สีเสื้อมงคลประจำเดือน | mulamoon.",
   description: "ตารางสีเสื้อมงคลประจำเดือน แยกสีเสริมงาน การเงิน ความรัก โชค และสีที่ควรเลี่ยง สไตล์สีน้ำแสนอบอุ่น",
+  alternates: {
+    canonical: "/lucky-colors",
+  },
 };
 
 export const revalidate = 3600;
@@ -440,7 +443,7 @@ export default async function LuckyColorsPage() {
                   </Box>
                   <Box>
                     <Typography sx={{ color: "#2D2520", fontSize: { xs: "0.96rem", md: "1.02rem" }, fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
-                      ของมงคลแนะนำประจำวัน
+                      สินค้ามงคลแนะนำประจำวัน
                     </Typography>
                     <Typography sx={{ display: { xs: "none", md: "block" }, color: "#5A4D43", fontSize: "0.76rem", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
                       เสริมพลังตามสีและเจตนามงคลวันนี้

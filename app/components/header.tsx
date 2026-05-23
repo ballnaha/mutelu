@@ -27,24 +27,22 @@ import React, { useState } from "react";
 
 const navItems = [
   { label: "หน้าแรก", href: "/" },
-  { label: "ซาจู", href: "/saju" },
+  { label: "บทความ", href: "/blog" },
+  { label: "สินค้ามงคล", href: "/lucky-items" },
   { label: "ไพ่ยิปซีรายวัน", href: "/tarot" },
   { label: "สีมงคล", href: "/lucky-colors" },
   { label: "ตรวจลอตเตอรี่", href: "/lottery" },
-  { label: "ของมงคล", href: "/lucky-items" },
-  { label: "บทความ", href: "/blog/lucky-work-desk-items-2026" },
-  { label: "หมวดหมู่", href: "/#categories" },
+  { label: "ซาจู", href: "/saju" },
 ];
 
 const activePillColors = [
   { bg: "#EBF3FF", text: "#2D2520" }, // หน้าแรก - Sky
-  { bg: "#EDF7EC", text: "#2D2520" }, // ซาจู - Sage Green
+  { bg: "#EBF3FF", text: "#2D2520" }, // บทความ - Blue
+  { bg: "#FFF0F2", text: "#2D2520" }, // สินค้ามงคล - Sakura Rose
   { bg: "#FFF5E4", text: "#2D2520" }, // ไพ่ยิปซีรายวัน - Peach/Gold
   { bg: "#F4EEFF", text: "#2D2520" }, // สีมงคล - Lavender
   { bg: "#FFEFEF", text: "#2D2520" }, // ตรวจลอตเตอรี่ - Coral Danger
-  { bg: "#FFF0F2", text: "#2D2520" }, // ของมงคล - Sakura Rose
-  { bg: "#EBF3FF", text: "#2D2520" }, // บทความ - Blue
-  { bg: "#FFF5E4", text: "#2D2520" }, // หมวดหมู่ - Peach
+  { bg: "#EDF7EC", text: "#2D2520" }, // ซาจู - Sage Green
 ] as const;
 
 function isNavActive(pathname: string, href: string, index: number) {

@@ -56,6 +56,33 @@ export type HomepageHeroPost = {
   homeHeroSlot: number;
 };
 
+export type BlogListPost = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  categorySlug: string | null;
+  date: string;
+  author: string;
+  heroImage: string;
+  tags: string[];
+  updatedAtIso: string | null;
+};
+
+export type BlogCategoryFilter = {
+  name: string;
+  slug: string;
+  description: string | null;
+  postCount: number;
+};
+
+export type BlogPostListResult = {
+  posts: BlogListPost[];
+  totalPosts: number;
+  totalPages: number;
+  currentPage: number;
+};
+
 type BlogPostRow = {
   id: string;
   slug: string;
@@ -72,6 +99,18 @@ type BlogPostRow = {
   seoTitle: string | null;
   seoDescription: string | null;
   homeHeroSlot?: number | null;
+  categorySlug?: string | null;
+};
+
+type BlogCategoryFilterRow = {
+  name: string;
+  slug: string;
+  description: string | null;
+  postCount: bigint | number;
+};
+
+type BlogCountRow = {
+  totalPosts: bigint | number;
 };
 
 type BlogPostSectionRow = {
@@ -329,6 +368,119 @@ export async function getPublishedBlogSitemapEntries(): Promise<BlogSitemapEntry
 
     throw error;
   }
+}
+
+export async function getPublishedBlogPosts(
+  limit = 24,
+  categorySlug?: string,
+  page = 1,
+): Promise<BlogPostListResult> {
+  try {
+    const currentPage = Math.max(1, Math.floor(page));
+    const offset = (currentPage - 1) * limit;
+    const countRows = await prisma.$queryRaw<BlogCountRow[]>`
+      SELECT COUNT(p.id) AS totalPosts
+      FROM blogpost p
+      LEFT JOIN blogcategory c ON p.categoryId = c.id
+      WHERE p.status = 'PUBLISHED'
+        AND (p.publishedAt IS NULL OR p.publishedAt <= NOW())
+        AND (${categorySlug ?? null} IS NULL OR c.slug = ${categorySlug ?? null})
+    `;
+    const posts = await prisma.$queryRaw<BlogPostRow[]>`
+      SELECT
+        p.id,
+        p.slug,
+        p.title,
+        p.excerpt,
+        COALESCE(c.name, 'ทั่วไป') AS category,
+        p.publishedAt,
+        p.updatedAt,
+        p.authorName,
+        p.authorRole,
+        p.authorImage,
+        p.heroImage,
+        p.tags,
+        p.seoTitle,
+        p.seoDescription,
+        c.slug AS categorySlug
+      FROM blogpost p
+      LEFT JOIN blogcategory c ON p.categoryId = c.id
+      WHERE p.status = 'PUBLISHED'
+        AND (p.publishedAt IS NULL OR p.publishedAt <= NOW())
+        AND (${categorySlug ?? null} IS NULL OR c.slug = ${categorySlug ?? null})
+      ORDER BY p.publishedAt DESC, p.createdAt DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `;
+    const totalPosts = Number(countRows[0]?.totalPosts ?? 0);
+    const totalPages = Math.max(1, Math.ceil(totalPosts / limit));
+
+    return {
+      posts: posts.map((post) => ({
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      category: post.category,
+      categorySlug: post.categorySlug ?? null,
+      date: formatThaiDate(post.publishedAt),
+      author: post.authorName,
+      heroImage: post.heroImage || "/images/hero-bg.png",
+      tags: stringArrayFromJson(post.tags),
+      updatedAtIso: post.updatedAt?.toISOString() ?? null,
+      })),
+      totalPosts,
+      totalPages,
+      currentPage,
+    };
+  } catch (error) {
+    if (isMissingBlogTable(error)) {
+      return {
+        posts: [],
+        totalPosts: 0,
+        totalPages: 1,
+        currentPage: 1,
+      };
+    }
+
+    throw error;
+  }
+}
+
+export async function getPublishedBlogCategories(): Promise<BlogCategoryFilter[]> {
+  try {
+    const categories = await prisma.$queryRaw<BlogCategoryFilterRow[]>`
+      SELECT
+        c.name,
+        c.slug,
+        c.description,
+        COUNT(p.id) AS postCount
+      FROM blogcategory c
+      INNER JOIN blogpost p ON p.categoryId = c.id
+      WHERE p.status = 'PUBLISHED'
+        AND (p.publishedAt IS NULL OR p.publishedAt <= NOW())
+      GROUP BY c.id, c.name, c.slug, c.description
+      ORDER BY postCount DESC, c.name ASC
+    `;
+
+    return categories.map((category) => ({
+      name: category.name,
+      slug: category.slug,
+      description: category.description,
+      postCount: Number(category.postCount),
+    }));
+  } catch (error) {
+    if (isMissingBlogTable(error)) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+export async function getPublishedBlogCategoryBySlug(slug: string): Promise<BlogCategoryFilter | null> {
+  const categories = await getPublishedBlogCategories();
+
+  return categories.find((category) => category.slug === slug) ?? null;
 }
 
 export async function getHomepageHeroPosts(limit = 9): Promise<HomepageHeroPost[]> {

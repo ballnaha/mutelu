@@ -30,6 +30,10 @@ export async function generateMetadata(
   return {
     title: `${topic.title} | mulamoon.`,
     description: topic.seoDescription,
+    robots: {
+      index: false,
+      follow: true,
+    },
   };
 }
 

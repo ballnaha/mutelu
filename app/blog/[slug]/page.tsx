@@ -31,6 +31,34 @@ type PageProps = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
+function sanitizeAndQualifyArticleHtml(html: string) {
+  const withoutBlockedTags = html
+    .replace(/<\s*(script|style|iframe|object|embed|form|input|button|meta|link|base)[\s\S]*?<\s*\/\s*\1\s*>/gi, "")
+    .replace(/<\s*(script|style|iframe|object|embed|form|input|button|meta|link|base)\b[^>]*\/?>/gi, "");
+  const withoutEventHandlers = withoutBlockedTags
+    .replace(/\son[a-z]+\s*=\s*"[^"]*"/gi, "")
+    .replace(/\son[a-z]+\s*=\s*'[^']*'/gi, "")
+    .replace(/\son[a-z]+\s*=\s*[^\s>]+/gi, "")
+    .replace(/\sstyle\s*=\s*"[^"]*"/gi, "")
+    .replace(/\sstyle\s*=\s*'[^']*'/gi, "");
+  const withoutDangerousUrls = withoutEventHandlers
+    .replace(/\s(href|src)\s*=\s*"javascript:[^"]*"/gi, "")
+    .replace(/\s(href|src)\s*=\s*'javascript:[^']*'/gi, "")
+    .replace(/\s(href|src)\s*=\s*javascript:[^\s>]+/gi, "");
+
+  return withoutDangerousUrls.replace(/<a\s+([^>]*href=(["'])https?:\/\/[^"']+\2[^>]*)>/gi, (match, attributes: string) => {
+    const hasRel = /\srel=(["'])[^"']*\1/i.test(attributes);
+    const hasTargetBlank = /\starget=(["'])_blank\1/i.test(attributes);
+    const qualifiedAttributes = [
+      attributes,
+      hasTargetBlank ? "" : 'target="_blank"',
+      hasRel ? "" : 'rel="sponsored nofollow noopener"',
+    ].filter(Boolean).join(" ");
+
+    return `<a ${qualifiedAttributes}>`;
+  });
+}
+
 export async function generateStaticParams() {
   const slugs = await getPublishedBlogPostSlugs();
 
@@ -62,7 +90,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
       url: `/blog/${post.slug}`,
       siteName,
       locale: "th_TH",
-      images: [absoluteUrl(post.heroImage)],
+      images: [absoluteUrl(`/blog/${post.slug}/opengraph-image`)],
       type: "article",
       publishedTime: post.publishedAtIso ?? undefined,
       modifiedTime: post.updatedAtIso ?? undefined,
@@ -72,7 +100,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
       card: "summary_large_image",
       title: post.seoTitle,
       description: post.seoDescription,
-      images: [absoluteUrl(post.heroImage)],
+      images: [absoluteUrl(`/blog/${post.slug}/opengraph-image`)],
     },
   };
 }
@@ -86,32 +114,58 @@ export default async function BlogPostPage(props: PageProps) {
     notFound();
   }
 
-  // JSON-LD Structured Data for SEO
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": post.title,
-    "description": post.excerpt,
-    "image": absoluteUrl(post.heroImage),
-    "datePublished": post.publishedAtIso ?? undefined,
-    "dateModified": post.updatedAtIso ?? undefined,
-    "author": {
-      "@type": "Person",
-      "name": post.author,
-      "jobTitle": post.authorRole
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "mulamoon",
-      "logo": {
-        "@type": "ImageObject",
-        "url": absoluteUrl("/images/logo-mulamoon.png")
-      }
-    },
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": absoluteUrl(`/blog/${post.slug}`)
-    }
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        headline: post.title,
+        description: post.excerpt,
+        image: absoluteUrl(post.heroImage),
+        datePublished: post.publishedAtIso ?? undefined,
+        dateModified: post.updatedAtIso ?? undefined,
+        author: {
+          "@type": "Person",
+          name: post.author,
+          jobTitle: post.authorRole,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: siteName,
+          logo: {
+            "@type": "ImageObject",
+            url: absoluteUrl("/images/logo-mulamoon.png"),
+          },
+        },
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": absoluteUrl(`/blog/${post.slug}`),
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "หน้าแรก",
+            item: absoluteUrl("/"),
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "บทความ",
+            item: absoluteUrl("/blog"),
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: post.title,
+            item: absoluteUrl(`/blog/${post.slug}`),
+          },
+        ],
+      },
+    ],
   };
 
   return (
@@ -129,7 +183,7 @@ export default async function BlogPostPage(props: PageProps) {
       {/* Inject JSON-LD */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
 
       <Header />
@@ -287,7 +341,7 @@ export default async function BlogPostPage(props: PageProps) {
                                 fontWeight: 500,
                                 fontFamily: "var(--font-prompt), sans-serif"
                               }}
-                              dangerouslySetInnerHTML={{ __html: paragraph }}
+                                dangerouslySetInnerHTML={{ __html: sanitizeAndQualifyArticleHtml(paragraph) }}
                             />
                           ))}
                         </Stack>

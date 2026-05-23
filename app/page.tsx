@@ -8,9 +8,13 @@ import { LuckyNumbers } from "./components/lucky-numbers";
 import { CategoryTabs } from "./components/category-tabs";
 import { getLuckyNumbersData } from "@/lib/lucky-numbers";
 import { getMonthlyLuckyColors } from "@/lib/lucky-colors";
-import { getHomepageHeroPosts } from "@/lib/blog-posts";
+import { absoluteUrl } from "@/lib/site";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mulamoon.com";
+const homepageTitle = "บทความสายมู ดูดวง สีมงคล ไพ่ยิปซี และสินค้ามงคลแนะนำ | mulamoon.";
+const homepageDescription =
+  "mulamoon เว็บบทความสายมูและเครื่องมือดูดวงออนไลน์ รวมไพ่ยิปซีรายวัน สีมงคล เลขมงคล ตรวจหวย ซาจู และไอเดียสินค้ามงคลพร้อมคำแนะนำก่อนเลือกซื้อ";
+const homepageOgImage = absoluteUrl("/opengraph-image");
 
 const homepageKeywords = [
   "ดูดวง",
@@ -31,33 +35,40 @@ const homepageKeywords = [
   "ดูดวงสุขภาพ",
   "ซาจู",
   "ของมงคล",
+  "สินค้ามงคล",
   "สายมู",
-  "ดวงชะตา"
+  "ดวงชะตา",
 ];
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "ดูดวงวันนี้ ไพ่ยิปซี สีมงคล ตรวจหวย | mulamoon.",
-  description:
-    "mulamoon รวมเครื่องมือดูดวงออนไลน์สำหรับสายมู เช็กดวงวันนี้ เปิดไพ่ยิปซีรายวัน ดูดวงซาจู สีเสื้อมงคล เลขมงคล ตรวจหวย และไอเทมมงคลแนะนำ",
+  title: homepageTitle,
+  description: homepageDescription,
   keywords: homepageKeywords,
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "ดูดวงวันนี้ ไพ่ยิปซี สีมงคล ตรวจหวย | mulamoon.",
-    description:
-      "เช็กดวงวันนี้ เปิดไพ่ทาโรต์รายวัน ดูสีเสื้อมงคล เลขมงคล ตรวจลอตเตอรี่ และเลือกของมงคลที่เข้ากับดวงของคุณ",
+    title: homepageTitle,
+    description: homepageDescription,
     url: "/",
     siteName: "mulamoon.",
     locale: "th_TH",
     type: "website",
+    images: [
+      {
+        url: homepageOgImage,
+        width: 1200,
+        height: 630,
+        alt: "mulamoon เว็บบทความสายมู ดูดวง และสินค้ามงคลแนะนำ",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ดูดวงวันนี้ ไพ่ยิปซี สีมงคล ตรวจหวย | mulamoon.",
-    description:
-      "เว็บดูดวงออนไลน์สำหรับเช็กดวงรายวัน ไพ่ยิปซี สีมงคล เลขมงคล ตรวจหวย และของมงคลแนะนำ",
+    title: homepageTitle,
+    description: homepageDescription,
+    images: [homepageOgImage],
   },
 };
 
@@ -69,6 +80,17 @@ const homepageJsonLd = {
       "@id": `${siteUrl}/#organization`,
       name: "mulamoon.",
       url: siteUrl,
+      logo: absoluteUrl("/images/logo-mulamoon.png"),
+      knowsAbout: [
+        "ดูดวง",
+        "ไพ่ยิปซี",
+        "สีมงคล",
+        "เลขมงคล",
+        "ซาจู",
+        "ของมงคล",
+        "สินค้ามงคล",
+        "บทความสายมู",
+      ],
     },
     {
       "@type": "WebSite",
@@ -84,12 +106,16 @@ const homepageJsonLd = {
       "@type": "WebPage",
       "@id": `${siteUrl}/#webpage`,
       url: siteUrl,
-      name: "ดูดวงวันนี้ ไพ่ยิปซี สีมงคล ตรวจหวย | mulamoon.",
-      description:
-        "รวมเครื่องมือดูดวงออนไลน์ ไพ่ยิปซีรายวัน สีเสื้อมงคล เลขมงคล ตรวจหวย ซาจู และของมงคลแนะนำ",
+      name: homepageTitle,
+      description: homepageDescription,
       isPartOf: {
         "@id": `${siteUrl}/#website`,
       },
+      publisher: {
+        "@id": `${siteUrl}/#organization`,
+      },
+      image: homepageOgImage,
+      isAccessibleForFree: true,
       about: [
         "ดูดวงวันนี้",
         "ไพ่ยิปซี",
@@ -97,13 +123,15 @@ const homepageJsonLd = {
         "เลขมงคล",
         "ตรวจหวย",
         "ของมงคล",
+        "สินค้ามงคล",
+        "บทความสายมู",
       ],
       inLanguage: "th-TH",
     },
     {
       "@type": "ItemList",
       "@id": `${siteUrl}/#home-services`,
-      name: "บริการดูดวงและเครื่องมือสายมูของ mulamoon.",
+      name: "บริการดูดวง เครื่องมือสายมู และบทความแนะนำของ mulamoon.",
       itemListElement: [
         {
           "@type": "ListItem",
@@ -132,7 +160,7 @@ const homepageJsonLd = {
         {
           "@type": "ListItem",
           position: 5,
-          name: "ของมงคลแนะนำ",
+          name: "สินค้ามงคลแนะนำ",
           url: `${siteUrl}/lucky-items`,
         },
       ],
@@ -141,10 +169,7 @@ const homepageJsonLd = {
 };
 
 export default async function Home() {
-  const [luckyNumbersData, homepageHeroPosts] = await Promise.all([
-    getLuckyNumbersData(),
-    getHomepageHeroPosts(),
-  ]);
+  const luckyNumbersData = await getLuckyNumbersData();
   const luckyColorsData = getMonthlyLuckyColors();
 
   return (
@@ -155,23 +180,46 @@ export default async function Home() {
       />
       <Header />
 
-      {/* Hero Section */}
       <Hero
-        heroPosts={homepageHeroPosts}
         todayLuckyColor={luckyColorsData?.today ?? null}
         luckyColorMonthLabel={luckyColorsData?.monthLabel}
         luckyColorYearBE={luckyColorsData?.yearBE}
       />
 
-      {/* Lucky Numbers Section */}
-      <LuckyNumbers data={luckyNumbersData} />
+      <Box id="lucky-numbers" sx={{ scrollMarginTop: { xs: "80px", md: "96px" } }}>
+        <LuckyNumbers data={luckyNumbersData} />
+      </Box>
 
-      {/* Category Tabs Section */}
       <Box id="categories" sx={{ scrollMarginTop: { xs: "80px", md: "96px" } }}>
         <CategoryTabs />
       </Box>
 
-      {/* Footer Section */}
+      <Box
+        sx={{
+          bgcolor: "#FAF8F2",
+          borderBottom: "3px solid #2D2520",
+          px: 2,
+          py: { xs: 2.5, md: 3 },
+        }}
+      >
+        <Box sx={{ maxWidth: 960, mx: "auto", textAlign: "center" }}>
+          <Box
+            component="p"
+            sx={{
+              m: 0,
+              color: "#6F6258",
+              fontSize: { xs: "0.78rem", md: "0.88rem" },
+              fontWeight: 700,
+              lineHeight: 1.8,
+              fontFamily: "var(--font-prompt), sans-serif",
+            }}
+          >
+            บางบทความอาจมีลิงก์แนะนำสินค้าแบบ affiliate เพื่อช่วยให้ผู้อ่านเลือกสินค้ามงคลได้ง่ายขึ้น
+            โดย mulamoon คัดเลือกจากความเหมาะสมของเนื้อหา ราคา และประโยชน์ต่อผู้อ่านเป็นหลัก
+          </Box>
+        </Box>
+      </Box>
+
       <Footer />
     </Box>
   );
