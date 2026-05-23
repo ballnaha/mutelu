@@ -89,10 +89,11 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
         <Box
           sx={{
             bgcolor: "#ffffff",
-            borderRadius: "32px",
-            p: { xs: 3.5, md: 4.5 },
+            borderRadius: { xs: "24px", md: "32px" },
+            p: { xs: 2, sm: 3.5, md: 4.5 },
             border: "3px solid #2D2520",
-            boxShadow: "8px 8px 0px #2D2520",
+            boxShadow: { xs: "5px 5px 0px #2D2520", md: "8px 8px 0px #2D2520" },
+            boxSizing: "border-box",
             // Keep completely static for high visual comfort
           }}
         >
@@ -100,7 +101,8 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
             display: "grid", 
             gridTemplateColumns: { xs: "1fr", md: "1fr 2.3fr 1fr" }, 
             alignItems: "center", 
-            gap: 4.5 
+            gap: { xs: 3, md: 4.5 },
+            minWidth: 0
           }}>
 
             {/* Header & Date Card */}
@@ -170,11 +172,14 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
               alignItems: "center",
               bgcolor: "#FAF6EE", // Sketch paper/wooden tray color
               borderRadius: "24px",
-              py: 3,
-              px: 4,
-              gap: 3,
+              py: { xs: 2.25, sm: 3 },
+              px: { xs: 1.5, sm: 4 },
+              gap: { xs: 2, sm: 3 },
               border: "2.5px solid #2D2520",
-              boxShadow: "inset 0 3px 8px rgba(45,37,32,0.06)"
+              boxShadow: "inset 0 3px 8px rgba(45,37,32,0.06)",
+              width: "100%",
+              minWidth: 0,
+              boxSizing: "border-box"
             }}>
               
               {/* 3-Digit Blue Tiles */}
@@ -190,18 +195,20 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
                 }}>
                   เลขเด่น 3 ตัว ✦
                 </Typography>
-                <Stack direction="row" spacing={1.5} sx={{ justifyContent: "center" }}>
+                <Stack direction="row" spacing={{ xs: 1, sm: 1.5 }} sx={{ justifyContent: "center", minWidth: 0 }}>
                   {threeDigits.map((n) => (
                     <Box 
                       key={n} 
                       sx={{ 
-                        minWidth: 46, 
-                        px: 1.5, 
-                        height: 52, 
-                        borderRadius: "16px", 
+                        width: { xs: 58, sm: "auto" },
+                        minWidth: { xs: 0, sm: 46 },
+                        px: { xs: 0.75, sm: 1.5 },
+                        height: { xs: 48, sm: 52 },
+                        borderRadius: { xs: "14px", sm: "16px" }, 
                         bgcolor: "#EBF3FF", // Pastel blue watercolor tile
                         border: "2px solid #2D2520", 
                         boxShadow: "2px 2px 0px #2D2520",
+                        boxSizing: "border-box",
                         display: "grid", 
                         placeItems: "center",
                         position: "relative",
@@ -224,7 +231,7 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
                         bgcolor: "rgba(255,255,255,0.45)"
                       }} />
                       <Typography sx={{ 
-                        fontSize: "1.45rem", 
+                        fontSize: { xs: "1.2rem", sm: "1.45rem" }, 
                         fontWeight: 900, 
                         color: "#2D2520", 
                         lineHeight: 1, 
@@ -258,18 +265,20 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
                 }}>
                   เลขท้าย 2 ตัว ✦
                 </Typography>
-                <Stack direction="row" spacing={1.5} sx={{ justifyContent: "center" }}>
+                <Stack direction="row" spacing={{ xs: 1, sm: 1.5 }} sx={{ justifyContent: "center", minWidth: 0 }}>
                   {twoDigits.map((n) => (
                     <Box 
                       key={n} 
                       sx={{ 
-                        minWidth: 46, 
-                        px: 1.5, 
-                        height: 52, 
-                        borderRadius: "16px", 
+                        width: { xs: 58, sm: "auto" },
+                        minWidth: { xs: 0, sm: 46 },
+                        px: { xs: 0.75, sm: 1.5 },
+                        height: { xs: 48, sm: 52 },
+                        borderRadius: { xs: "14px", sm: "16px" }, 
                         bgcolor: "#FFF0F2", // Pastel rose watercolor tile
                         border: "2px solid #2D2520", 
                         boxShadow: "2px 2px 0px #2D2520",
+                        boxSizing: "border-box",
                         display: "grid", 
                         placeItems: "center",
                         position: "relative",
@@ -292,7 +301,7 @@ export function LuckyNumbers({ data }: LuckyNumbersProps) {
                         bgcolor: "rgba(255,255,255,0.45)"
                       }} />
                       <Typography sx={{ 
-                        fontSize: "1.45rem", 
+                        fontSize: { xs: "1.2rem", sm: "1.45rem" }, 
                         fontWeight: 900, 
                         color: "#2D2520", 
                         lineHeight: 1, 

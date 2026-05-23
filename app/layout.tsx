@@ -3,6 +3,8 @@ import { Mali } from "next/font/google";
 import "./globals.css";
 import { BackToTop } from "./components/back-to-top";
 import { Providers } from "./providers";
+import { Analytics } from "./components/analytics";
+import { siteName, siteUrl } from "@/lib/site";
 
 const mali = Mali({
   variable: "--font-mali",
@@ -11,9 +13,21 @@ const mali = Mali({
 });
 
 export const metadata: Metadata = {
-  title: "mulamoon | เว็บดูดวงออนไลน์",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "mulamoon | เว็บดูดวงออนไลน์",
+    template: `%s | ${siteName}`,
+  },
   description:
     "เว็บไซต์ดูดวงออนไลน์โทนพาสเทลสำหรับเช็กดวงรายวัน ไพ่ยิปซี ฤกษ์มงคล และจองคิวปรึกษาแบบส่วนตัว",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    siteName,
+    locale: "th_TH",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -33,6 +47,7 @@ export default function RootLayout({
           <BackToTop />
         </Providers>
       </body>
+      <Analytics />
     </html>
   );
 }

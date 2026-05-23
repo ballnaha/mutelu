@@ -41,6 +41,8 @@ export type BlogArticle = {
   tableOfContents: string[];
   seoTitle: string;
   seoDescription: string;
+  publishedAtIso: string | null;
+  updatedAtIso: string | null;
 };
 
 export type HomepageHeroPost = {
@@ -61,6 +63,7 @@ type BlogPostRow = {
   excerpt: string;
   category: string;
   publishedAt: Date | null;
+  updatedAt: Date | null;
   authorName: string;
   authorRole: string | null;
   authorImage: string | null;
@@ -94,6 +97,19 @@ type BlogAffiliateProductRow = {
 
 type BlogSlugRow = {
   slug: string;
+};
+
+export type BlogSitemapEntry = {
+  slug: string;
+  lastModified: Date;
+  heroImage: string | null;
+};
+
+type BlogSitemapRow = {
+  slug: string;
+  publishedAt: Date | null;
+  updatedAt: Date | null;
+  heroImage: string | null;
 };
 
 type AffiliateTargetRow = {
@@ -195,6 +211,8 @@ function mapBlogPost(
     tableOfContents: sections.map((section) => section.heading),
     seoTitle: post.seoTitle ?? post.title,
     seoDescription: post.seoDescription ?? post.excerpt,
+    publishedAtIso: post.publishedAt?.toISOString() ?? null,
+    updatedAtIso: post.updatedAt?.toISOString() ?? null,
   };
 }
 
@@ -208,6 +226,7 @@ export async function getPublishedBlogPostBySlug(slug: string) {
         p.excerpt,
         COALESCE(c.name, 'ทั่วไป') AS category,
         p.publishedAt,
+        p.updatedAt,
         p.authorName,
         p.authorRole,
         p.authorImage,
@@ -288,6 +307,30 @@ export async function getPublishedBlogPostSlugs() {
   }
 }
 
+export async function getPublishedBlogSitemapEntries(): Promise<BlogSitemapEntry[]> {
+  try {
+    const posts = await prisma.$queryRaw<BlogSitemapRow[]>`
+      SELECT slug, publishedAt, updatedAt, heroImage
+      FROM blogpost
+      WHERE status = 'PUBLISHED'
+        AND (publishedAt IS NULL OR publishedAt <= NOW())
+      ORDER BY COALESCE(updatedAt, publishedAt) DESC
+    `;
+
+    return posts.map((post) => ({
+      slug: post.slug,
+      lastModified: post.updatedAt ?? post.publishedAt ?? new Date(),
+      heroImage: post.heroImage,
+    }));
+  } catch (error) {
+    if (isMissingBlogTable(error)) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
 export async function getHomepageHeroPosts(limit = 9): Promise<HomepageHeroPost[]> {
   try {
     const posts = await prisma.$queryRaw<BlogPostRow[]>`
@@ -298,6 +341,7 @@ export async function getHomepageHeroPosts(limit = 9): Promise<HomepageHeroPost[
         p.excerpt,
         COALESCE(c.name, 'ทั่วไป') AS category,
         p.publishedAt,
+        p.updatedAt,
         p.authorName,
         p.authorRole,
         p.authorImage,

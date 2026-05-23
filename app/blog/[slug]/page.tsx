@@ -24,6 +24,7 @@ import {
   getPublishedBlogPostBySlug,
   getPublishedBlogPostSlugs,
 } from "@/lib/blog-posts";
+import { absoluteUrl, siteName } from "@/lib/site";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -50,21 +51,28 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   }
 
   return {
-    title: `${post.seoTitle} | mulamoon`,
+    title: post.seoTitle,
     description: post.seoDescription,
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
     openGraph: {
       title: post.seoTitle,
       description: post.seoDescription,
-      images: [post.heroImage],
+      url: `/blog/${post.slug}`,
+      siteName,
+      locale: "th_TH",
+      images: [absoluteUrl(post.heroImage)],
       type: "article",
-      publishedTime: post.date,
+      publishedTime: post.publishedAtIso ?? undefined,
+      modifiedTime: post.updatedAtIso ?? undefined,
       authors: [post.author],
     },
     twitter: {
       card: "summary_large_image",
       title: post.seoTitle,
       description: post.seoDescription,
-      images: [post.heroImage],
+      images: [absoluteUrl(post.heroImage)],
     },
   };
 }
@@ -84,8 +92,9 @@ export default async function BlogPostPage(props: PageProps) {
     "@type": "BlogPosting",
     "headline": post.title,
     "description": post.excerpt,
-    "image": post.heroImage,
-    "datePublished": post.date,
+    "image": absoluteUrl(post.heroImage),
+    "datePublished": post.publishedAtIso ?? undefined,
+    "dateModified": post.updatedAtIso ?? undefined,
     "author": {
       "@type": "Person",
       "name": post.author,
@@ -96,12 +105,12 @@ export default async function BlogPostPage(props: PageProps) {
       "name": "mulamoon",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://mulamoon.com/logo.png"
+        "url": absoluteUrl("/images/logo-mulamoon.png")
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://mulamoon.com/blog/${post.slug}`
+      "@id": absoluteUrl(`/blog/${post.slug}`)
     }
   };
 
