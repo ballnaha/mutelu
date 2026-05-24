@@ -1,11 +1,13 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { connection } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { UserTable } from "./user-table";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage() {
+  await connection();
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
   });

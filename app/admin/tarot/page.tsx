@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { connection } from "next/server";
 import { tarotCards } from "@/app/tarot/tarot-data";
 import TarotUploader from "./tarot-uploader";
 
@@ -23,6 +24,7 @@ function getPngImagePath(imagePath: string) {
 }
 
 export default async function AdminTarotPage() {
+  await connection();
   const tarotBackFilePath = path.join(TAROT_IMAGE_DIR, "tarot-back.webp");
   let hasTarotBackWebp = false;
   try {

@@ -1,9 +1,9 @@
 import React from "react";
+import { connection } from "next/server";
 import { 
   Box, 
   Button, 
   Card, 
-  Container, 
   Stack, 
   Typography 
 } from "@mui/material";
@@ -13,6 +13,7 @@ import { getBlogPosts } from "./actions";
 import BlogTable from "./_components/blog-table";
 
 export default async function AdminBlogListPage() {
+  await connection();
   const posts = await getBlogPosts();
 
   return (

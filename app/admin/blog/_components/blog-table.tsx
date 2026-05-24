@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { 
   Box, 
-  Card, 
   Table, 
   TableBody, 
   TableCell, 
@@ -35,10 +34,11 @@ interface BlogTableProps {
 
 export default function BlogTable({ initialPosts }: BlogTableProps) {
   const { showSnackbar } = useSnackbar();
-  const [posts, setPosts] = useState(initialPosts);
+  const [deletedPostIds, setDeletedPostIds] = useState<Set<string>>(() => new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<{ id: string; title: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const posts = initialPosts.filter((post) => !deletedPostIds.has(post.id));
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -60,7 +60,7 @@ export default function BlogTable({ initialPosts }: BlogTableProps) {
     setDeleting(true);
     try {
       await deleteBlogPost(postToDelete.id);
-      setPosts(posts.filter(p => p.id !== postToDelete.id));
+      setDeletedPostIds((current) => new Set(current).add(postToDelete.id));
       showSnackbar("ลบบทความและรูปภาพเรียบร้อยแล้ว", "success");
     } catch (error) {
       console.error("Delete failed:", error);

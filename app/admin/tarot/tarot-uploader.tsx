@@ -33,6 +33,10 @@ type UploadState = {
   message: string;
 } | null;
 
+type CardOverride = Pick<TarotUploadItem, "hasWebp" | "updatedAt"> & {
+  webpImagePath?: string;
+};
+
 function getPreviewUrl(card: TarotUploadItem) {
   const baseUrl = card.hasWebp ? card.webpImagePath : card.originalImagePath;
   return card.updatedAt ? `${baseUrl}?v=${card.updatedAt}` : baseUrl;
@@ -50,13 +54,21 @@ const TAROT_GROUPS = [
 ];
 
 export default function TarotUploader({ initialCards }: { initialCards: TarotUploadItem[] }) {
-  const [cards, setCards] = useState(initialCards);
+  const [cardOverrides, setCardOverrides] = useState<Record<string, CardOverride>>({});
   const [query, setQuery] = useState("");
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [activeAction, setActiveAction] = useState<"upload" | "delete" | null>(null);
   const [message, setMessage] = useState<UploadState>(null);
   const [isPending, startTransition] = useTransition();
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const cards = useMemo(
+    () =>
+      initialCards.map((card) => {
+        const override = cardOverrides[card.id];
+        return override ? { ...card, ...override, webpImagePath: override.webpImagePath || card.webpImagePath } : card;
+      }),
+    [cardOverrides, initialCards]
+  );
 
   const filteredCards = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -85,13 +97,10 @@ export default function TarotUploader({ initialCards }: { initialCards: TarotUpl
     startTransition(async () => {
       try {
         const result = await uploadTarotCardImage(card.id, formData);
-        setCards((current) =>
-          current.map((item) =>
-            item.id === result.cardId
-              ? { ...item, hasWebp: true, webpImagePath: result.imageUrl, updatedAt: result.updatedAt }
-              : item
-          )
-        );
+        setCardOverrides((current) => ({
+          ...current,
+          [result.cardId]: { hasWebp: true, webpImagePath: result.imageUrl, updatedAt: result.updatedAt },
+        }));
         setMessage({ type: "success", message: `อัปโหลด ${card.thaiName} เป็น WebP เรียบร้อยแล้ว` });
       } catch (error) {
         setMessage({
@@ -117,11 +126,10 @@ export default function TarotUploader({ initialCards }: { initialCards: TarotUpl
     startTransition(async () => {
       try {
         const result = await deleteTarotCardImage(card.id);
-        setCards((current) =>
-          current.map((item) =>
-            item.id === result.cardId ? { ...item, hasWebp: false, updatedAt: result.updatedAt } : item
-          )
-        );
+        setCardOverrides((current) => ({
+          ...current,
+          [result.cardId]: { hasWebp: false, updatedAt: result.updatedAt },
+        }));
         setMessage({ type: "success", message: `ลบรูป WebP ของ ${card.thaiName} เรียบร้อยแล้ว` });
       } catch (error) {
         setMessage({
