@@ -5,6 +5,7 @@ import { Calendar } from "iconsax-react";
 import { Footer } from "@/app/components/footer";
 import { Header } from "@/app/components/header";
 import { getPublishedBlogCategories, getPublishedBlogPosts } from "@/lib/blog-posts";
+import { sanitizeRichTextHtml, stripHtml } from "@/lib/html";
 import { absoluteUrl, siteName } from "@/lib/site";
 
 const title = "บทความสายมู ดูดวง สีมงคล ไพ่ยิปซี และสินค้ามงคล | mulamoon.";
@@ -95,7 +96,7 @@ export default async function BlogIndexPage(props: BlogIndexPageProps) {
     blogPost: posts.slice(0, 12).map((post) => ({
       "@type": "BlogPosting",
       headline: post.title,
-      description: post.excerpt,
+      description: stripHtml(post.excerpt),
       image: absoluteUrl(post.heroImage),
       url: absoluteUrl(`/blog/${post.slug}`),
       author: {
@@ -318,7 +319,7 @@ export default async function BlogIndexPage(props: BlogIndexPageProps) {
                           fontFamily: "var(--font-prompt), sans-serif",
                         }}
                       >
-                        {post.excerpt}
+                        <span dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(post.excerpt) }} />
                       </Typography>
 
                       <Box sx={{ flex: 1 }} />

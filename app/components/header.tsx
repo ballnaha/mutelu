@@ -16,6 +16,7 @@ import {
   Toolbar,
   Typography,
   Avatar,
+  CircularProgress,
   Menu,
   MenuItem,
 } from "@mui/material";
@@ -121,6 +122,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session, status } = useSession();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen((open) => !open);
@@ -132,6 +134,16 @@ export function Header() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleGoogleSignIn = () => {
+    if (isGoogleSigningIn) return;
+    setIsGoogleSigningIn(true);
+    void signIn("google").then((result) => {
+      if (result?.error) {
+        setIsGoogleSigningIn(false);
+      }
+    });
   };
 
   return (
@@ -340,8 +352,16 @@ export function Header() {
                 </Box>
               ) : (
                 <Button
-                  onClick={() => signIn("google")}
-                  startIcon={<GoogleMark />}
+                  onClick={handleGoogleSignIn}
+                  disabled={isGoogleSigningIn}
+                  aria-busy={isGoogleSigningIn}
+                  startIcon={
+                    isGoogleSigningIn ? (
+                      <CircularProgress size={18} thickness={5} sx={{ color: "#2D2520" }} />
+                    ) : (
+                      <GoogleMark />
+                    )
+                  }
                   disableElevation
                   sx={{
                     color: "#2D2520",
@@ -368,9 +388,16 @@ export function Header() {
                     py: 0.9,
                     fontSize: "0.85rem",
                     transition: "all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                    "&.Mui-disabled": {
+                      color: "#2D2520",
+                      bgcolor: "#FFFDF9",
+                      opacity: 0.78,
+                      border: "2px solid #2D2520",
+                      boxShadow: "1.5px 1.5px 0px #2D2520",
+                    },
                   }}
                 >
-                  เข้าสู่ระบบ
+                  {isGoogleSigningIn ? "กำลังเชื่อมต่อ..." : "เข้าสู่ระบบ"}
                 </Button>
               )}
             </Box>
@@ -525,8 +552,16 @@ export function Header() {
           ) : (
             <Button
               fullWidth
-              onClick={() => signIn("google")}
-              startIcon={<GoogleMark />}
+              onClick={handleGoogleSignIn}
+              disabled={isGoogleSigningIn}
+              aria-busy={isGoogleSigningIn}
+              startIcon={
+                isGoogleSigningIn ? (
+                  <CircularProgress size={18} thickness={5} sx={{ color: "#2D2520" }} />
+                ) : (
+                  <GoogleMark />
+                )
+              }
               disableElevation
               sx={{
                 color: "#2D2520",
@@ -549,9 +584,16 @@ export function Header() {
                   boxShadow: "0px 0px 0px #2D2520"
                 },
                 transition: "all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                "&.Mui-disabled": {
+                  color: "#2D2520",
+                  bgcolor: "#FFFDF9",
+                  opacity: 0.78,
+                  border: "2px solid #2D2520",
+                  boxShadow: "1.5px 1.5px 0px #2D2520",
+                },
               }}
             >
-              เข้าสู่ระบบด้วย Google
+              {isGoogleSigningIn ? "กำลังเชื่อมต่อ..." : "เข้าสู่ระบบด้วย Google"}
             </Button>
           )}
         </Box>

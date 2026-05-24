@@ -362,6 +362,12 @@ export async function deleteImage(imageUrl: string) {
 }
 
 // Category Actions
+function revalidateCategoryAdminPages() {
+  revalidatePath("/admin/categories");
+  revalidatePath("/admin/blog");
+  revalidatePath("/admin/blog/new");
+}
+
 export async function getCategories() {
   return await prisma.blogcategory.findMany({
     orderBy: { name: "asc" },
@@ -379,7 +385,7 @@ export async function createCategory(data: { name: string; slug: string; descrip
     id: crypto.randomBytes(4).toString("hex"), // Fallback for ID
     updatedAt: new Date()
   } });
-  revalidatePath("/admin/categories");
+  revalidateCategoryAdminPages();
   return result;
 }
 
@@ -388,11 +394,11 @@ export async function updateCategory(id: string, data: { name: string; slug: str
     where: { id },
     data
   });
-  revalidatePath("/admin/categories");
+  revalidateCategoryAdminPages();
   return result;
 }
 
 export async function deleteCategory(id: string) {
   await prisma.blogcategory.delete({ where: { id } });
-  revalidatePath("/admin/categories");
+  revalidateCategoryAdminPages();
 }

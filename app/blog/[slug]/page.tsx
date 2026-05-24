@@ -25,39 +25,12 @@ import {
   getPublishedBlogPosts,
 } from "@/lib/blog-posts";
 import { absoluteUrl, siteName } from "@/lib/site";
+import { sanitizeRichTextHtml, stripHtml } from "@/lib/html";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
-
-function sanitizeAndQualifyArticleHtml(html: string) {
-  const withoutBlockedTags = html
-    .replace(/<\s*(script|style|iframe|object|embed|form|input|button|meta|link|base)[\s\S]*?<\s*\/\s*\1\s*>/gi, "")
-    .replace(/<\s*(script|style|iframe|object|embed|form|input|button|meta|link|base)\b[^>]*\/?>/gi, "");
-  const withoutEventHandlers = withoutBlockedTags
-    .replace(/\son[a-z]+\s*=\s*"[^"]*"/gi, "")
-    .replace(/\son[a-z]+\s*=\s*'[^']*'/gi, "")
-    .replace(/\son[a-z]+\s*=\s*[^\s>]+/gi, "")
-    .replace(/\sstyle\s*=\s*"[^"]*"/gi, "")
-    .replace(/\sstyle\s*=\s*'[^']*'/gi, "");
-  const withoutDangerousUrls = withoutEventHandlers
-    .replace(/\s(href|src)\s*=\s*"javascript:[^"]*"/gi, "")
-    .replace(/\s(href|src)\s*=\s*'javascript:[^']*'/gi, "")
-    .replace(/\s(href|src)\s*=\s*javascript:[^\s>]+/gi, "");
-
-  return withoutDangerousUrls.replace(/<a\s+([^>]*href=(["'])https?:\/\/[^"']+\2[^>]*)>/gi, (match, attributes: string) => {
-    const hasRel = /\srel=(["'])[^"']*\1/i.test(attributes);
-    const hasTargetBlank = /\starget=(["'])_blank\1/i.test(attributes);
-    const qualifiedAttributes = [
-      attributes,
-      hasTargetBlank ? "" : 'target="_blank"',
-      hasRel ? "" : 'rel="sponsored nofollow noopener"',
-    ].filter(Boolean).join(" ");
-
-    return `<a ${qualifiedAttributes}>`;
-  });
-}
 
 export async function generateStaticParams() {
   const slugs = await getPublishedBlogPostSlugs();
@@ -127,7 +100,7 @@ export default async function BlogPostPage(props: PageProps) {
       {
         "@type": "BlogPosting",
         headline: post.title,
-        description: post.excerpt,
+        description: stripHtml(post.excerpt),
         image: absoluteUrl(post.heroImage),
         datePublished: post.publishedAtIso ?? undefined,
         dateModified: post.updatedAtIso ?? undefined,
@@ -233,7 +206,7 @@ export default async function BlogPostPage(props: PageProps) {
             </Typography>
 
             <Typography sx={{ color: "#5A4D43", fontSize: { xs: "1.02rem", md: "1.1rem" }, lineHeight: 1.75, mb: 4, maxWidth: 700, mx: "auto", fontWeight: 600, fontFamily: "var(--font-prompt), sans-serif" }}>
-              {post.excerpt}
+              <span dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(post.excerpt) }} />
             </Typography>
 
             <Box
@@ -361,7 +334,7 @@ export default async function BlogPostPage(props: PageProps) {
                                 fontWeight: 500,
                                 fontFamily: "var(--font-prompt), sans-serif"
                               }}
-                                dangerouslySetInnerHTML={{ __html: sanitizeAndQualifyArticleHtml(paragraph) }}
+                                dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(paragraph) }}
                             />
                           ))}
                         </Stack>
@@ -491,7 +464,7 @@ export default async function BlogPostPage(props: PageProps) {
                         </Typography>
                         <Typography sx={{ color: "#5A4D43", fontSize: "0.8rem", fontWeight: 500, lineHeight: 1.5, mb: 1.5, flexGrow: 1, fontFamily: "var(--font-prompt), sans-serif",
                           overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
-                          {related.excerpt}
+                          <span dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(related.excerpt) }} />
                         </Typography>
                         <Typography sx={{ color: "#8C7E74", fontSize: "0.72rem", fontWeight: 700, fontFamily: "var(--font-prompt), sans-serif" }}>
                           {related.date}

@@ -10,6 +10,7 @@ import {
   getPublishedBlogCategoryBySlug,
   getPublishedBlogPosts,
 } from "@/lib/blog-posts";
+import { sanitizeRichTextHtml } from "@/lib/html";
 import { absoluteUrl, siteName } from "@/lib/site";
 
 const postsPerPage = 12;
@@ -229,7 +230,7 @@ export default async function BlogCategoryPage(props: PageProps) {
                         {post.title}
                       </Typography>
                       <Typography sx={{ color: "#5A4D43", fontSize: "0.88rem", lineHeight: 1.65, fontWeight: 600, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden", fontFamily: "var(--font-prompt), sans-serif" }}>
-                        {post.excerpt}
+                        <span dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(post.excerpt) }} />
                       </Typography>
                     </Stack>
                   </Box>

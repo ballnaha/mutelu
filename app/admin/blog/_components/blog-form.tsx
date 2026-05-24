@@ -407,6 +407,7 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
                     onChange={handleInputChange}
                     required
                     placeholder="เกริ่นนำบทความสั้นๆ เพื่อดึงดูดผู้อ่าน..."
+                    helperText="รองรับ HTML พื้นฐาน เช่น <strong>, <em>, <u>, <br>, <a href='...'>"
                     variant="outlined"
                     sx={{ "& .MuiOutlinedInput-root": { borderRadius: "14px" } }}
                   />

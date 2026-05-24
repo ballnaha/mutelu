@@ -350,9 +350,11 @@ export function Hero({ heroPosts = [], todayLuckyColor = null, luckyColorMonthLa
                 color: "#2D2520", 
                 fontWeight: 850, 
                 fontSize: { xs: "1.9rem", md: "2.8rem" }, 
-                lineHeight: 1.15, 
+                lineHeight: 1.36,
                 mb: 2,
                 fontFamily: "var(--font-prompt), sans-serif",
+                letterSpacing: 0,
+                py: 0.25,
                 textShadow: "2px 2px 0px #ffffff, -2px -2px 0px #ffffff, 2px -2px 0px #ffffff, -2px 2px 0px #ffffff"
               }}>
                 {mainStory.title}

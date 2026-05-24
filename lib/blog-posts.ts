@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { stripHtml } from "@/lib/html";
 
 export type BlogArticleSection = {
   type: "section";
@@ -258,7 +259,7 @@ function mapBlogPost(
     tags: stringArrayFromJson(post.tags),
     tableOfContents: sections.map((section) => section.heading),
     seoTitle: post.seoTitle ?? post.title,
-    seoDescription: post.seoDescription ?? post.excerpt,
+    seoDescription: post.seoDescription ?? stripHtml(post.excerpt),
     publishedAtIso: post.publishedAt?.toISOString() ?? null,
     updatedAtIso: post.updatedAt?.toISOString() ?? null,
   };
