@@ -68,11 +68,45 @@ export type BlogBlockInput =
       sortOrder: number;
     };
 
+export type HeroSlotAssignment = {
+  id: string;
+  title: string;
+  homeHeroSlot: number | null;
+};
+
 async function assertAdmin() {
   const session = await getServerSession(authOptions);
   if ((session?.user as { role?: string } | undefined)?.role !== "admin") {
     throw new Error("Unauthorized");
   }
+}
+
+function normalizeHeroSlot(featuredOnHome: unknown, homeHeroSlot: unknown) {
+  if (!featuredOnHome) return null;
+
+  const slot = Number(homeHeroSlot) || 1;
+  return Math.min(Math.max(slot, 1), 3);
+}
+
+async function releaseExistingHeroSlot(
+  tx: Prisma.TransactionClient,
+  homeHeroSlot: number | null,
+  exceptPostId?: string
+) {
+  if (!homeHeroSlot) return;
+
+  await tx.blogpost.updateMany({
+    where: {
+      featuredOnHome: true,
+      homeHeroSlot,
+      ...(exceptPostId ? { id: { not: exceptPostId } } : {}),
+    },
+    data: {
+      featuredOnHome: false,
+      homeHeroSlot: null,
+      updatedAt: new Date(),
+    },
+  });
 }
 
 export async function getBlogPosts() {
@@ -100,6 +134,40 @@ export async function getBlogPostById(id: string) {
   });
 }
 
+export async function getHeroSlotAssignments(): Promise<HeroSlotAssignment[]> {
+  return await prisma.blogpost.findMany({
+    where: {
+      featuredOnHome: true,
+      homeHeroSlot: { in: [1, 2, 3] },
+    },
+    select: {
+      id: true,
+      title: true,
+      homeHeroSlot: true,
+    },
+    orderBy: [
+      { homeHeroSlot: "asc" },
+      { updatedAt: "desc" },
+    ],
+  });
+}
+
+async function assertUniqueBlogSlug(slug: string, exceptPostId?: string) {
+  const existingPost = await prisma.blogpost.findFirst({
+    where: {
+      slug,
+      ...(exceptPostId ? { id: { not: exceptPostId } } : {}),
+    },
+    select: {
+      title: true,
+    },
+  });
+
+  if (existingPost) {
+    throw new Error(`URL Slug "${slug}" ถูกใช้แล้วโดยบทความ "${existingPost.title}" กรุณาเปลี่ยน slug ก่อนบันทึก`);
+  }
+}
+
 export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
   const {
     title,
@@ -120,9 +188,15 @@ export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
   const authorName = session?.user?.name || "mulamoon Admin";
   const authorRole = (session?.user as any)?.role === "admin" ? "ทีมบรรณาธิการ" : "นักเขียน";
   const authorImage = session?.user?.image || null;
+  const selectedHeroSlot = normalizeHeroSlot(featuredOnHome, homeHeroSlot);
 
-  const result = await prisma.blogpost.create({
-    data: {
+  await assertUniqueBlogSlug(slug);
+
+  const result = await prisma.$transaction(async (tx) => {
+    await releaseExistingHeroSlot(tx, selectedHeroSlot);
+
+    return await tx.blogpost.create({
+      data: {
       id: crypto.randomBytes(4).toString("hex"),
       title,
       slug,
@@ -132,8 +206,8 @@ export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
       authorRole,
       authorImage,
       heroImage,
-      featuredOnHome: Boolean(featuredOnHome),
-      homeHeroSlot: featuredOnHome ? Number(homeHeroSlot) || 1 : null,
+      featuredOnHome: Boolean(selectedHeroSlot),
+      homeHeroSlot: selectedHeroSlot,
       tags: tags || [],
       seoTitle,
       seoDescription,
@@ -170,7 +244,8 @@ export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
             updatedAt: new Date()
           }))
       }
-    }
+      }
+    });
   });
 
   revalidatePath("/admin/blog");
@@ -201,8 +276,14 @@ export async function updateBlogPost(id: string, data: any, blocks: BlogBlockInp
   const authorRole = (session?.user as any)?.role === "admin" ? "ทีมบรรณาธิการ" : "นักเขียน";
   const authorImage = session?.user?.image || null;
 
+  const selectedHeroSlot = normalizeHeroSlot(featuredOnHome, homeHeroSlot);
+
+  await assertUniqueBlogSlug(slug, id);
+
   // Transaction to update post and replace sections/products
   const result = await prisma.$transaction(async (tx) => {
+    await releaseExistingHeroSlot(tx, selectedHeroSlot, id);
+
     // Delete existing sections and products
     await tx.blogpostsection.deleteMany({ where: { postId: id } });
     await tx.blogaffiliateproduct.deleteMany({ where: { postId: id } });
@@ -219,8 +300,8 @@ export async function updateBlogPost(id: string, data: any, blocks: BlogBlockInp
         authorRole,
         authorImage,
         heroImage,
-        featuredOnHome: Boolean(featuredOnHome),
-        homeHeroSlot: featuredOnHome ? Number(homeHeroSlot) || 1 : null,
+        featuredOnHome: Boolean(selectedHeroSlot),
+        homeHeroSlot: selectedHeroSlot,
         tags: tags || [],
         seoTitle,
         seoDescription,

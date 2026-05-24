@@ -6,6 +6,10 @@ import {
   Box,
   Button,
   Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   Stack,
   Table,
@@ -42,12 +46,17 @@ export default function CategoryList({ categories }: CategoryListProps) {
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<CategoryRow | null>(null);
 
-  const handleDelete = async (category: CategoryRow) => {
+  const handleDelete = async () => {
+    if (!categoryToDelete) return;
+
+    const category = categoryToDelete;
     setDeletingId(category.id);
     try {
       await deleteCategory(category.id);
       showSnackbar("ลบหมวดหมู่เรียบร้อย", "success");
+      setCategoryToDelete(null);
       router.refresh();
     } catch (error) {
       console.error("Delete category failed:", error);
@@ -151,7 +160,7 @@ export default function CategoryList({ categories }: CategoryListProps) {
                       <IconButton
                         size="small"
                         disabled={deletingId === cat.id}
-                        onClick={() => handleDelete(cat)}
+                        onClick={() => setCategoryToDelete(cat)}
                         sx={{ color: "#64748b", "&:hover": { color: "#ef4444", bgcolor: "#fef2f2" } }}
                       >
                         <Trash size={18} color="#ef4444" />
@@ -173,6 +182,56 @@ export default function CategoryList({ categories }: CategoryListProps) {
           </Table>
         </TableContainer>
       </Card>
+
+      <Dialog
+        open={Boolean(categoryToDelete)}
+        onClose={() => {
+          if (!deletingId) setCategoryToDelete(null);
+        }}
+        maxWidth="xs"
+        fullWidth
+        slotProps={{ paper: { sx: { borderRadius: "24px", p: 1 } } }}
+      >
+        <DialogTitle sx={{ fontWeight: 900, color: "#0f172a", pb: 1 }}>
+          ยืนยันการลบหมวดหมู่
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={1.5} sx={{ pt: 0.5 }}>
+            <Typography sx={{ color: "#475569", fontWeight: 600, lineHeight: 1.8 }}>
+              ต้องการลบหมวดหมู่ “{categoryToDelete?.name}” ใช่ไหม?
+            </Typography>
+            {Boolean(categoryToDelete?._count.blogpost) && (
+              <Typography sx={{ color: "#dc2626", fontSize: "0.86rem", fontWeight: 700, lineHeight: 1.7 }}>
+                หมวดหมู่นี้มีบทความอยู่ {categoryToDelete?._count.blogpost} บทความ หากยังมีการผูกข้อมูลอยู่ ระบบอาจลบไม่สำเร็จ
+              </Typography>
+            )}
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button
+            onClick={() => setCategoryToDelete(null)}
+            disabled={Boolean(deletingId)}
+            sx={{ color: "#64748b", fontWeight: 800, borderRadius: "12px" }}
+          >
+            ยกเลิก
+          </Button>
+          <Button
+            onClick={handleDelete}
+            disabled={Boolean(deletingId)}
+            variant="contained"
+            sx={{
+              bgcolor: "#dc2626",
+              borderRadius: "12px",
+              px: 3,
+              fontWeight: 900,
+              boxShadow: "0 4px 12px rgba(220, 38, 38, 0.2)",
+              "&:hover": { bgcolor: "#b91c1c" },
+            }}
+          >
+            {deletingId ? "กำลังลบ..." : "ลบหมวดหมู่"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

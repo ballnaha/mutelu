@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import BlogForm from "../../_components/blog-form";
-import { getBlogPostById, getCategories } from "../../actions";
+import { getBlogPostById, getCategories, getHeroSlotAssignments } from "../../actions";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -11,9 +11,10 @@ type PageProps = {
 export default async function AdminEditBlogPostPage({ params }: PageProps) {
   await connection();
   const { id } = await params;
-  const [post, categories] = await Promise.all([
+  const [post, categories, heroSlotAssignments] = await Promise.all([
     getBlogPostById(id),
-    getCategories()
+    getCategories(),
+    getHeroSlotAssignments(),
   ]);
 
   if (!post) {
@@ -22,7 +23,7 @@ export default async function AdminEditBlogPostPage({ params }: PageProps) {
 
   return (
     <Box>
-      <BlogForm initialData={post} categories={categories} isEdit />
+      <BlogForm initialData={post} categories={categories} heroSlotAssignments={heroSlotAssignments} isEdit />
     </Box>
   );
 }

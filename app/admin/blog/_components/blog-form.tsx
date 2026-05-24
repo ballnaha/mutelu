@@ -18,7 +18,8 @@ import {
   Tab,
   FormControlLabel,
   Switch,
-  Autocomplete
+  Autocomplete,
+  Alert
 } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -41,12 +42,14 @@ import {
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSnackbar } from "../../_context/snackbar-context";
-import { BlogBlockInput, createBlogPost, updateBlogPost, uploadImage, deleteImage } from "../actions";
+import { createBlogPost, updateBlogPost, uploadImage, deleteImage } from "../actions";
+import type { BlogBlockInput, HeroSlotAssignment } from "../actions";
 import ImageUpload from "./image-upload";
 
 type BlogFormProps = {
   initialData?: any;
   categories: any[];
+  heroSlotAssignments?: HeroSlotAssignment[];
   isEdit?: boolean;
 };
 
@@ -97,7 +100,11 @@ function getPlatformLabel(platform: string) {
   return labels[platform] ?? platform;
 }
 
-export default function BlogForm({ initialData, categories, isEdit = false }: BlogFormProps) {
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "เกิดข้อผิดพลาดในการบันทึกข้อมูล";
+}
+
+export default function BlogForm({ initialData, categories, heroSlotAssignments = [], isEdit = false }: BlogFormProps) {
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
   const [activeTab, setActiveTab] = useState(0);
@@ -119,6 +126,10 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
     status: initialData?.status || "DRAFT",
     publishedAt: (initialData?.publishedAt ? dayjs(initialData.publishedAt) : dayjs()) as Dayjs | null,
   });
+  const selectedHeroSlot = Number(formData.homeHeroSlot) || 1;
+  const heroSlotConflict = formData.featuredOnHome
+    ? heroSlotAssignments.find((item) => item.homeHeroSlot === selectedHeroSlot && item.id !== initialData?.id)
+    : undefined;
 
   // Blocks State
   const [blocks, setBlocks] = useState<BlogBlockInput[]>(() => {
@@ -267,7 +278,7 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
       router.refresh();
     } catch (err) {
       console.error(err);
-      showSnackbar("เกิดข้อผิดพลาดในการบันทึกข้อมูล", "error");
+      showSnackbar(getErrorMessage(err), "error");
     } finally {
       setLoading(false);
     }
@@ -452,7 +463,8 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
                   />
 
                   {formData.featuredOnHome && (
-                    <TextField
+                    <Stack spacing={1.25}>
+                      <TextField
                       fullWidth
                       select
                       label="ตำแหน่งใน Hero หน้าแรก"
@@ -460,12 +472,19 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
                       onChange={(event) => setFormData(prev => ({ ...prev, homeHeroSlot: Number(event.target.value) }))}
                       helperText="ตำแหน่ง 1 คือการ์ดใหญ่ ส่วน 2 และ 3 คือการ์ดย่อยด้านขวา"
                       variant="outlined"
+                      color={heroSlotConflict ? "warning" : "primary"}
                       sx={{ "& .MuiOutlinedInput-root": { borderRadius: "14px" } }}
                     >
                       <MenuItem value={1}>ตำแหน่ง 1 - การ์ดใหญ่</MenuItem>
                       <MenuItem value={2}>ตำแหน่ง 2 - การ์ดย่อยบน</MenuItem>
                       <MenuItem value={3}>ตำแหน่ง 3 - การ์ดย่อยล่าง</MenuItem>
-                    </TextField>
+                      </TextField>
+                      {heroSlotConflict && (
+                        <Alert severity="warning" sx={{ borderRadius: "12px", fontWeight: 700 }}>
+                          Hero #{selectedHeroSlot} ถูกใช้โดย “{heroSlotConflict.title}” อยู่ หากบันทึกบทความนี้ บทความเดิมจะถูกถอดออกจาก Hero อัตโนมัติ
+                        </Alert>
+                      )}
+                    </Stack>
                   )}
                 </Stack>
               </Card>
@@ -502,7 +521,7 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
                       key={idx}
                       elevation={0}
                       sx={{
-                        p: 3,
+                        p: { xs: 2.5, md: block.type === "section" ? 4 : 3 },
                         borderRadius: "20px",
                         border: "1px solid #f1f5f9",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
@@ -525,7 +544,7 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
                         </IconButton>
                       </Stack>
 
-                      <Stack spacing={2.5}>
+                      <Stack spacing={block.type === "section" ? 3 : 2.5}>
                         <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
                           <Box sx={{ width: 32, height: 32, borderRadius: "8px", display: "grid", placeItems: "center", bgcolor: block.type === "section" ? "#eff2ff" : "#ecfdf5" }}>
                             {block.type === "section" ? <DocumentText size={18} color="#4f46e5" /> : <Shop size={18} color="#10b981" />}
@@ -543,18 +562,40 @@ export default function BlogForm({ initialData, categories, isEdit = false }: Bl
                               value={block.heading}
                               onChange={(e) => updateBlock(idx, { heading: e.target.value })}
                               variant="outlined"
-                              sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
+                              sx={{
+                                "& .MuiOutlinedInput-root": {
+                                  borderRadius: "12px",
+                                  fontSize: "1.05rem",
+                                  fontWeight: 700,
+                                },
+                              }}
                             />
                             <TextField
                               fullWidth
                               multiline
-                              rows={4}
+                              minRows={10}
+                              maxRows={22}
                               label="เนื้อหา (Paragraphs - คั่นด้วยบรรทัดใหม่)"
                               value={block.paragraphs.join("\n")}
                               onChange={(e) => updateBlock(idx, { paragraphs: e.target.value.split("\n") })}
                               helperText="รองรับ HTML Tag (เช่น <a href='...'>ลิงก์</a>, <b>ตัวหนา</b>, <span style='color:red'>ใส่สี</span>)"
                               variant="outlined"
-                              sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
+                              sx={{
+                                "& .MuiOutlinedInput-root": {
+                                  borderRadius: "14px",
+                                  alignItems: "flex-start",
+                                  fontSize: "0.98rem",
+                                  lineHeight: 1.75,
+                                  fontFamily: "Consolas, 'Courier New', var(--font-prompt), monospace",
+                                },
+                                "& textarea": {
+                                  lineHeight: 1.75,
+                                },
+                                "& .MuiFormHelperText-root": {
+                                  fontSize: "0.78rem",
+                                  lineHeight: 1.6,
+                                },
+                              }}
                             />
                           </>
                         ) : (
