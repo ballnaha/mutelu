@@ -212,7 +212,7 @@ export default async function Home() {
           }}
         >
           {[
-            { emoji: "👁️", value: "50,000+", label: "คนต่อเดือน", color: "#FF8E9E" },
+            
             { emoji: "📅", value: "อัปเดต", label: "ทุกวัน", color: "#FFF066" },
             { emoji: "🔮", value: "4 เครื่องมือ", label: "ดูดวงฟรี", color: "#B3D9FF" },
             { emoji: "🇹🇭", value: "ภาษาไทย", label: "100%", color: "#C9F5D3" },
