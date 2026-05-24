@@ -272,27 +272,46 @@ export default function TarotUploader({ initialCards }: { initialCards: TarotUpl
                         />
                       </Stack>
 
-                      <Stack spacing={1}>
+                      <Stack direction="row" spacing={1} sx={{ alignItems: "center", flexWrap: "wrap", rowGap: 1 }}>
                         <Button
-                          variant="contained"
+                          size="small"
+                          variant="outlined"
                           disabled={isPending}
                           onClick={() => inputRefs.current[card.id]?.click()}
-                          startIcon={isUploading && !isDeleting ? <DocumentUpload size={18} color="currentColor" /> : <GalleryAdd size={18} color="currentColor" />}
-                          fullWidth
-                          sx={{ borderRadius: "10px", fontWeight: 800, bgcolor: "#0f172a", "&:hover": { bgcolor: "#1e293b" } }}
+                          startIcon={isUploading && !isDeleting ? <DocumentUpload size={16} color="currentColor" /> : <GalleryAdd size={16} color="currentColor" />}
+                          sx={{
+                            minHeight: 32,
+                            borderRadius: "999px",
+                            px: 1.5,
+                            fontSize: "0.75rem",
+                            fontWeight: 800,
+                            color: "#0f172a",
+                            borderColor: "#cbd5e1",
+                            bgcolor: "#fff",
+                            "&:hover": { bgcolor: "#f8fafc", borderColor: "#94a3b8" },
+                          }}
                         >
-                          {isUploading && !isDeleting ? "กำลังอัปโหลด" : "อัปโหลดรูป"}
+                          {isUploading && !isDeleting ? "กำลังอัปโหลด" : "อัปโหลด"}
                         </Button>
                         <Button
-                          variant="outlined"
+                          size="small"
+                          variant="text"
                           color="error"
                           disabled={isPending || !card.hasWebp}
                           onClick={() => handleDelete(card)}
-                          startIcon={<CloseCircle size={18} color="currentColor" />}
-                          fullWidth
-                          sx={{ borderRadius: "10px", fontWeight: 800 }}
+                          startIcon={<CloseCircle size={16} color="currentColor" />}
+                          sx={{
+                            minHeight: 32,
+                            borderRadius: "999px",
+                            px: 1.25,
+                            fontSize: "0.75rem",
+                            fontWeight: 800,
+                            color: "#dc2626",
+                            "&:hover": { bgcolor: "#fef2f2" },
+                            "&.Mui-disabled": { color: "#cbd5e1" },
+                          }}
                         >
-                          {isDeleting ? "กำลังลบ..." : "ลบรูป WebP"}
+                          {isDeleting ? "กำลังลบ..." : "ลบ"}
                         </Button>
                       </Stack>
                     </Stack>

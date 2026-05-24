@@ -9,6 +9,7 @@ import {
   TableContainer, 
   TableHead, 
   TableRow, 
+  TablePagination,
   Typography, 
   Stack, 
   Avatar, 
@@ -19,7 +20,9 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Button
+  Button,
+  MenuItem,
+  TextField
 } from "@mui/material";
 import { Edit2, Trash, Eye, User, Flash } from "iconsax-react";
 import { format } from "date-fns";
@@ -35,10 +38,45 @@ interface BlogTableProps {
 export default function BlogTable({ initialPosts }: BlogTableProps) {
   const { showSnackbar } = useSnackbar();
   const [deletedPostIds, setDeletedPostIds] = useState<Set<string>>(() => new Set());
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [heroFilter, setHeroFilter] = useState("all");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<{ id: string; title: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const posts = initialPosts.filter((post) => !deletedPostIds.has(post.id));
+  const activePosts = initialPosts.filter((post) => !deletedPostIds.has(post.id));
+  const categoryOptions = Array.from(
+    new Map(
+      activePosts
+        .filter((post) => post.blogcategory?.id)
+        .map((post) => [post.blogcategory.id, post.blogcategory.name])
+    )
+  );
+  const hasActiveFilters = Boolean(searchQuery.trim()) || statusFilter !== "all" || categoryFilter !== "all" || heroFilter !== "all";
+  const posts = activePosts.filter((post) => {
+    const keyword = searchQuery.trim().toLowerCase();
+    const matchesSearch = !keyword || [
+      post.title,
+      post.slug,
+      post.excerpt,
+      post.authorName,
+      post.blogcategory?.name,
+    ].some((value) => String(value || "").toLowerCase().includes(keyword));
+    const matchesStatus = statusFilter === "all" || post.status === statusFilter;
+    const matchesCategory = categoryFilter === "all" || post.blogcategory?.id === categoryFilter;
+    const matchesHero =
+      heroFilter === "all" ||
+      (heroFilter === "none" && !post.featuredOnHome) ||
+      (post.featuredOnHome && String(post.homeHeroSlot || 1) === heroFilter);
+
+    return matchesSearch && matchesStatus && matchesCategory && matchesHero;
+  });
+  const paginatedPosts = posts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
+  const resetPage = () => setPage(0);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -74,6 +112,103 @@ export default function BlogTable({ initialPosts }: BlogTableProps) {
 
   return (
     <>
+      <Box sx={{ p: 2.5, borderBottom: "1px solid #f1f5f9", bgcolor: "#fff" }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 1.5, alignItems: "center" }}>
+          <Box sx={{ gridColumn: { xs: "span 12", md: "span 4" } }}>
+            <TextField
+              fullWidth
+              size="small"
+              label="ค้นหาบทความ"
+              placeholder="ชื่อ, slug, คำโปรย, ผู้เขียน"
+              value={searchQuery}
+              onChange={(event) => {
+                setSearchQuery(event.target.value);
+                resetPage();
+              }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+            />
+          </Box>
+          <Box sx={{ gridColumn: { xs: "span 12", sm: "span 4", md: "span 2" } }}>
+            <TextField
+              fullWidth
+              select
+              size="small"
+              label="สถานะ"
+              value={statusFilter}
+              onChange={(event) => {
+                setStatusFilter(event.target.value);
+                resetPage();
+              }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+            >
+              <MenuItem value="all">ทั้งหมด</MenuItem>
+              <MenuItem value="PUBLISHED">เผยแพร่แล้ว</MenuItem>
+              <MenuItem value="DRAFT">ฉบับร่าง</MenuItem>
+              <MenuItem value="ARCHIVED">เก็บถาวร</MenuItem>
+            </TextField>
+          </Box>
+          <Box sx={{ gridColumn: { xs: "span 12", sm: "span 4", md: "span 3" } }}>
+            <TextField
+              fullWidth
+              select
+              size="small"
+              label="หมวดหมู่"
+              value={categoryFilter}
+              onChange={(event) => {
+                setCategoryFilter(event.target.value);
+                resetPage();
+              }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+            >
+              <MenuItem value="all">ทั้งหมด</MenuItem>
+              {categoryOptions.map(([id, name]) => (
+                <MenuItem key={id} value={id}>
+                  {name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+          <Box sx={{ gridColumn: { xs: "span 12", sm: "span 4", md: "span 2" } }}>
+            <TextField
+              fullWidth
+              select
+              size="small"
+              label="Hero"
+              value={heroFilter}
+              onChange={(event) => {
+                setHeroFilter(event.target.value);
+                resetPage();
+              }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+            >
+              <MenuItem value="all">ทั้งหมด</MenuItem>
+              <MenuItem value="1">Hero #1</MenuItem>
+              <MenuItem value="2">Hero #2</MenuItem>
+              <MenuItem value="3">Hero #3</MenuItem>
+              <MenuItem value="none">ไม่อยู่ Hero</MenuItem>
+            </TextField>
+          </Box>
+          <Box sx={{ gridColumn: { xs: "span 12", md: "span 1" }, display: "flex", justifyContent: { xs: "flex-start", md: "flex-end" } }}>
+            <Button
+              disabled={!hasActiveFilters}
+              onClick={() => {
+                setSearchQuery("");
+                setStatusFilter("all");
+                setCategoryFilter("all");
+                setHeroFilter("all");
+                resetPage();
+              }}
+              sx={{ borderRadius: "12px", fontWeight: 800, color: "#64748b" }}
+            >
+              ล้าง
+            </Button>
+          </Box>
+        </Box>
+        <Typography sx={{ mt: 1.5, color: "#94a3b8", fontSize: "0.78rem", fontWeight: 700 }}>
+          แสดง {posts.length} จาก {activePosts.length} บทความ
+        </Typography>
+      </Box>
+
       <TableContainer>
         <Table sx={{ minWidth: 800 }}>
           <TableHead>
@@ -86,7 +221,7 @@ export default function BlogTable({ initialPosts }: BlogTableProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {posts.map((post: any) => {
+            {paginatedPosts.map((post: any) => {
               const status = getStatusColor(post.status);
               return (
                 <TableRow key={post.id} hover sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
@@ -165,7 +300,7 @@ export default function BlogTable({ initialPosts }: BlogTableProps) {
               <TableRow>
                 <TableCell colSpan={5} sx={{ textAlign: "center", py: 10 }}>
                   <Typography sx={{ color: "#94a3b8", fontWeight: 600 }}>
-                    ยังไม่มีบทความในระบบ
+                    {activePosts.length === 0 ? "ยังไม่มีบทความในระบบ" : "ไม่พบบทความตามเงื่อนไขที่เลือก"}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -173,6 +308,29 @@ export default function BlogTable({ initialPosts }: BlogTableProps) {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <TablePagination
+        component="div"
+        count={posts.length}
+        page={page}
+        onPageChange={(_, nextPage) => setPage(nextPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(event) => {
+          setRowsPerPage(Number(event.target.value));
+          setPage(0);
+        }}
+        rowsPerPageOptions={[10, 20, 50]}
+        labelRowsPerPage="แถวต่อหน้า"
+        labelDisplayedRows={({ from, to, count }) => `${from}-${to} จาก ${count}`}
+        sx={{
+          borderTop: "1px solid #f1f5f9",
+          "& .MuiTablePagination-toolbar": { px: 2.5 },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+            fontWeight: 700,
+            color: "#64748b",
+          },
+        }}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog
