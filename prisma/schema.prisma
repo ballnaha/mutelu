@@ -152,9 +152,10 @@ model MasterAffiliateProduct {
   element     Element  @default(NONE)
   category    String   @default("general")
   aspect      String   @default("general")
+  placements  Json?
   isActive    Boolean  @default(true)
   rating      Float?   @default(4.9)
-  reviewCount Int?     @default(120)
+  reviewCount String?  @default("120")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   blogaffiliateproduct blogaffiliateproduct[]

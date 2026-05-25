@@ -33,7 +33,7 @@ export type LuckyItemProduct = {
   category: string;
   aspect: string;
   rating?: number | null;
-  reviewCount?: number | null;
+  reviewCount?: number | string | null;
   images?: unknown;
 };
 
@@ -84,7 +84,7 @@ const formatPrice = (priceVal: string | null | undefined) => {
   if (!priceVal) return "";
   const trimmed = priceVal.trim();
   if (!trimmed) return "";
-  if (/^\d/.test(trimmed)) {
+  if (/^\d/.test(trimmed) && !/[฿บาท]/.test(trimmed)) {
     return `฿${trimmed}`;
   }
   return trimmed;
@@ -164,7 +164,7 @@ export function LuckyItemCard({ product }: { product: LuckyItemProduct }) {
   const ownProduct = isOwnProduct(product);
   const btnStyle = getPlatformBtnStyle(product.platform, ownProduct);
   const rating = product.rating?.toFixed(1) ?? "4.9";
-  const reviewCount = product.reviewCount ?? 120;
+  const reviewCount = product.reviewCount ?? "120";
   const aspectLabel = aspectLabels[product.aspect] ?? aspectLabels.general;
   const elementLabel = elementLabels[product.element] ?? "ใช้ได้ทั่วไป";
 

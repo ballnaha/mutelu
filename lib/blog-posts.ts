@@ -17,7 +17,7 @@ export type BlogAffiliateItem = {
   image: string;
   priceLabel: string;
   rating?: number | null;
-  reviewCount?: number | null;
+  reviewCount?: number | string | null;
   originalPrice?: string | null;
   highlights: string[];
   badge: string;
@@ -132,7 +132,7 @@ type BlogAffiliateProductRow = {
   image: string | null;
   priceLabel: string | null;
   rating: number | null;
-  reviewCount: number | null;
+  reviewCount: number | string | null;
   originalPrice: string | null;
   highlights: unknown;
   badge: string | null;

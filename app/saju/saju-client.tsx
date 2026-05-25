@@ -38,6 +38,7 @@ import {
 } from "iconsax-react";
 import { AffiliateCard } from "../components/affiliate-card";
 import { calculateSaju, type AnnualInfluence, type BirthGender, type ElementKey, type Pillar, type SajuReading } from "@/lib/saju-calculator";
+import { selectDailyItems } from "@/lib/daily-random";
 
 // --- Types & Constants ---
 
@@ -52,7 +53,7 @@ type SajuAffiliateProduct = {
   platform?: string;
   productSlug?: string | null;
   rating?: number | null;
-  reviewCount?: number | null;
+  reviewCount?: number | string | null;
   images?: any;
   productType?: string | null;
   internalSlug?: string | null;
@@ -1728,7 +1729,7 @@ export function SajuClient() {
           const elementEnum = luckyElement.toUpperCase();
           const res = await fetch(`/api/affiliate?element=${elementEnum}`);
           const data = await res.json();
-          setAffiliateProducts(data);
+          setAffiliateProducts(Array.isArray(data) ? selectDailyItems(data, 3, `saju-${elementEnum}`) : []);
         } catch (error) {
           console.error("Failed to fetch affiliates:", error);
         } finally {

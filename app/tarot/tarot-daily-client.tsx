@@ -52,6 +52,7 @@ import {
 import { AffiliateCard } from "../components/affiliate-card";
 import { encodeTarotShareCards } from "@/lib/tarot-share-warning";
 import { openFacebookShare } from "@/lib/facebook-share";
+import { selectDailyItems } from "@/lib/daily-random";
 
 type TarotAffiliateProduct = {
   id: string;
@@ -69,7 +70,7 @@ type TarotAffiliateProduct = {
   aspect?: string | null;
   element?: string | null;
   rating?: number | null;
-  reviewCount?: number | null;
+  reviewCount?: number | string | null;
   images?: any;
 };
 
@@ -883,11 +884,15 @@ export function TarotDailyClient() {
       }
     }
 
+    if (matched.length >= 3) {
+      return selectDailyItems(matched, 3, `tarot-${detectedCat || personalZodiac?.element || "general"}`);
+    }
+
     // 3. Robust Padding fallback: If we still have fewer than 3 items, fill up from the active pool
     if (matched.length < 3) {
       const remainingCount = 3 - matched.length;
       const otherProducts = allProducts.filter(p => !matched.some(m => m.id === p.id));
-      matched = [...matched, ...otherProducts.slice(0, remainingCount)];
+      matched = [...matched, ...selectDailyItems(otherProducts, remainingCount, `tarot-fallback-${detectedCat || personalZodiac?.element || "general"}`)];
     }
 
     return matched.slice(0, 3);

@@ -280,11 +280,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         component="main"
         sx={{
           flexGrow: 1,
-          p: { xs: 3, md: 4 },
+          p: { xs: 1.5, sm: 3, md: 4 },
           width: { md: `calc(100% - ${drawerWidth}px)` },
           mt: { xs: 8, md: 0 },
           bgcolor: "#f8f9fa", // Light background for admin panel
-          minHeight: "100vh"
+          minHeight: "100vh",
+          minWidth: 0,
         }}
       >
         <SnackbarProvider>

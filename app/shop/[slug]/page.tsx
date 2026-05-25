@@ -15,7 +15,7 @@ const formatPrice = (priceVal: string | null | undefined) => {
   if (!priceVal) return "";
   const trimmed = priceVal.trim();
   if (!trimmed) return "";
-  if (/^\d/.test(trimmed)) {
+  if (/^\d/.test(trimmed) && !/[฿บาท]/.test(trimmed)) {
     return `฿${trimmed}`;
   }
   return trimmed;

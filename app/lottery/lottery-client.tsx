@@ -5,6 +5,7 @@ import { Alert, Box, Button, CircularProgress, Container, Stack, Typography } fr
 import { Calendar, Cup, Refresh, ShieldTick, MagicStar } from "iconsax-react";
 import type { LotteryApiPayload, LotteryCheckMatch, LotteryDraw, LotteryHistoryItem } from "@/lib/lottery";
 import { checkLotteryNumber } from "@/lib/lottery";
+import { selectDailyItems } from "@/lib/daily-random";
 import { AffiliateCard } from "../components/affiliate-card";
 
 type LotteryClientProps = {
@@ -54,7 +55,7 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
       .then((data) => {
         if (Array.isArray(data)) {
           const wealth = data.filter((p: any) => p.aspect?.toLowerCase() === "wealth");
-          setWealthProducts(wealth.length > 0 ? wealth.slice(0, 3) : data.slice(0, 3));
+          setWealthProducts(selectDailyItems(wealth.length > 0 ? wealth : data, 3, "lottery-wealth"));
         }
       })
       .catch((err) => console.error("Failed to load wealth affiliate products:", err));

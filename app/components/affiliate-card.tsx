@@ -87,7 +87,7 @@ const formatPrice = (priceVal: string | null | undefined) => {
   if (!priceVal) return "";
   const trimmed = priceVal.trim();
   if (!trimmed) return "";
-  if (/^\d/.test(trimmed)) {
+  if (/^\d/.test(trimmed) && !/[฿บาท]/.test(trimmed)) {
     return `฿${trimmed}`;
   }
   return trimmed;
@@ -213,7 +213,7 @@ export function AffiliateCard({
 
   const fallbackStats = getHashStats(name);
   const rating = propRating !== undefined && propRating !== null && propRating !== "" ? Number(propRating).toFixed(1) : fallbackStats.rating;
-  const reviews = propReviewCount !== undefined && propReviewCount !== null && propReviewCount !== "" ? Number(propReviewCount) : fallbackStats.reviews;
+  const reviews = propReviewCount !== undefined && propReviewCount !== null && propReviewCount !== "" ? String(propReviewCount) : String(fallbackStats.reviews);
   const discountStats = getSlashedPrice(price, propOriginalPrice);
 
   // Platform specific branding colors

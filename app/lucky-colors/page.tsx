@@ -8,6 +8,7 @@ import { Header } from "@/app/components/header";
 import { getMonthlyLuckyColors, type LuckyColor } from "@/lib/lucky-colors";
 import { prisma } from "@/lib/prisma";
 import { AffiliateCard } from "@/app/components/affiliate-card";
+import { selectDailyItems } from "@/lib/daily-random";
 
 export const metadata: Metadata = {
   title: "สีเสื้อมงคลประจำเดือน | mulamoon.",
@@ -285,12 +286,20 @@ export default async function LuckyColorsPage() {
 
   const featuredDay = data.today ?? data.days[0];
 
-  // Fetch 3 active master products for the same 3-column layout as Tarot.
-  const products = await prisma.masterAffiliateProduct.findMany({
+  const luckyColorProducts = await prisma.$queryRaw<any[]>`
+    SELECT *
+    FROM MasterAffiliateProduct
+    WHERE isActive = true
+      AND JSON_CONTAINS(placements, JSON_QUOTE('LUCKY_COLORS'))
+    ORDER BY createdAt DESC
+  `;
+
+  // Admin can pin products here by selecting the "หน้า สีมงคล" placement.
+  const fallbackProducts = luckyColorProducts.length > 0 ? [] : await prisma.masterAffiliateProduct.findMany({
     where: { isActive: true },
     orderBy: { createdAt: "desc" },
-    take: 3,
   });
+  const products = selectDailyItems(luckyColorProducts.length > 0 ? luckyColorProducts : fallbackProducts, 3, "lucky-colors");
 
   return (
     <Box sx={{ bgcolor: "#FFFDF9", minHeight: "100vh", color: "#2D2520" }}>
@@ -495,7 +504,7 @@ export default async function LuckyColorsPage() {
 
                 {products.length > 0 ? (
                   <Typography sx={{ display: { xs: "none", md: "block" }, color: "#5A4D43", fontSize: "0.65rem", textAlign: "center", mt: 2.5, fontStyle: "italic", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
-                    * แนะนำตามพลังสีมงคลและสินค้า active ล่าสุด
+                    * แนะนำจากตำแหน่งแสดงผล "หน้า สีมงคล" ในหลังบ้าน
                   </Typography>
                 ) : null}
               </Box>

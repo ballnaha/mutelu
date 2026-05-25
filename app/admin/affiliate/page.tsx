@@ -5,12 +5,14 @@ import {
   Avatar,
   Box,
   Button,
+  Checkbox,
   Chip,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   IconButton,
   MenuItem,
   Paper,
@@ -25,6 +27,8 @@ import {
   Tabs,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { Add, Edit, Eye, EyeSlash, Refresh, Shop, Trash } from "iconsax-react";
 import { deleteImage, uploadProductImage } from "../blog/actions";
@@ -38,7 +42,7 @@ const formatPrice = (priceVal: string | null | undefined) => {
   if (!priceVal) return "";
   const trimmed = priceVal.trim();
   if (!trimmed) return "";
-  if (/^\d/.test(trimmed)) {
+  if (/^\d/.test(trimmed) && !/[฿บาท]/.test(trimmed)) {
     return `฿${trimmed}`;
   }
   return trimmed;
@@ -67,6 +71,10 @@ const ASPECTS = [
   { value: "career", label: "เสริมดวงการงาน/การเรียน (Career)" },
   { value: "wealth", label: "เสริมดวงการเงิน/โชคลาภ (Wealth)" },
   { value: "health", label: "เสริมสุขภาพกายใจ/พลังชีวิต (Health)" },
+];
+
+const PLACEMENT_OPTIONS = [
+  { value: "LUCKY_COLORS", label: "หน้า สีมงคล" },
 ];
 
 const RETAIL_CATEGORIES = [
@@ -104,7 +112,8 @@ interface Product {
   aspect: string;
   isActive: boolean;
   rating?: number | null;
-  reviewCount?: number | null;
+  reviewCount?: number | string | null;
+  placements?: unknown;
   _count?: {
     blogaffiliateproduct: number;
   };
@@ -135,6 +144,7 @@ type ProductFormData = {
   aspect: string;
   rating: string;
   reviewCount: string;
+  placements: string[];
 };
 
 type ProductFilters = {
@@ -165,6 +175,7 @@ const emptyForm: ProductFormData = {
   aspect: "general",
   rating: "4.9",
   reviewCount: "120",
+  placements: [],
 };
 
 const emptyProductFilters: ProductFilters = {
@@ -212,7 +223,26 @@ function parseProductImages(images: unknown) {
   return [];
 }
 
+function parseProductPlacements(placements: unknown) {
+  if (Array.isArray(placements)) {
+    return placements.filter((item): item is string => typeof item === "string" && item.trim() !== "");
+  }
+
+  if (typeof placements === "string") {
+    try {
+      const parsed = JSON.parse(placements);
+      return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string" && item.trim() !== "") : [];
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
 export default function AdminAffiliatePage() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
@@ -227,6 +257,7 @@ export default function AdminAffiliatePage() {
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [isProductDeleting, setIsProductDeleting] = useState(false);
   const [deletingCategory, setDeletingCategory] = useState<AffiliateCategory | null>(null);
+  const [categoryDeleteMessage, setCategoryDeleteMessage] = useState("");
   const [isCategorySaving, setIsCategorySaving] = useState(false);
   const [productFilters, setProductFilters] = useState<ProductFilters>(emptyProductFilters);
 
@@ -333,6 +364,7 @@ export default function AdminAffiliatePage() {
         aspect: product.aspect || "general",
         rating: product.rating?.toString() ?? "4.9",
         reviewCount: product.reviewCount?.toString() ?? "120",
+        placements: parseProductPlacements(product.placements),
       });
     } else {
       setEditingProduct(null);
@@ -388,7 +420,7 @@ export default function AdminAffiliatePage() {
         productSlug: formData.productType === "OWN_PRODUCT" ? "" : formData.productSlug,
         internalSlug: formData.productType === "OWN_PRODUCT" ? formData.internalSlug : "",
         rating: formData.rating ? parseFloat(formData.rating) : 4.9,
-        reviewCount: formData.reviewCount ? parseInt(formData.reviewCount, 10) : 120,
+        reviewCount: formData.reviewCount.trim() || "120",
         originalPrice: formData.originalPrice || null,
       };
 
@@ -530,24 +562,34 @@ export default function AdminAffiliatePage() {
 
   const handleOpenDeleteCategory = (category: AffiliateCategory) => {
     if (editingCategory?.id === category.id) handleCancelEditCategory();
+    setCategoryDeleteMessage("");
     setDeletingCategory(category);
+  };
+
+  const handleCloseDeleteCategory = () => {
+    if (isCategorySaving) return;
+    setDeletingCategory(null);
+    setCategoryDeleteMessage("");
   };
 
   const handleDeleteCategory = async () => {
     if (!deletingCategory || isCategorySaving) return;
 
     setIsCategorySaving(true);
+    setCategoryDeleteMessage("");
     try {
       const res = await fetch(`/api/affiliate-categories?id=${encodeURIComponent(deletingCategory.id)}`, { method: "DELETE" });
       if (res.ok) {
         setDeletingCategory(null);
+        setCategoryDeleteMessage("");
         await fetchCategories();
       } else {
         const data = await res.json();
-        alert(data.error === "Category is used by products" ? "ประเภทนี้ถูกใช้อยู่ในสินค้า ให้ปิดสถานะแทนการลบ" : data.error || "ไม่สามารถลบประเภทสินค้าได้");
+        setCategoryDeleteMessage(data.error === "Category is used by products" ? "ประเภทนี้ถูกใช้อยู่ในสินค้า ให้ปิดสถานะแทนการลบ" : data.error || "ไม่สามารถลบประเภทสินค้าได้");
       }
     } catch (error) {
       console.error("Delete category error:", error);
+      setCategoryDeleteMessage("ไม่สามารถลบประเภทสินค้าได้");
     } finally {
       setIsCategorySaving(false);
     }
@@ -612,37 +654,41 @@ export default function AdminAffiliatePage() {
 
   return (
     <Box>
-      <Stack direction="row" sx={{ mb: 4, justifyContent: "space-between", alignItems: "center" }}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={{ xs: 1.5, sm: 2 }}
+        sx={{ mb: { xs: 2.5, sm: 4 }, justifyContent: "space-between", alignItems: { xs: "stretch", sm: "center" } }}
+      >
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 900, mb: 1, color: "#0f172a" }}>
+          <Typography variant="h4" sx={{ fontWeight: 900, mb: 1, color: "#0f172a", fontSize: { xs: "1.65rem", sm: "2.125rem" } }}>
             จัดการสินค้า Affiliate
           </Typography>
-          <Typography sx={{ color: "#64748b" }}>
+          <Typography sx={{ color: "#64748b", fontSize: { xs: "0.88rem", sm: "1rem" }, lineHeight: 1.55 }}>
             คลังสินค้ากลางสำหรับ Saju และสินค้าที่แทรกในบทความ
           </Typography>
         </Box>
-        <Stack direction="row" spacing={2}>
-          <Button variant="outlined" startIcon={<Refresh size={20} color="currentColor" />} onClick={() => fetchProducts()} sx={{ borderRadius: "12px", fontWeight: 700 }}>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
+          <Button variant="outlined" startIcon={<Refresh size={20} color="currentColor" />} onClick={() => fetchProducts()} sx={{ borderRadius: "12px", fontWeight: 700, justifyContent: "center" }}>
             รีเฟรช
           </Button>
-          <Button variant="contained" startIcon={<Add size={20} color="white" />} onClick={() => handleOpen()} sx={{ borderRadius: "12px", bgcolor: "var(--primary)", fontWeight: 700 }}>
+          <Button variant="contained" startIcon={<Add size={20} color="white" />} onClick={() => handleOpen()} sx={{ borderRadius: "12px", bgcolor: "var(--primary)", fontWeight: 700, justifyContent: "center" }}>
             เพิ่มสินค้าใหม่
           </Button>
         </Stack>
       </Stack>
 
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 2, mb: 3 }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: { xs: 1, sm: 2 }, mb: { xs: 2, sm: 3 } }}>
         <SummaryCard title="สินค้าทั้งหมด" value={products.length} />
         <SummaryCard title="ใช้ใน Saju" value={sajuProducts.length} />
         <SummaryCard title="ใช้ใน Tarot" value={tarotProducts.length} />
         <SummaryCard title="ใช้ใน Blog" value={blogProducts.length} />
       </Box>
 
-      <Paper elevation={0} sx={{ p: 2.5, mb: 3, borderRadius: "18px", border: "1px solid #e2e8f0" }}>
+      <Paper elevation={0} sx={{ p: { xs: 1.25, sm: 2.5 }, mb: { xs: 2, sm: 3 }, borderRadius: { xs: "14px", sm: "18px" }, border: "1px solid #e2e8f0" }}>
         <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ justifyContent: "space-between", alignItems: { xs: "stretch", md: "center" }, mb: 2 }}>
           <Box>
             <Typography sx={{ fontWeight: 900, color: "#0f172a" }}>ประเภทสินค้า Affiliate</Typography>
-            <Typography sx={{ color: "#64748b", fontSize: "0.85rem" }}>รายการนี้ใช้ร่วมกับ dropdown สินค้าและตัวกรองหน้า /lucky-items</Typography>
+            <Typography sx={{ color: "#64748b", fontSize: "0.85rem" }}>ประเภทสินค้าใช้จัดหมวดสินค้า ส่วนตำแหน่งแสดงผลเลือกได้ในฟอร์มสินค้า</Typography>
           </Box>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.2} sx={{ minWidth: { md: 420 } }}>
             <TextField
@@ -660,7 +706,7 @@ export default function AdminAffiliatePage() {
               disabled={!categoryName.trim() || isCategorySaving}
               onClick={handleCreateCategory}
               startIcon={isCategorySaving ? <CircularProgress size={16} sx={{ color: "#fff" }} /> : <Add size={18} color="white" />}
-              sx={{ borderRadius: "12px", bgcolor: "var(--primary)", fontWeight: 800 }}
+              sx={{ borderRadius: "12px", bgcolor: "var(--primary)", fontWeight: 800, width: { xs: "100%", sm: "auto" } }}
             >
               เพิ่มประเภท
             </Button>
@@ -678,6 +724,7 @@ export default function AdminAffiliatePage() {
                 spacing={0.5}
                 sx={{
                   alignItems: "center",
+                  maxWidth: "100%",
                   border: "1px solid #e2e8f0",
                   borderRadius: "999px",
                   bgcolor: isEditingCategory ? "#fff" : category.isActive ? "#f8fafc" : "#fff1f2",
@@ -697,7 +744,7 @@ export default function AdminAffiliatePage() {
                         if (e.key === "Escape") handleCancelEditCategory();
                       }}
                       sx={{
-                        width: { xs: 180, sm: 220 },
+                        width: { xs: "min(48vw, 180px)", sm: 220 },
                         "& .MuiOutlinedInput-root": {
                           height: 30,
                           borderRadius: "999px",
@@ -753,7 +800,8 @@ export default function AdminAffiliatePage() {
                         color: category.isActive ? "#0f172a" : "#e11d48",
                         border: 0,
                         fontWeight: 900,
-                        "& .MuiChip-label": { px: 1.2, fontSize: "0.9rem" },
+                        maxWidth: { xs: "calc(100vw - 168px)", sm: "none" },
+                        "& .MuiChip-label": { px: 1.2, fontSize: "0.9rem", overflow: "hidden", textOverflow: "ellipsis" },
                       }}
                     />
                     <IconButton
@@ -780,16 +828,22 @@ export default function AdminAffiliatePage() {
         </Stack>
       </Paper>
 
-      <Paper elevation={0} sx={{ borderRadius: "20px", border: "1px solid #e2e8f0", overflow: "hidden" }}>
-        <Tabs value={activeTab} onChange={(_, value) => setActiveTab(value)} sx={{ px: 2, borderBottom: "1px solid #e2e8f0" }}>
+      <Paper elevation={0} sx={{ borderRadius: { xs: "14px", sm: "20px" }, border: "1px solid #e2e8f0", overflow: "hidden" }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, value) => setActiveTab(value)}
+          variant={isMobile ? "scrollable" : "standard"}
+          scrollButtons={isMobile ? "auto" : false}
+          sx={{ px: { xs: 1, sm: 2 }, borderBottom: "1px solid #e2e8f0", "& .MuiTab-root": { minWidth: { xs: 112, sm: 90 }, fontWeight: 800 } }}
+        >
           <Tab label="คลังสินค้า" />
           <Tab label="ใช้ใน Saju" />
           <Tab label="ใช้ใน Tarot" />
           <Tab label="ใช้ใน Blog" />
         </Tabs>
 
-        <Box sx={{ p: 2, borderBottom: "1px solid #e2e8f0", bgcolor: "#fbfdff" }}>
-          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 1.25 }}>
+        <Box sx={{ p: { xs: 1.25, sm: 2 }, borderBottom: "1px solid #e2e8f0", bgcolor: "#fbfdff" }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: { xs: 1, sm: 1.25 } }}>
             <TextField
               size="small"
               label="ค้นหาสินค้า"
@@ -804,7 +858,7 @@ export default function AdminAffiliatePage() {
               value={productFilters.productType}
               slotProps={STABLE_SELECT_SLOT_PROPS}
               onChange={(e) => setProductFilters((prev) => ({ ...prev, productType: e.target.value }))}
-              sx={{ gridColumn: { xs: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+              sx={{ gridColumn: { xs: "span 12", sm: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
             >
               <MenuItem value="all">ทั้งหมด</MenuItem>
               <MenuItem value="AFFILIATE">Affiliate</MenuItem>
@@ -817,7 +871,7 @@ export default function AdminAffiliatePage() {
               value={productFilters.platform}
               slotProps={STABLE_SELECT_SLOT_PROPS}
               onChange={(e) => setProductFilters((prev) => ({ ...prev, platform: e.target.value }))}
-              sx={{ gridColumn: { xs: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+              sx={{ gridColumn: { xs: "span 12", sm: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
             >
               <MenuItem value="all">ทุกแพลตฟอร์ม</MenuItem>
               {PLATFORMS.map((platform) => <MenuItem key={platform.value} value={platform.value}>{platform.label}</MenuItem>)}
@@ -829,7 +883,7 @@ export default function AdminAffiliatePage() {
               value={productFilters.category}
               slotProps={STABLE_SELECT_SLOT_PROPS}
               onChange={(e) => setProductFilters((prev) => ({ ...prev, category: e.target.value }))}
-              sx={{ gridColumn: { xs: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+              sx={{ gridColumn: { xs: "span 12", sm: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
             >
               <MenuItem value="all">ทุกประเภท</MenuItem>
               {categoryFilterOptions.map((category) => <MenuItem key={category.value} value={category.value}>{category.label}</MenuItem>)}
@@ -841,7 +895,7 @@ export default function AdminAffiliatePage() {
               value={productFilters.element}
               slotProps={STABLE_SELECT_SLOT_PROPS}
               onChange={(e) => setProductFilters((prev) => ({ ...prev, element: e.target.value }))}
-              sx={{ gridColumn: { xs: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+              sx={{ gridColumn: { xs: "span 12", sm: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
             >
               <MenuItem value="all">ทุกธาตุ</MenuItem>
               {ELEMENTS.map((element) => <MenuItem key={element.value} value={element.value}>{element.label}</MenuItem>)}
@@ -853,7 +907,7 @@ export default function AdminAffiliatePage() {
               value={productFilters.aspect}
               slotProps={STABLE_SELECT_SLOT_PROPS}
               onChange={(e) => setProductFilters((prev) => ({ ...prev, aspect: e.target.value }))}
-              sx={{ gridColumn: { xs: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+              sx={{ gridColumn: { xs: "span 12", sm: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
             >
               <MenuItem value="all">ทุกหมวด</MenuItem>
               {ASPECTS.map((aspect) => <MenuItem key={aspect.value} value={aspect.value}>{aspect.label}</MenuItem>)}
@@ -865,7 +919,7 @@ export default function AdminAffiliatePage() {
               value={productFilters.status}
               slotProps={STABLE_SELECT_SLOT_PROPS}
               onChange={(e) => setProductFilters((prev) => ({ ...prev, status: e.target.value }))}
-              sx={{ gridColumn: { xs: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+              sx={{ gridColumn: { xs: "span 12", sm: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
             >
               <MenuItem value="all">ทุกสถานะ</MenuItem>
               <MenuItem value="active">เปิดใช้งาน</MenuItem>
@@ -878,7 +932,7 @@ export default function AdminAffiliatePage() {
               value={productFilters.usage}
               slotProps={STABLE_SELECT_SLOT_PROPS}
               onChange={(e) => setProductFilters((prev) => ({ ...prev, usage: e.target.value }))}
-              sx={{ gridColumn: { xs: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
+              sx={{ gridColumn: { xs: "span 12", sm: "span 6", md: "span 2" }, "& .MuiOutlinedInput-root": { borderRadius: "12px", bgcolor: "#fff" } }}
             >
               <MenuItem value="all">ทั้งหมด</MenuItem>
               <MenuItem value="used">ถูกใช้ใน Blog</MenuItem>
@@ -891,6 +945,8 @@ export default function AdminAffiliatePage() {
                 gridColumn: { xs: "span 12", md: "span 8" },
                 alignItems: "center",
                 justifyContent: { xs: "space-between", md: "flex-end" },
+                flexWrap: "wrap",
+                rowGap: 0.5,
               }}
             >
               <Typography sx={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 700 }}>
@@ -914,23 +970,43 @@ export default function AdminAffiliatePage() {
             <Typography sx={{ mt: 2, color: "#64748b" }}>กำลังโหลดข้อมูลสินค้า...</Typography>
           </Box>
         ) : (
-          <ProductTable products={filteredProducts} onEdit={handleOpen} onDelete={handleOpenDeleteProduct} onToggle={toggleStatus} />
+          isMobile ? (
+            <ProductMobileList products={filteredProducts} onEdit={handleOpen} onDelete={handleOpenDeleteProduct} onToggle={toggleStatus} />
+          ) : (
+            <ProductTable products={filteredProducts} onEdit={handleOpen} onDelete={handleOpenDeleteProduct} onToggle={toggleStatus} />
+          )
         )}
       </Paper>
 
-      <Dialog open={open} onClose={() => !isSaving && setOpen(false)} maxWidth="lg" fullWidth>
-        <DialogTitle sx={{ px: 3, pt: 3, pb: 1 }}>
-          <Typography sx={{ fontWeight: 900, fontSize: "1.25rem", color: "#0f172a" }}>
+      <Dialog
+        open={open}
+        onClose={() => !isSaving && setOpen(false)}
+        maxWidth="lg"
+        fullWidth
+        fullScreen={isMobile}
+        scroll="paper"
+        slotProps={{
+          paper: {
+            sx: {
+              maxHeight: isMobile ? "100dvh" : "calc(100dvh - 48px)",
+              overflow: "hidden",
+              borderRadius: isMobile ? 0 : undefined,
+            },
+          },
+        }}
+      >
+        <DialogTitle sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 }, pb: 1 }}>
+          <Typography sx={{ fontWeight: 900, fontSize: { xs: "1.08rem", sm: "1.25rem" }, color: "#0f172a" }}>
             {editingProduct ? "แก้ไขสินค้า" : "เพิ่มสินค้าใหม่"}
           </Typography>
           <Typography sx={{ color: "#64748b", fontSize: "0.85rem", mt: 0.5 }}>
             ข้อมูลนี้จะถูกใช้ร่วมกันทั้ง Saju และสินค้าแทรกในบทความ
           </Typography>
         </DialogTitle>
-        <DialogContent dividers sx={{ p: 0 }}>
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "360px 1fr" }, minHeight: 520 }}>
-            <Box sx={{ p: 3, bgcolor: "#f8fafc", borderRight: { md: "1px solid #e2e8f0" } }}>
-              <Stack spacing={2.5}>
+        <DialogContent dividers sx={{ p: 0, overflowY: "auto" }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "360px 1fr" }, minHeight: { xs: "auto", md: 520 } }}>
+            <Box sx={{ p: { xs: 2, sm: 3 }, bgcolor: "#f8fafc", borderRight: { md: "1px solid #e2e8f0" } }}>
+              <Stack spacing={{ xs: 2, sm: 2.5 }}>
                 <Box>
                   <Typography sx={{ fontWeight: 900, color: "#0f172a", mb: 0.5 }}>
                     รูปหลักสินค้า
@@ -962,7 +1038,7 @@ export default function AdminAffiliatePage() {
                   <Typography sx={{ color: "#64748b", fontSize: "0.78rem", mb: 1.5 }}>
                     ใช้แสดงในแกลเลอรีภาพประกอบสินค้า
                   </Typography>
-                  <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
+                  <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", sm: "1fr 1fr" }, gap: { xs: 1, sm: 1.5 } }}>
                     {[0, 1, 2, 3].map((index) => {
                       const imgVal = formData.images?.[index] || null;
                       return (
@@ -1031,8 +1107,8 @@ export default function AdminAffiliatePage() {
               </Stack>
             </Box>
 
-            <Box sx={{ p: 3 }}>
-              <Stack spacing={3}>
+            <Box sx={{ p: { xs: 2, sm: 3 } }}>
+              <Stack spacing={{ xs: 2.5, sm: 3 }}>
                 <Box>
                   <Typography sx={{ fontWeight: 900, color: "#0f172a", mb: 2 }}>
                     รายละเอียดสินค้า
@@ -1064,13 +1140,14 @@ export default function AdminAffiliatePage() {
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
                     />
-                    <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
                       <TextField
-                        label="ราคาเริ่มต้น/ปัจจุบัน (เช่น ฿299 หรือ 299)"
+                        label="ราคา/ช่วงราคา (เช่น ฿299, 199-299 หรือ เริ่มต้น 199)"
                         fullWidth
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                         sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
+                        helperText="ช่องนี้เป็นป้ายราคา ใส่ข้อความหรือช่วงราคาได้"
                       />
                       <TextField
                         label="ราคาก่อนลด/ราคาเต็ม (เช่น ฿450 หรือ 450)"
@@ -1081,7 +1158,7 @@ export default function AdminAffiliatePage() {
                         helperText="เว้นว่างไว้หากไม่มีราคาเต็มก่อนลด"
                       />
                     </Box>
-                    <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
                       <TextField
                         label="คะแนนดาวจำลอง (เช่น 4.9)"
                         value={formData.rating}
@@ -1089,9 +1166,10 @@ export default function AdminAffiliatePage() {
                         sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
                       />
                       <TextField
-                        label="จำนวนรีวิวสินค้า (เช่น 120)"
+                        label="จำนวนรีวิวสินค้า (เช่น 120 หรือ 9.7k)"
                         value={formData.reviewCount}
                         onChange={(e) => setFormData({ ...formData, reviewCount: e.target.value })}
+                        helperText="ใส่ตัวเลขหรือตัวอักษรย่อได้"
                         sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
                       />
                     </Box>
@@ -1158,14 +1236,45 @@ export default function AdminAffiliatePage() {
                     >
                       {ASPECTS.map((opt) => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}
                     </TextField>
+                    <Box sx={{ gridColumn: "span 12", p: 1.5, borderRadius: "12px", border: "1px solid #e2e8f0", bgcolor: "#f8fafc" }}>
+                      <Typography sx={{ fontWeight: 900, color: "#0f172a", mb: 0.5, fontSize: "0.9rem" }}>
+                        ตำแหน่งแสดงผล
+                      </Typography>
+                      <Typography sx={{ color: "#64748b", fontSize: "0.78rem", mb: 1 }}>
+                        ใช้เลือกว่าสินค้าชิ้นนี้จะถูกนำไปแสดงในหน้าไหน โดยไม่กระทบประเภทสินค้า
+                      </Typography>
+                      <Stack direction={{ xs: "column", sm: "row" }} spacing={0.5} sx={{ flexWrap: "wrap" }}>
+                        {PLACEMENT_OPTIONS.map((placement) => (
+                          <FormControlLabel
+                            key={placement.value}
+                            control={
+                              <Checkbox
+                                checked={formData.placements.includes(placement.value)}
+                                onChange={(e) => {
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    placements: e.target.checked
+                                      ? Array.from(new Set([...prev.placements, placement.value]))
+                                      : prev.placements.filter((item) => item !== placement.value),
+                                  }));
+                                }}
+                                sx={{ color: "var(--primary)", "&.Mui-checked": { color: "var(--primary)" } }}
+                              />
+                            }
+                            label={placement.label}
+                            sx={{ mr: 2, "& .MuiFormControlLabel-label": { fontWeight: 800, color: "#334155", fontSize: "0.88rem" } }}
+                          />
+                        ))}
+                      </Stack>
+                    </Box>
                   </Box>
                 </Box>
               </Stack>
             </Box>
           </Box>
         </DialogContent>
-        <DialogActions sx={{ p: 2.5, gap: 1, borderTop: "1px solid #e2e8f0" }}>
-          <Button disabled={isSaving} onClick={() => setOpen(false)} sx={{ color: "#64748b", fontWeight: 700 }}>ยกเลิก</Button>
+        <DialogActions sx={{ p: { xs: 1.5, sm: 2.5 }, gap: 1, borderTop: "1px solid #e2e8f0", flexDirection: { xs: "column-reverse", sm: "row" }, alignItems: "stretch" }}>
+          <Button disabled={isSaving} onClick={() => setOpen(false)} sx={{ color: "#64748b", fontWeight: 700, width: { xs: "100%", sm: "auto" } }}>ยกเลิก</Button>
           <Button
             variant="contained"
             onClick={handleSubmit}
@@ -1177,7 +1286,7 @@ export default function AdminAffiliatePage() {
               (formData.productType === "OWN_PRODUCT" && !formData.internalSlug)
             }
             startIcon={isSaving ? <CircularProgress size={16} sx={{ color: "#fff" }} /> : undefined}
-            sx={{ borderRadius: "10px", px: 4, bgcolor: "var(--primary)", fontWeight: 700 }}
+            sx={{ borderRadius: "10px", px: 4, bgcolor: "var(--primary)", fontWeight: 700, width: { xs: "100%", sm: "auto" } }}
           >
             {isSaving ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
           </Button>
@@ -1238,7 +1347,7 @@ export default function AdminAffiliatePage() {
 
       <Dialog
         open={Boolean(deletingCategory)}
-        onClose={() => !isCategorySaving && setDeletingCategory(null)}
+        onClose={handleCloseDeleteCategory}
         maxWidth="xs"
         fullWidth
       >
@@ -1251,27 +1360,40 @@ export default function AdminAffiliatePage() {
           <Typography sx={{ color: "#475569", lineHeight: 1.7 }}>
             {deletingCategory ? `ยืนยันลบประเภท "${deletingCategory.name}" ออกจากรายการหมวดสินค้า Affiliate` : ""}
           </Typography>
-          <Typography sx={{ color: "#e11d48", fontSize: "0.82rem", fontWeight: 800, mt: 1 }}>
-            ถ้าประเภทนี้ถูกใช้อยู่ในสินค้า ระบบจะไม่อนุญาตให้ลบ
-          </Typography>
+          {categoryDeleteMessage ? (
+            <Box sx={{ mt: 2, p: 1.5, borderRadius: "12px", bgcolor: "#fff1f2", border: "1px solid #fecdd3" }}>
+              <Typography sx={{ color: "#be123c", fontSize: "0.86rem", fontWeight: 900, lineHeight: 1.6 }}>
+                {categoryDeleteMessage}
+              </Typography>
+              <Typography sx={{ color: "#9f1239", fontSize: "0.82rem", fontWeight: 700, lineHeight: 1.6, mt: 0.4 }}>
+                หากต้องการซ่อนประเภทนี้ ให้ปิดสถานะประเภทแทนการลบ หรือย้ายสินค้าไปประเภทอื่นก่อน
+              </Typography>
+            </Box>
+          ) : (
+            <Typography sx={{ color: "#e11d48", fontSize: "0.82rem", fontWeight: 800, mt: 1 }}>
+              ถ้าประเภทนี้ถูกใช้อยู่ในสินค้า ระบบจะไม่อนุญาตให้ลบ
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3, pt: 1, gap: 1 }}>
           <Button
             disabled={isCategorySaving}
-            onClick={() => setDeletingCategory(null)}
+            onClick={handleCloseDeleteCategory}
             sx={{ borderRadius: "10px", color: "#64748b", fontWeight: 800 }}
           >
-            ยกเลิก
+            {categoryDeleteMessage ? "รับทราบ" : "ยกเลิก"}
           </Button>
-          <Button
-            variant="contained"
-            disabled={isCategorySaving}
-            onClick={handleDeleteCategory}
-            startIcon={isCategorySaving ? <CircularProgress size={16} sx={{ color: "#fff" }} /> : <Trash size={16} color="white" />}
-            sx={{ borderRadius: "10px", bgcolor: "#e11d48", fontWeight: 900, "&:hover": { bgcolor: "#be123c" } }}
-          >
-            ลบประเภท
-          </Button>
+          {!categoryDeleteMessage && (
+            <Button
+              variant="contained"
+              disabled={isCategorySaving}
+              onClick={handleDeleteCategory}
+              startIcon={isCategorySaving ? <CircularProgress size={16} sx={{ color: "#fff" }} /> : <Trash size={16} color="white" />}
+              sx={{ borderRadius: "10px", bgcolor: "#e11d48", fontWeight: 900, "&:hover": { bgcolor: "#be123c" } }}
+            >
+              ลบประเภท
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </Box>
@@ -1280,17 +1402,132 @@ export default function AdminAffiliatePage() {
 
 function SummaryCard({ title, value }: { title: string; value: number }) {
   return (
-    <Paper elevation={0} sx={{ gridColumn: { xs: "span 12", sm: "span 6", md: "span 3" }, p: 2.5, borderRadius: "16px", border: "1px solid #e2e8f0" }}>
-      <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
-        <Box sx={{ width: 42, height: 42, borderRadius: "12px", bgcolor: "#ecfdf5", display: "grid", placeItems: "center" }}>
+    <Paper elevation={0} sx={{ gridColumn: { xs: "span 6", md: "span 3" }, p: { xs: 1.5, sm: 2.5 }, borderRadius: "16px", border: "1px solid #e2e8f0" }}>
+      <Stack direction="row" spacing={{ xs: 1, sm: 2 }} sx={{ alignItems: "center" }}>
+        <Box sx={{ width: { xs: 34, sm: 42 }, height: { xs: 34, sm: 42 }, borderRadius: "12px", bgcolor: "#ecfdf5", display: "grid", placeItems: "center", flexShrink: 0 }}>
           <Shop size={22} color="#10b981" variant="Bulk" />
         </Box>
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 900, color: "#0f172a" }}>{value}</Typography>
-          <Typography sx={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 700 }}>{title}</Typography>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="h5" sx={{ fontWeight: 900, color: "#0f172a", fontSize: { xs: "1.25rem", sm: "1.5rem" } }}>{value}</Typography>
+          <Typography sx={{ color: "#64748b", fontSize: { xs: "0.72rem", sm: "0.85rem" }, fontWeight: 700, lineHeight: 1.25 }}>{title}</Typography>
         </Box>
       </Stack>
     </Paper>
+  );
+}
+
+function ProductMobileList({
+  products,
+  onEdit,
+  onDelete,
+  onToggle,
+}: {
+  products: Product[];
+  onEdit: (product: Product) => void;
+  onDelete: (product: Product) => void;
+  onToggle: (product: Product) => void;
+}) {
+  if (products.length === 0) {
+    return (
+      <Box sx={{ px: 2, py: 6, textAlign: "center", color: "#64748b" }}>
+        ยังไม่มีสินค้าในมุมมองนี้
+      </Box>
+    );
+  }
+
+  return (
+    <Stack spacing={1.25} sx={{ p: { xs: 1, sm: 1.25 }, bgcolor: "#f8fafc" }}>
+      {products.map((product) => {
+        const meta = elementMeta(product.element);
+        const aspect = product.aspect?.toLowerCase() || "general";
+        const aspectMeta: Record<string, { label: string; bg: string; color: string }> = {
+          love: { label: "ความรัก", bg: "#FFE6EA", color: "#FF8E9E" },
+          career: { label: "การงาน", bg: "#eff6ff", color: "#3b82f6" },
+          wealth: { label: "การเงิน", bg: "#fef3c7", color: "#d97706" },
+          health: { label: "สุขภาพ", bg: "#ecfdf5", color: "#10b981" },
+        };
+        const tarotAspect = aspectMeta[aspect];
+        const productType = (product.productType ?? "AFFILIATE") === "OWN_PRODUCT" ? "สินค้าเราเอง" : "Affiliate";
+        const blogCount = product._count?.blogaffiliateproduct ?? 0;
+
+        return (
+          <Paper
+            key={product.id}
+            elevation={0}
+            sx={{
+              p: { xs: 1, sm: 1.25 },
+              border: "1px solid #e2e8f0",
+              borderRadius: "12px",
+              bgcolor: "#fff",
+            }}
+          >
+            <Stack direction="row" spacing={{ xs: 1, sm: 1.2 }} sx={{ alignItems: "flex-start" }}>
+              <Avatar variant="rounded" src={product.image} sx={{ width: { xs: 60, sm: 72 }, height: { xs: 60, sm: 72 }, border: "1px solid #f1f5f9", flexShrink: 0 }} />
+              <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Stack direction="row" spacing={0.75} sx={{ alignItems: "flex-start", justifyContent: "space-between", gap: 1 }}>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: { xs: "0.88rem", sm: "0.95rem" }, lineHeight: 1.32 }}>
+                      {product.name}
+                    </Typography>
+                    <Typography sx={{ color: "var(--primary)", fontWeight: 900, fontSize: { xs: "0.8rem", sm: "0.86rem" }, mt: 0.25 }}>
+                      {formatPrice(product.price)}
+                    </Typography>
+                  </Box>
+                  <IconButton aria-label={product.isActive ? "ปิดการใช้งานสินค้า" : "เปิดการใช้งานสินค้า"} onClick={() => onToggle(product)} sx={{ width: 34, height: 34, flexShrink: 0 }}>
+                    {product.isActive ? <Eye size={20} color="#10b981" variant="Bulk" /> : <EyeSlash size={20} color="#94a3b8" variant="Bulk" />}
+                  </IconButton>
+                </Stack>
+
+                <Typography
+                  sx={{
+                    color: "#64748b",
+                    fontSize: "0.78rem",
+                    lineHeight: 1.4,
+                    mt: 0.45,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {product.description}
+                </Typography>
+              </Box>
+            </Stack>
+
+            <Stack direction="row" spacing={0.75} sx={{ flexWrap: "wrap", rowGap: 0.75, mt: 1.25 }}>
+              <Chip
+                label={productType}
+                size="small"
+                sx={{ height: 23, bgcolor: productType === "สินค้าเราเอง" ? "#ecfdf5" : "#eff2ff", color: productType === "สินค้าเราเอง" ? "#047857" : "#4f46e5", fontWeight: 900, fontSize: "0.68rem" }}
+              />
+              <Chip label={platformLabel(product.platform)} size="small" sx={{ height: 23, bgcolor: "#f8fafc", color: "#334155", fontWeight: 800, fontSize: "0.68rem" }} />
+              <Chip label={meta.label} size="small" sx={{ height: 23, fontWeight: 800, bgcolor: `${meta.color}15`, color: meta.color, border: `1px solid ${meta.color}30`, fontSize: "0.68rem" }} />
+              {tarotAspect ? (
+                <Chip label={tarotAspect.label} size="small" sx={{ height: 23, fontWeight: 800, bgcolor: tarotAspect.bg, color: tarotAspect.color, border: "1px solid currentColor", fontSize: "0.68rem" }} />
+              ) : (
+                <Chip label="ทั่วไป" size="small" sx={{ height: 23, bgcolor: "#f1f5f9", color: "#64748b", fontWeight: 800, fontSize: "0.68rem" }} />
+              )}
+              <Chip label={`${blogCount} บทความ`} size="small" sx={{ height: 23, bgcolor: "#eff2ff", color: "#4f46e5", fontWeight: 800, fontSize: "0.68rem" }} />
+            </Stack>
+
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ justifyContent: "space-between", alignItems: { xs: "stretch", sm: "center" }, mt: 1.25 }}>
+              <Typography sx={{ minWidth: 0, color: "#94a3b8", fontSize: "0.74rem", fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {product.internalSlug || product.productSlug || "-"}
+              </Typography>
+              <Stack direction="row" spacing={0.75} sx={{ flexShrink: 0, justifyContent: { xs: "flex-end", sm: "flex-start" } }}>
+                <IconButton aria-label={`แก้ไข ${product.name}`} onClick={() => onEdit(product)} sx={{ width: 38, height: 38, color: "#6366f1", border: "1px solid #e0e7ff", bgcolor: "#eef2ff" }}>
+                  <Edit size={18} variant="Outline" color="currentColor" />
+                </IconButton>
+                <IconButton aria-label={`ลบ ${product.name}`} onClick={() => onDelete(product)} sx={{ width: 38, height: 38, color: "#f43f5e", border: "1px solid #ffe4e6", bgcolor: "#fff1f2" }}>
+                  <Trash size={18} variant="Outline" color="currentColor" />
+                </IconButton>
+              </Stack>
+            </Stack>
+          </Paper>
+        );
+      })}
+    </Stack>
   );
 }
 
