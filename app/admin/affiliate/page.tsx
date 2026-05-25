@@ -1267,7 +1267,7 @@ export default function AdminAffiliatePage() {
                       label="รายละเอียด"
                       fullWidth
                       multiline
-                      rows={4}
+                      rows={10}
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}

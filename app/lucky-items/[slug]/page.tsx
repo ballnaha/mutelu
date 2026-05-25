@@ -206,9 +206,21 @@ export default async function LuckyItemDetailPage(props: PageProps) {
                 <Typography component="h1" sx={{ color: "#2D2520", fontSize: { xs: "1.9rem", md: "2.75rem" }, lineHeight: 1.12, fontWeight: 950, mb: 1.2, fontFamily: "var(--font-prompt), sans-serif" }}>
                   {product.name}
                 </Typography>
-                <Typography sx={{ color: "#5A4D43", fontSize: { xs: "0.98rem", md: "1.06rem" }, lineHeight: 1.8, fontWeight: 600, fontFamily: "var(--font-prompt), sans-serif" }}>
-                  {product.description}
-                </Typography>
+                <Typography
+                  component="div"
+                  dangerouslySetInnerHTML={{ __html: product.description ?? "" }}
+                  sx={{
+                    color: "#5A4D43",
+                    fontSize: { xs: "0.98rem", md: "1.06rem" },
+                    lineHeight: 1.8,
+                    fontWeight: 600,
+                    fontFamily: "var(--font-prompt), sans-serif",
+                    whiteSpace: "pre-wrap",
+                    "& p": { margin: 0, mb: 1.2 },
+                    "& ul, & ol": { pl: 2, my: 1.2 },
+                    "& a": { color: "#FF8E9E", textDecoration: "underline" },
+                  }}
+                />
               </Box>
 
               <Stack direction="row" spacing={1.5} sx={{ alignItems: "flex-end", flexWrap: "wrap" }}>

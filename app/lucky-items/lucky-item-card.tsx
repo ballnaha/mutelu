@@ -325,7 +325,7 @@ export function LuckyItemCard({ product }: { product: LuckyItemProduct }) {
               color: "#2D2520",
               fontSize: { xs: "0.82rem", sm: "0.98rem" },
               fontWeight: 950,
-              lineHeight: { xs: 1.28, sm: 1.34 },
+              lineHeight: 1.5,
               minHeight: "2.65em",
               display: "-webkit-box",
               WebkitLineClamp: 2,
@@ -338,10 +338,12 @@ export function LuckyItemCard({ product }: { product: LuckyItemProduct }) {
           </Typography>
 
           <Typography
+            component="div"
+            dangerouslySetInnerHTML={{ __html: product.description }}
             sx={{
               color: "#6B625A",
               fontSize: { xs: "0.68rem", sm: "0.78rem" },
-              lineHeight: { xs: 1.38, sm: 1.45 },
+              lineHeight: 1.5,
               minHeight: "2.9em",
               display: "-webkit-box",
               WebkitLineClamp: 2,
@@ -349,10 +351,9 @@ export function LuckyItemCard({ product }: { product: LuckyItemProduct }) {
               overflow: "hidden",
               fontWeight: 550,
               fontFamily: "var(--font-prompt), sans-serif",
+              "& *": { display: "inline", margin: 0, padding: 0 }
             }}
-          >
-            {product.description}
-          </Typography>
+          />
 
           <Box sx={{ flex: 1 }} />
 
@@ -482,9 +483,21 @@ export function LuckyItemCard({ product }: { product: LuckyItemProduct }) {
                 <Chip label={aspectLabel} size="small" sx={{ bgcolor: "#FFF066", color: "#2D2520", border: "1.5px solid #2D2520", borderRadius: "6px", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }} />
               </Stack>
 
-              <Typography sx={{ color: "#5A4D43", fontSize: "0.9rem", lineHeight: 1.7, fontWeight: 600, fontFamily: "var(--font-prompt), sans-serif" }}>
-                {product.description}
-              </Typography>
+              <Typography
+                component="div"
+                dangerouslySetInnerHTML={{ __html: product.description }}
+                sx={{
+                  color: "#5A4D43",
+                  fontSize: "0.9rem",
+                  lineHeight: 1.7,
+                  fontWeight: 600,
+                  fontFamily: "var(--font-prompt), sans-serif",
+                  whiteSpace: "pre-wrap",
+                  "& p": { margin: 0, mb: 1 },
+                  "& ul, & ol": { pl: 2, my: 1 },
+                  "& a": { color: "#FF8E9E", textDecoration: "underline" },
+                }}
+              />
 
               <Stack spacing={0.7}>
                 {detailPoints.map((point) => (

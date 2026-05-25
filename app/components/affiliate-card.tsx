@@ -315,9 +315,21 @@ export function AffiliateCard({
               {badge && <Chip label={badge} size="small" sx={{ bgcolor: "#FFF066", color: "#2D2520", border: "1.5px solid #2D2520", borderRadius: "6px", fontWeight: 900, fontFamily: "var(--font-prompt), sans-serif" }} />}
             </Stack>
 
-            <Typography sx={{ color: "#5A4D43", fontSize: "0.9rem", lineHeight: 1.7, fontWeight: 600, fontFamily: "var(--font-prompt), sans-serif" }}>
-              {description}
-            </Typography>
+            <Typography
+              component="div"
+              dangerouslySetInnerHTML={{ __html: description }}
+              sx={{
+                color: "#5A4D43",
+                fontSize: "0.9rem",
+                lineHeight: 1.7,
+                fontWeight: 600,
+                fontFamily: "var(--font-prompt), sans-serif",
+                whiteSpace: "pre-wrap",
+                "& p": { margin: 0, mb: 1 },
+                "& ul, & ol": { pl: 2, my: 1 },
+                "& a": { color: accentColor, textDecoration: "underline" },
+              }}
+            />
 
             {highlights && highlights.length > 0 && (
               <Stack spacing={0.7}>
@@ -475,7 +487,7 @@ export function AffiliateCard({
               fontSize: "0.86rem",
               fontWeight: 950,
               color: "#2D2520",
-              lineHeight: 1.25,
+              lineHeight: 1.5,
               display: "-webkit-box",
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
@@ -489,20 +501,21 @@ export function AffiliateCard({
           {/* Subtitle / Comment from DB description */}
           {description && (
             <Typography
+              component="div"
+              dangerouslySetInnerHTML={{ __html: `💬 ${description}` }}
               sx={{
                 fontSize: "0.74rem",
                 color: "#786c62",
                 fontFamily: "var(--font-prompt), sans-serif",
-                lineHeight: 1.3,
+                lineHeight: 1.5,
                 display: "-webkit-box",
                 WebkitLineClamp: 1,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                fontWeight: 500
+                fontWeight: 500,
+                "& *": { display: "inline", margin: 0, padding: 0 }
               }}
-            >
-              💬 {description}
-            </Typography>
+            />
           )}
 
           {/* Price & CTA Row */}
@@ -668,7 +681,7 @@ export function AffiliateCard({
             fontSize: { xs: "0.96rem", sm: "1.16rem", md: "1.28rem" },
             fontWeight: 950,
             color: "#2D2520",
-            lineHeight: 1.28,
+            lineHeight: 1.5,
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
@@ -696,6 +709,8 @@ export function AffiliateCard({
 
         {description && (
           <Typography
+            component="div"
+            dangerouslySetInnerHTML={{ __html: description }}
             sx={{
               display: { xs: "none", sm: "-webkit-box" },
               fontSize: "0.88rem",
@@ -705,11 +720,10 @@ export function AffiliateCard({
               fontFamily: "var(--font-prompt), sans-serif",
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
-              overflow: "hidden"
+              overflow: "hidden",
+              "& *": { display: "inline", margin: 0, padding: 0 }
             }}
-          >
-            {description}
-          </Typography>
+          />
         )}
 
         {highlights.length > 0 && (
@@ -717,7 +731,7 @@ export function AffiliateCard({
             {highlights.slice(0, 3).map((highlight) => (
               <Stack key={highlight} direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
                 <TickCircle size={15} color={accent} variant="Bold" style={{ flexShrink: 0, marginTop: 1.5 }} />
-                <Typography sx={{ color: "#5A4D43", fontSize: "0.8rem", lineHeight: 1.35, fontWeight: 700, fontFamily: "var(--font-prompt), sans-serif" }}>
+                <Typography sx={{ color: "#5A4D43", fontSize: "0.8rem", lineHeight: 1.5, fontWeight: 700, fontFamily: "var(--font-prompt), sans-serif" }}>
                   {highlight}
                 </Typography>
               </Stack>
