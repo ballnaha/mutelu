@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { connection } from "next/server";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { ArrowLeft, Briefcase, Calendar, MagicStar, MoneyRecive, Heart, CloseCircle } from "iconsax-react";
 
 import { Footer } from "@/app/components/footer";
 import { Header } from "@/app/components/header";
+import { AffiliatePlacementProducts } from "@/app/components/affiliate-placement-products";
 import { getMonthlyLuckyColors, type LuckyColor } from "@/lib/lucky-colors";
-import { prisma } from "@/lib/prisma";
-import { AffiliateCard } from "@/app/components/affiliate-card";
-import { selectDailyItems } from "@/lib/daily-random";
 
 export const metadata: Metadata = {
   title: "สีเสื้อมงคลประจำเดือน | mulamoon.",
@@ -18,6 +15,8 @@ export const metadata: Metadata = {
     canonical: "/lucky-colors",
   },
 };
+
+export const revalidate = 3600;
 
 const colorLabels = [
   { key: "work", label: "งาน", icon: Briefcase },
@@ -277,8 +276,6 @@ function MobileColorList({
 }
 
 export default async function LuckyColorsPage() {
-  await connection();
-
   const data = getMonthlyLuckyColors();
 
   if (!data) {
@@ -286,21 +283,6 @@ export default async function LuckyColorsPage() {
   }
 
   const featuredDay = data.today ?? data.days[0];
-
-  const luckyColorProducts = await prisma.$queryRaw<any[]>`
-    SELECT *
-    FROM MasterAffiliateProduct
-    WHERE isActive = true
-      AND JSON_CONTAINS(placements, JSON_QUOTE('LUCKY_COLORS'))
-    ORDER BY createdAt DESC
-  `;
-
-  // Admin can pin products here by selecting the "หน้า สีมงคล" placement.
-  const fallbackProducts = luckyColorProducts.length > 0 ? [] : await prisma.masterAffiliateProduct.findMany({
-    where: { isActive: true },
-    orderBy: { createdAt: "desc" },
-  });
-  const products = selectDailyItems(luckyColorProducts.length > 0 ? luckyColorProducts : fallbackProducts, 3, "lucky-colors");
 
   return (
     <Box sx={{ bgcolor: "#FFFDF9", minHeight: "100vh", color: "#2D2520" }}>
@@ -437,78 +419,22 @@ export default async function LuckyColorsPage() {
               </Stack>
             </Box>
 
-            <Box
-                sx={{
-                  bgcolor: "#FFFDF9",
-                  p: { xs: 2, md: 3 },
-                  borderRadius: { xs: "18px", md: "20px" },
-                  border: "2.5px solid #2D2520",
-                  borderTop: { xs: "5px solid #FF8E9E", md: "8px solid #FF8E9E" },
-                  boxShadow: { xs: "3px 3px 0px #2D2520", md: "4px 4px 0px #2D2520" },
-                }}
-              >
-                <Stack direction="row" spacing={1.2} sx={{ alignItems: "center", mb: { xs: 1.5, md: 2.5 } }}>
-                  <Box sx={{ width: 32, height: 32, borderRadius: "8px", bgcolor: "rgba(255, 142, 158, 0.15)", border: "2px solid #2D2520", display: "grid", placeItems: "center" }}>
-                    <MagicStar size={20} variant="Bulk" color="#FF8E9E" />
-                  </Box>
-                  <Box>
-                    <Typography sx={{ color: "#2D2520", fontSize: { xs: "0.96rem", md: "1.02rem" }, fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
-                      สินค้ามงคลแนะนำประจำวัน
-                    </Typography>
-                    <Typography sx={{ display: { xs: "none", md: "block" }, color: "#5A4D43", fontSize: "0.76rem", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
-                      เสริมพลังตามสีและเจตนามงคลวันนี้
-                    </Typography>
-                  </Box>
-                </Stack>
-
-                <Stack spacing={{ xs: 1.5, md: 2.2 }}>
-                  {products.length > 0 ? products.map((product) => (
-                    <AffiliateCard
-                      key={product.id}
-                      name={product.name}
-                      description={product.description}
-                      price={product.price}
-                      originalPrice={product.originalPrice}
-                      image={product.image}
-                      images={product.images}
-                      link={product.url}
-                      platform={product.platform}
-                      platformLabel={product.platform}
-                      productSlug={product.productSlug}
-                      productType={product.productType}
-                      internalSlug={product.internalSlug}
-                      rating={product.rating}
-                      reviewCount={product.reviewCount}
-                      variant="sidebar"
-                      accentColor="#FF8E9E"
-                      badge={product.aspect === "love" ? "หนุนดวงความรัก" : product.aspect === "wealth" ? "ดึงดูดทรัพย์เสี่ยงดวง" : product.aspect === "health" ? "หนุนสุขภาพกายใจ" : "เสริมการงานและอำนาจ"}
-                    />
-                  )) : (
-                    <Box
-                      sx={{
-                        minHeight: 150,
-                        borderRadius: "16px",
-                        border: "2px dashed rgba(45,37,32,0.35)",
-                        bgcolor: "#FAF8F2",
-                        display: "grid",
-                        placeItems: "center",
-                        px: 2,
-                        textAlign: "center",
-                      }}
-                    >
-                      <Typography sx={{ color: "#5A4D43", fontSize: "0.92rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
-                        ยังไม่มีสินค้า
-                      </Typography>
-                    </Box>
-                  )}
-                </Stack>
-
-                {products.length > 0 ? (
-                  <Typography sx={{ display: { xs: "none", md: "block" }, color: "#5A4D43", fontSize: "0.65rem", textAlign: "center", mt: 2.5, fontStyle: "italic", fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
-                    * แนะนำจากตำแหน่งแสดงผล "หน้า สีมงคล" ในหลังบ้าน
-                  </Typography>
-                ) : null}
-              </Box>
+            <AffiliatePlacementProducts
+              placement="LUCKY_COLORS"
+              scope="lucky-colors"
+              title="สินค้ามงคลแนะนำประจำวัน"
+              description="เสริมพลังตามสีและเจตนามงคลวันนี้"
+              footnote={'* แนะนำจากตำแหน่งแสดงผล "หน้า สีมงคล" ในหลังบ้าน'}
+              layout="stack"
+              containerSx={{
+                p: { xs: 2, md: 3 },
+                mt: 0,
+                borderRadius: { xs: "18px", md: "20px" },
+                border: "2.5px solid #2D2520",
+                borderTop: { xs: "5px solid #FF8E9E", md: "8px solid #FF8E9E" },
+                boxShadow: { xs: "3px 3px 0px #2D2520", md: "4px 4px 0px #2D2520" },
+              }}
+            />
           </Box>
 
           <MobileColorList

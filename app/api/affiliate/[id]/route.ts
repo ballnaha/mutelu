@@ -48,6 +48,7 @@ export async function PATCH(
     }
 
     revalidatePath("/lucky-colors");
+    revalidatePath("/lottery");
 
     return NextResponse.json(product);
   } catch (error) {
@@ -68,6 +69,7 @@ export async function DELETE(
     });
 
     revalidatePath("/lucky-colors");
+    revalidatePath("/lottery");
 
     return NextResponse.json({ message: "Product deleted successfully" });
   } catch (error) {

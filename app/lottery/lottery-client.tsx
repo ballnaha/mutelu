@@ -1,12 +1,11 @@
 "use client";
 
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useState, useRef } from "react";
 import { Alert, Box, Button, CircularProgress, Container, Stack, Typography } from "@mui/material";
 import { Calendar, Cup, Refresh, ShieldTick, MagicStar } from "iconsax-react";
 import type { LotteryApiPayload, LotteryCheckMatch, LotteryDraw, LotteryHistoryItem } from "@/lib/lottery";
 import { checkLotteryNumber } from "@/lib/lottery";
-import { selectDailyItems } from "@/lib/daily-random";
-import { AffiliateCard } from "../components/affiliate-card";
+import { AffiliatePlacementProducts } from "../components/affiliate-placement-products";
 
 type LotteryClientProps = {
   initialData: LotteryApiPayload | null;
@@ -47,19 +46,6 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState(initialError);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [wealthProducts, setWealthProducts] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetch("/api/affiliate")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          const wealth = data.filter((p: any) => p.aspect?.toLowerCase() === "wealth");
-          setWealthProducts(selectDailyItems(wealth.length > 0 ? wealth : data, 3, "lottery-wealth"));
-        }
-      })
-      .catch((err) => console.error("Failed to load wealth affiliate products:", err));
-  }, []);
 
   const cleanNumber = number.replace(/\D/g, "").slice(0, 6);
 
@@ -744,88 +730,16 @@ export function LotteryClient({ initialData, initialDraws, initialHistory, initi
           </Stack>
         </Box>
 
-        {/* Recommended Wealth Products Section */}
-        <Box
-            sx={{
-              p: { xs: 3, md: 5 },
-              mt: { xs: 5, md: 6 },
-              borderRadius: "24px",
-              border: "3px solid #2D2520",
-              bgcolor: "#FFFDF9",
-              boxShadow: "6px 6px 0px 0px #2D2520",
-            }}
-          >
-            <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
-              <Box
-                sx={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: "10px",
-                  display: "grid",
-                  placeItems: "center",
-                  bgcolor: "rgba(255, 142, 158, 0.15)",
-                  border: "2px solid #2D2520"
-                }}
-              >
-                <MagicStar size={22} variant="Bulk" color="#FF8E9E" />
-              </Box>
-              <Box>
-                <Typography sx={{ color: "#FF8E9E", fontWeight: 950, fontSize: "0.78rem", letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: "var(--font-prompt), sans-serif" }}>
-                  RECOMMENDED WEALTH ITEMS
-                </Typography>
-                <Typography variant="h5" sx={{ color: "#2D2520", fontWeight: 950, fontSize: { xs: "1.2rem", md: "1.5rem" }, fontFamily: "var(--font-prompt), sans-serif" }}>
-                  ของมงคลนำโชคเสริมดวงโชคลาภและการเงิน
-                </Typography>
-              </Box>
-            </Stack>
-
-            <Typography sx={{ color: "#5A4D43", fontSize: "0.9rem", mb: 4, lineHeight: 1.6, fontWeight: 550, fontFamily: "var(--font-prompt), sans-serif" }}>
-              เพิ่มพลังหนุนนำดวงการเงินและช่วยเปิดทางโชคลาภให้คุณอย่างราบรื่น! อาจารย์คัดสรรไอเทมสายมูยอดนิยมที่ผ่านพิธีประจุพลังงานเสริมสิริมงคล เสริมดวงโภคทรัพย์มาให้บูชาค่ะ
-            </Typography>
-
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", lg: "repeat(3, minmax(0, 1fr))" }, gap: 3 }}>
-              {wealthProducts.length > 0 ? wealthProducts.map((product) => (
-                <AffiliateCard
-                  key={product.id}
-                  name={product.name}
-                  description={product.description}
-                  price={product.price}
-                  originalPrice={product.originalPrice}
-                  image={product.image}
-                  images={product.images}
-                  link={product.url}
-                  platform={product.platform}
-                  platformLabel={product.platform}
-                  productSlug={product.productSlug}
-                  productType={product.productType}
-                  internalSlug={product.internalSlug}
-                  rating={product.rating}
-                  reviewCount={product.reviewCount}
-                  variant="sidebar"
-                  accentColor="#FF8E9E"
-                  badge="ดึงดูดทรัพย์เสี่ยงดวง"
-                />
-              )) : (
-                <Box
-                  sx={{
-                    minHeight: 170,
-                    borderRadius: "16px",
-                    border: "2px dashed rgba(45,37,32,0.35)",
-                    bgcolor: "#FAF8F2",
-                    display: "grid",
-                    placeItems: "center",
-                    px: 2,
-                    textAlign: "center",
-                    gridColumn: { xs: "auto", md: "1 / -1" },
-                  }}
-                >
-                  <Typography sx={{ color: "#5A4D43", fontSize: "0.95rem", fontWeight: 800, fontFamily: "var(--font-prompt), sans-serif" }}>
-                    ยังไม่มีสินค้า
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          </Box>
+        <AffiliatePlacementProducts
+          placement="LOTTERY_WEALTH"
+          fallbackAspect="wealth"
+          scope="lottery-wealth"
+          eyebrow="RECOMMENDED WEALTH ITEMS"
+          title="ของมงคลนำโชคเสริมดวงโชคลาภและการเงิน"
+          description="เพิ่มพลังหนุนนำดวงการเงินและช่วยเปิดทางโชคลาภให้คุณอย่างราบรื่น! อาจารย์คัดสรรไอเทมสายมูยอดนิยมที่ผ่านพิธีประจุพลังงานเสริมสิริมงคล เสริมดวงโภคทรัพย์มาให้บูชาค่ะ"
+          fixedBadge="ดึงดูดทรัพย์เสี่ยงดวง"
+          emptyGridColumn={{ gridColumn: { xs: "auto", md: "1 / -1" } }}
+        />
 
         {/* History Table Section */}
         <Box sx={{ mt: { xs: 5, md: 6 } }}>

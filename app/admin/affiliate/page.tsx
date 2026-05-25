@@ -77,6 +77,7 @@ const ASPECTS = [
 
 const PLACEMENT_OPTIONS = [
   { value: "LUCKY_COLORS", label: "หน้า สีมงคล" },
+  { value: "LOTTERY_WEALTH", label: "หน้า ตรวจลอตเตอรี่" },
 ];
 
 const RETAIL_CATEGORIES = [

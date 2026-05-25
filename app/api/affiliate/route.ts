@@ -15,6 +15,7 @@ export async function GET(request: Request) {
     const element = searchParams.get("element") as Element | null;
     const category = searchParams.get("category");
     const aspect = searchParams.get("aspect");
+    const placement = searchParams.get("placement");
     const admin = searchParams.get("admin") === "1";
 
     const products = await prisma.$queryRaw<any[]>`
@@ -30,6 +31,7 @@ export async function GET(request: Request) {
         AND (${element ?? null} IS NULL OR m.element = ${element ?? null})
         AND (${category ?? null} IS NULL OR m.category = ${category ?? null})
         AND (${aspect ?? null} IS NULL OR m.aspect = ${aspect ?? null})
+        AND (${placement ?? null} IS NULL OR JSON_CONTAINS(m.placements, JSON_QUOTE(${placement ?? null})))
       ORDER BY m.createdAt DESC
     `;
 
@@ -41,7 +43,11 @@ export async function GET(request: Request) {
       blogaffiliateproductCount: undefined,
     }));
 
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
+    });
   } catch (error) {
     console.error("Fetch Affiliate Error:", error);
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
@@ -105,6 +111,7 @@ export async function POST(request: Request) {
     }
 
     revalidatePath("/lucky-colors");
+    revalidatePath("/lottery");
 
     return NextResponse.json(product);
   } catch (error) {
