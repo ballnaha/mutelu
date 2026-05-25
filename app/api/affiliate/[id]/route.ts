@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { ProductType } from "@prisma/client";
 
@@ -46,6 +47,8 @@ export async function PATCH(
       `;
     }
 
+    revalidatePath("/lucky-colors");
+
     return NextResponse.json(product);
   } catch (error) {
     console.error("Update Affiliate Error:", error);
@@ -63,6 +66,8 @@ export async function DELETE(
     await prisma.masterAffiliateProduct.delete({
       where: { id },
     });
+
+    revalidatePath("/lucky-colors");
 
     return NextResponse.json({ message: "Product deleted successfully" });
   } catch (error) {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { Element, ProductType } from "@prisma/client";
 
@@ -102,6 +103,8 @@ export async function POST(request: Request) {
         WHERE id = ${product.id}
       `;
     }
+
+    revalidatePath("/lucky-colors");
 
     return NextResponse.json(product);
   } catch (error) {

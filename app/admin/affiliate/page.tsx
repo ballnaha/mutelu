@@ -23,6 +23,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Tabs,
   TextField,
@@ -33,6 +34,7 @@ import {
 import { Add, Edit, Eye, EyeSlash, Refresh, Shop, Trash } from "iconsax-react";
 import { deleteImage, uploadProductImage } from "../blog/actions";
 import ImageUpload from "../blog/_components/image-upload";
+import { useSnackbar } from "../_context/snackbar-context";
 
 function isProductUpload(imageUrl: string) {
   return imageUrl.startsWith("/api/uploads/product/") || imageUrl.startsWith("/uploads/product/");
@@ -243,6 +245,7 @@ function parseProductPlacements(placements: unknown) {
 export default function AdminAffiliatePage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { showSnackbar } = useSnackbar();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
@@ -260,6 +263,8 @@ export default function AdminAffiliatePage() {
   const [categoryDeleteMessage, setCategoryDeleteMessage] = useState("");
   const [isCategorySaving, setIsCategorySaving] = useState(false);
   const [productFilters, setProductFilters] = useState<ProductFilters>(emptyProductFilters);
+  const [productPage, setProductPage] = useState(0);
+  const [productsPerPage, setProductsPerPage] = useState(10);
 
   const categoryOptions = categories.length > 0
     ? categories.filter((category) => category.isActive).map((category) => ({ value: category.name, label: category.name }))
@@ -279,9 +284,14 @@ export default function AdminAffiliatePage() {
     try {
       const res = await fetch("/api/affiliate?admin=1");
       const data = await res.json();
-      setProducts(data);
+      if (Array.isArray(data)) {
+        setProducts(data);
+      } else {
+        showSnackbar("ไม่สามารถโหลดข้อมูลสินค้าได้", "error");
+      }
     } catch (error) {
       console.error("Fetch error:", error);
+      showSnackbar("ไม่สามารถโหลดข้อมูลสินค้าได้", "error");
     } finally {
       setIsLoading(false);
     }
@@ -291,9 +301,14 @@ export default function AdminAffiliatePage() {
     try {
       const res = await fetch("/api/affiliate-categories?admin=1");
       const data = await res.json();
-      if (Array.isArray(data)) setCategories(data);
+      if (Array.isArray(data)) {
+        setCategories(data);
+      } else {
+        showSnackbar("ไม่สามารถโหลดประเภทสินค้าได้", "error");
+      }
     } catch (error) {
       console.error("Fetch categories error:", error);
+      showSnackbar("ไม่สามารถโหลดประเภทสินค้าได้", "error");
     }
   };
 
@@ -309,7 +324,10 @@ export default function AdminAffiliatePage() {
         if (Array.isArray(productData)) setProducts(productData);
         if (Array.isArray(categoryData)) setCategories(categoryData);
       })
-      .catch((error) => console.error("Fetch error:", error))
+      .catch((error) => {
+        console.error("Fetch error:", error);
+        showSnackbar("ไม่สามารถโหลดข้อมูลหลังบ้านได้", "error");
+      })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
       });
@@ -440,9 +458,14 @@ export default function AdminAffiliatePage() {
         }
         await fetchProducts();
         setOpen(false);
+        showSnackbar(editingProduct ? "อัปเดตสินค้าเรียบร้อยแล้ว" : "เพิ่มสินค้าเรียบร้อยแล้ว", "success");
+      } else {
+        const data = await res.json().catch(() => null);
+        showSnackbar(data?.error || "ไม่สามารถบันทึกสินค้าได้", "error");
       }
     } catch (error) {
       console.error("Submit error:", error);
+      showSnackbar("ไม่สามารถบันทึกสินค้าได้", "error");
     } finally {
       setIsSaving(false);
     }
@@ -472,9 +495,14 @@ export default function AdminAffiliatePage() {
         }
         setDeletingProduct(null);
         await fetchProducts();
+        showSnackbar("ลบสินค้าเรียบร้อยแล้ว", "success");
+      } else {
+        const data = await res.json().catch(() => null);
+        showSnackbar(data?.error || "ไม่สามารถลบสินค้าได้", "error");
       }
     } catch (error) {
       console.error("Delete error:", error);
+      showSnackbar("ไม่สามารถลบสินค้าได้", "error");
     } finally {
       setIsProductDeleting(false);
     }
@@ -495,12 +523,14 @@ export default function AdminAffiliatePage() {
       if (res.ok) {
         setCategoryName("");
         await fetchCategories();
+        showSnackbar("เพิ่มประเภทสินค้าเรียบร้อยแล้ว", "success");
       } else {
         const data = await res.json();
-        alert(data.error || "ไม่สามารถเพิ่มประเภทสินค้าได้");
+        showSnackbar(data.error || "ไม่สามารถเพิ่มประเภทสินค้าได้", "error");
       }
     } catch (error) {
       console.error("Create category error:", error);
+      showSnackbar("ไม่สามารถเพิ่มประเภทสินค้าได้", "error");
     } finally {
       setIsCategorySaving(false);
     }
@@ -536,12 +566,14 @@ export default function AdminAffiliatePage() {
       if (res.ok) {
         handleCancelEditCategory();
         await Promise.all([fetchCategories(), fetchProducts(false)]);
+        showSnackbar("แก้ไขประเภทสินค้าเรียบร้อยแล้ว", "success");
       } else {
         const data = await res.json();
-        alert(data.error || "ไม่สามารถแก้ไขประเภทสินค้าได้");
+        showSnackbar(data.error || "ไม่สามารถแก้ไขประเภทสินค้าได้", "error");
       }
     } catch (error) {
       console.error("Update category error:", error);
+      showSnackbar("ไม่สามารถแก้ไขประเภทสินค้าได้", "error");
     } finally {
       setIsCategorySaving(false);
     }
@@ -554,9 +586,16 @@ export default function AdminAffiliatePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: category.id, isActive: !category.isActive }),
       });
-      if (res.ok) fetchCategories();
+      if (res.ok) {
+        await fetchCategories();
+        showSnackbar(category.isActive ? "ปิดประเภทสินค้าแล้ว" : "เปิดประเภทสินค้าแล้ว", "success");
+      } else {
+        const data = await res.json().catch(() => null);
+        showSnackbar(data?.error || "ไม่สามารถเปลี่ยนสถานะประเภทสินค้าได้", "error");
+      }
     } catch (error) {
       console.error("Toggle category error:", error);
+      showSnackbar("ไม่สามารถเปลี่ยนสถานะประเภทสินค้าได้", "error");
     }
   };
 
@@ -583,13 +622,16 @@ export default function AdminAffiliatePage() {
         setDeletingCategory(null);
         setCategoryDeleteMessage("");
         await fetchCategories();
+        showSnackbar("ลบประเภทสินค้าเรียบร้อยแล้ว", "success");
       } else {
         const data = await res.json();
         setCategoryDeleteMessage(data.error === "Category is used by products" ? "ประเภทนี้ถูกใช้อยู่ในสินค้า ให้ปิดสถานะแทนการลบ" : data.error || "ไม่สามารถลบประเภทสินค้าได้");
+        showSnackbar("ไม่สามารถลบประเภทสินค้าได้", "warning");
       }
     } catch (error) {
       console.error("Delete category error:", error);
       setCategoryDeleteMessage("ไม่สามารถลบประเภทสินค้าได้");
+      showSnackbar("ไม่สามารถลบประเภทสินค้าได้", "error");
     } finally {
       setIsCategorySaving(false);
     }
@@ -602,9 +644,16 @@ export default function AdminAffiliatePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !product.isActive }),
       });
-      if (res.ok) fetchProducts();
+      if (res.ok) {
+        await fetchProducts(false);
+        showSnackbar(product.isActive ? "ปิดการใช้งานสินค้าแล้ว" : "เปิดการใช้งานสินค้าแล้ว", "success");
+      } else {
+        const data = await res.json().catch(() => null);
+        showSnackbar(data?.error || "ไม่สามารถเปลี่ยนสถานะสินค้าได้", "error");
+      }
     } catch (error) {
       console.error("Toggle error:", error);
+      showSnackbar("ไม่สามารถเปลี่ยนสถานะสินค้าได้", "error");
     }
   };
 
@@ -646,6 +695,20 @@ export default function AdminAffiliatePage() {
       return matchesQuery && matchesProductType && matchesPlatform && matchesCategory && matchesElement && matchesAspect && matchesStatus && matchesUsage;
     });
   }, [productFilters, tableProducts]);
+
+  useEffect(() => {
+    setProductPage(0);
+  }, [activeTab, productFilters]);
+
+  useEffect(() => {
+    const maxPage = Math.max(0, Math.ceil(filteredProducts.length / productsPerPage) - 1);
+    if (productPage > maxPage) setProductPage(maxPage);
+  }, [filteredProducts.length, productPage, productsPerPage]);
+
+  const paginatedProducts = useMemo(
+    () => filteredProducts.slice(productPage * productsPerPage, productPage * productsPerPage + productsPerPage),
+    [filteredProducts, productPage, productsPerPage],
+  );
 
   const activeProductFilterCount = Object.entries(productFilters).filter(([key, value]) => {
     if (key === "query") return Boolean(value.trim());
@@ -793,7 +856,6 @@ export default function AdminAffiliatePage() {
                       size="medium"
                       color={category.isActive ? "default" : "error"}
                       variant={category.isActive ? "filled" : "outlined"}
-                      onClick={() => handleToggleCategory(category)}
                       sx={{
                         height: 34,
                         bgcolor: "transparent",
@@ -804,6 +866,21 @@ export default function AdminAffiliatePage() {
                         "& .MuiChip-label": { px: 1.2, fontSize: "0.9rem", overflow: "hidden", textOverflow: "ellipsis" },
                       }}
                     />
+                    <IconButton
+                      size="small"
+                      aria-label={`${category.isActive ? "ปิด" : "เปิด"}ประเภท ${category.name}`}
+                      onClick={() => handleToggleCategory(category)}
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        color: category.isActive ? "#10b981" : "#94a3b8",
+                        bgcolor: category.isActive ? "#ecfdf5" : "#f1f5f9",
+                        border: `1px solid ${category.isActive ? "#bbf7d0" : "#e2e8f0"}`,
+                        "&:hover": { bgcolor: category.isActive ? "#d1fae5" : "#e2e8f0" },
+                      }}
+                    >
+                      {category.isActive ? <Eye size={17} color="currentColor" variant="Bulk" /> : <EyeSlash size={17} color="currentColor" variant="Bulk" />}
+                    </IconButton>
                     <IconButton
                       size="small"
                       aria-label={`แก้ไขประเภท ${category.name}`}
@@ -831,7 +908,10 @@ export default function AdminAffiliatePage() {
       <Paper elevation={0} sx={{ borderRadius: { xs: "14px", sm: "20px" }, border: "1px solid #e2e8f0", overflow: "hidden" }}>
         <Tabs
           value={activeTab}
-          onChange={(_, value) => setActiveTab(value)}
+          onChange={(_, value) => {
+            setActiveTab(value);
+            setProductPage(0);
+          }}
           variant={isMobile ? "scrollable" : "standard"}
           scrollButtons={isMobile ? "auto" : false}
           sx={{ px: { xs: 1, sm: 2 }, borderBottom: "1px solid #e2e8f0", "& .MuiTab-root": { minWidth: { xs: 112, sm: 90 }, fontWeight: 800 } }}
@@ -955,7 +1035,10 @@ export default function AdminAffiliatePage() {
               <Button
                 variant="text"
                 disabled={activeProductFilterCount === 0}
-                onClick={() => setProductFilters(emptyProductFilters)}
+                onClick={() => {
+                  setProductFilters(emptyProductFilters);
+                  setProductPage(0);
+                }}
                 sx={{ borderRadius: "10px", color: "#64748b", fontWeight: 800 }}
               >
                 ล้างตัวกรอง{activeProductFilterCount > 0 ? ` (${activeProductFilterCount})` : ""}
@@ -971,10 +1054,42 @@ export default function AdminAffiliatePage() {
           </Box>
         ) : (
           isMobile ? (
-            <ProductMobileList products={filteredProducts} onEdit={handleOpen} onDelete={handleOpenDeleteProduct} onToggle={toggleStatus} />
+            <ProductMobileList products={paginatedProducts} onEdit={handleOpen} onDelete={handleOpenDeleteProduct} onToggle={toggleStatus} />
           ) : (
-            <ProductTable products={filteredProducts} onEdit={handleOpen} onDelete={handleOpenDeleteProduct} onToggle={toggleStatus} />
+            <ProductTable products={paginatedProducts} onEdit={handleOpen} onDelete={handleOpenDeleteProduct} onToggle={toggleStatus} />
           )
+        )}
+        {!isLoading && (
+          <TablePagination
+            component="div"
+            count={filteredProducts.length}
+            page={productPage}
+            rowsPerPage={productsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            labelRowsPerPage="แสดงต่อหน้า"
+            labelDisplayedRows={({ from, to, count }) => `${from}-${to} จาก ${count !== -1 ? count : `มากกว่า ${to}`}`}
+            onPageChange={(_, nextPage) => setProductPage(nextPage)}
+            onRowsPerPageChange={(event) => {
+              setProductsPerPage(parseInt(event.target.value, 10));
+              setProductPage(0);
+            }}
+            sx={{
+              borderTop: "1px solid #e2e8f0",
+              bgcolor: "#fff",
+              "& .MuiTablePagination-toolbar": {
+                px: { xs: 1, sm: 2 },
+                flexWrap: { xs: "wrap", sm: "nowrap" },
+                justifyContent: { xs: "center", sm: "flex-end" },
+                rowGap: 0.75,
+              },
+              "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+                m: 0,
+                fontSize: { xs: "0.78rem", sm: "0.875rem" },
+                fontWeight: 700,
+                color: "#64748b",
+              },
+            }}
+          />
         )}
       </Paper>
 

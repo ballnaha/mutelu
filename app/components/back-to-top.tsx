@@ -2,12 +2,20 @@
 
 import { Box, IconButton, Tooltip } from "@mui/material";
 import { ArrowUp2 } from "iconsax-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export function BackToTop() {
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
+  const isAdminPage = pathname?.startsWith("/admin");
 
   useEffect(() => {
+    if (isAdminPage) {
+      setIsVisible(false);
+      return;
+    }
+
     const onScroll = () => {
       setIsVisible(window.scrollY > 420);
     };
@@ -17,7 +25,9 @@ export function BackToTop() {
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  }, []);
+  }, [isAdminPage]);
+
+  if (isAdminPage) return null;
 
   const handleClick = () => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
