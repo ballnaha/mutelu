@@ -11,6 +11,8 @@ import { getHomepageHeroPosts } from "@/lib/blog-posts";
 import { getMonthlyLuckyColors } from "@/lib/lucky-colors";
 import { absoluteUrl } from "@/lib/site";
 
+export const dynamic = "force-dynamic";
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mulamoon.com";
 const homepageTitle = "บทความสายมู ดูดวง สีมงคล ไพ่ยิปซี และสินค้ามงคลแนะนำ | mulamoon.";
 const homepageDescription =
