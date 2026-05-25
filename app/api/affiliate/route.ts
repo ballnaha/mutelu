@@ -111,6 +111,13 @@ export async function POST(request: Request) {
     }
 
     revalidatePath("/lucky-colors");
+    revalidatePath("/lucky-items");
+    revalidatePath("/sitemap.xml");
+    if (product.productType === ProductType.OWN_PRODUCT && product.internalSlug) {
+      revalidatePath(`/shop/${product.internalSlug}`);
+    } else {
+      revalidatePath(`/lucky-items/${product.productSlug || product.id}`);
+    }
     revalidatePath("/lottery");
 
     return NextResponse.json(product);

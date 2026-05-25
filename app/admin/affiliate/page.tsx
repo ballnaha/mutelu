@@ -201,12 +201,27 @@ function platformLabel(platform: string) {
 }
 
 function createProductSlug(name: string) {
-  return name
+  const normalizedName = name
+    .normalize("NFKD")
     .toLowerCase()
-    .trim()
-    .replace(/[^\u0E00-\u0E7F\w\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+    .trim();
+  const Segmenter = (Intl as typeof Intl & {
+    Segmenter?: new (locale: string, options: { granularity: "word" }) => {
+      segment: (input: string) => Iterable<{ segment: string; isWordLike?: boolean }>;
+    };
+  }).Segmenter;
+  const words = Segmenter
+    ? Array.from(new Segmenter("th", { granularity: "word" }).segment(normalizedName))
+      .filter((part) => part.isWordLike !== false)
+      .map((part) => part.segment)
+    : normalizedName.split(/\s+/);
+  const slugSource = words.length > 0 ? words.join("-") : normalizedName;
+
+  return slugSource
+    .replace(/[^\u0E00-\u0E7Fa-z0-9_-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 90);
 }
 
 function parseProductImages(images: unknown) {
@@ -1203,6 +1218,7 @@ export default function AdminAffiliatePage() {
                         platform: isOwn ? "mulamoon" : (prev.platform === "mulamoon" ? "shopee" : prev.platform),
                         url: (isOwn || prev.platform === "mulamoon") && (!prev.url || prev.url === "#" || prev.url === "") ? "https://line.me/R/ti/p/%40877xivsv" : prev.url,
                         internalSlug: isOwn && !prev.internalSlug ? (prev.productSlug || generatedSlug) : prev.internalSlug,
+                        productSlug: !isOwn && !prev.productSlug ? generatedSlug : prev.productSlug,
                       };
                     });
                   }}
@@ -1241,8 +1257,8 @@ export default function AdminAffiliatePage() {
                         setFormData((prev) => ({
                           ...prev,
                           name: nameVal,
-                          productSlug: !editingProduct ? generatedSlug : prev.productSlug,
-                          internalSlug: !editingProduct && (prev.productType === "OWN_PRODUCT" || !prev.internalSlug) ? generatedSlug : prev.internalSlug,
+                          productSlug: !prev.productSlug || prev.productSlug === createProductSlug(prev.name) ? generatedSlug : prev.productSlug,
+                          internalSlug: !prev.internalSlug || prev.internalSlug === createProductSlug(prev.name) ? generatedSlug : prev.internalSlug,
                         }));
                       }}
                       sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
@@ -1319,8 +1335,15 @@ export default function AdminAffiliatePage() {
                       sx={{ gridColumn: { xs: "span 12", md: "span 6" }, "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
                       label={formData.productType === "OWN_PRODUCT" ? "Slug สำหรับหน้า /shop/[slug]" : "Product Slug/ID"}
                       value={formData.productType === "OWN_PRODUCT" ? formData.internalSlug : formData.productSlug}
-                      helperText={formData.productType === "OWN_PRODUCT" ? "ต้องไม่ซ้ำกับสินค้าเราเองอื่น ๆ ใช้สร้าง URL เช่น /shop/lucky-bracelet-pink" : undefined}
-                      onChange={(e) => setFormData({ ...formData, productSlug: e.target.value, internalSlug: formData.productType === "OWN_PRODUCT" ? e.target.value : formData.internalSlug })}
+                      helperText={formData.productType === "OWN_PRODUCT" ? "สร้างอัตโนมัติจากชื่อสินค้าและแก้เองได้ ใช้สร้าง URL เช่น /shop/lucky-bracelet-pink" : "สร้างอัตโนมัติจากชื่อสินค้าและแก้เองได้ ใช้สร้าง URL เช่น /lucky-items/lucky-bracelet"}
+                      onChange={(e) => {
+                        const slugValue = createProductSlug(e.target.value);
+                        setFormData({
+                          ...formData,
+                          productSlug: formData.productType === "OWN_PRODUCT" ? formData.productSlug : slugValue,
+                          internalSlug: formData.productType === "OWN_PRODUCT" ? slugValue : formData.internalSlug,
+                        });
+                      }}
                     />
                     <TextField
                       sx={{ gridColumn: { xs: "span 12", md: "span 6" }, "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}

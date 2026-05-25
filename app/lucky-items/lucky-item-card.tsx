@@ -70,6 +70,14 @@ function productHref(product: Pick<LuckyItemProduct, "platform" | "productSlug" 
   return product.url;
 }
 
+function productDetailHref(product: Pick<LuckyItemProduct, "id" | "productSlug" | "productType" | "internalSlug">) {
+  if (product.productType === "OWN_PRODUCT" && product.internalSlug) {
+    return `/shop/${encodeURIComponent(product.internalSlug)}`;
+  }
+
+  return `/lucky-items/${encodeURIComponent(product.productSlug || product.id)}`;
+}
+
 function getDiscount(price: string, originalPrice?: string | null) {
   if (!originalPrice) return null;
 
@@ -159,6 +167,7 @@ export function LuckyItemCard({ product }: { product: LuckyItemProduct }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const href = productHref(product);
+  const detailHref = productDetailHref(product);
   const discount = getDiscount(product.price, product.originalPrice);
   const platform = platformTheme(product.platform);
   const ownProduct = isOwnProduct(product);
@@ -245,9 +254,8 @@ export function LuckyItemCard({ product }: { product: LuckyItemProduct }) {
         }}
       >
         <Box
-          component="button"
-          type="button"
-          onClick={() => setOpen(true)}
+          component="a"
+          href={detailHref}
           aria-label={`ดูรายละเอียด ${product.name}`}
           sx={{
             position: "relative",
@@ -261,6 +269,7 @@ export function LuckyItemCard({ product }: { product: LuckyItemProduct }) {
             placeItems: "center",
             overflow: "hidden",
             cursor: "pointer",
+            textDecoration: "none",
           }}
         >
           <Box
@@ -304,15 +313,15 @@ export function LuckyItemCard({ product }: { product: LuckyItemProduct }) {
           </Stack>
 
           <Typography
-            component="button"
-            type="button"
-            onClick={() => setOpen(true)}
+            component="a"
+            href={detailHref}
             sx={{
               p: 0,
               border: 0,
               bgcolor: "transparent",
               textAlign: "left",
               cursor: "pointer",
+              textDecoration: "none",
               color: "#2D2520",
               fontSize: { xs: "0.82rem", sm: "0.98rem" },
               fontWeight: 950,
@@ -359,10 +368,10 @@ export function LuckyItemCard({ product }: { product: LuckyItemProduct }) {
               </Typography>
             </Stack>
             <Button
-              type="button"
+              component="a"
+              href={detailHref}
               variant="contained"
               endIcon={<ArrowRight size={15} color="currentColor" />}
-              onClick={() => setOpen(true)}
               sx={{
                 ...neoBrutalistBtn("#FFFDF9", "#2D2520", "#FFF066"),
                 minWidth: { xs: 66, sm: 92 },

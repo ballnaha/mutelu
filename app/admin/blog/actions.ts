@@ -168,6 +168,14 @@ async function assertUniqueBlogSlug(slug: string, exceptPostId?: string) {
   }
 }
 
+function revalidateBlogPublicPages(slug?: string | null, previousSlug?: string | null) {
+  revalidatePath("/");
+  revalidatePath("/blog");
+  revalidatePath("/sitemap.xml");
+  if (slug) revalidatePath(`/blog/${slug}`);
+  if (previousSlug && previousSlug !== slug) revalidatePath(`/blog/${previousSlug}`);
+}
+
 export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
   const {
     title,
@@ -249,9 +257,7 @@ export async function createBlogPost(data: any, blocks: BlogBlockInput[]) {
   });
 
   revalidatePath("/admin/blog");
-  revalidatePath("/");
-  revalidatePath("/blog");
-  revalidatePath(`/blog/${slug}`);
+  revalidateBlogPublicPages(slug);
   return result;
 }
 
@@ -279,6 +285,10 @@ export async function updateBlogPost(id: string, data: any, blocks: BlogBlockInp
   const selectedHeroSlot = normalizeHeroSlot(featuredOnHome, homeHeroSlot);
 
   await assertUniqueBlogSlug(slug, id);
+  const previousPost = await prisma.blogpost.findUnique({
+    where: { id },
+    select: { slug: true },
+  });
 
   // Transaction to update post and replace sections/products
   const result = await prisma.$transaction(async (tx) => {
@@ -343,9 +353,7 @@ export async function updateBlogPost(id: string, data: any, blocks: BlogBlockInp
   });
 
   revalidatePath("/admin/blog");
-  revalidatePath("/");
-  revalidatePath("/blog");
-  revalidatePath(`/blog/${slug}`);
+  revalidateBlogPublicPages(slug, previousPost?.slug);
   return result;
 }
 
@@ -377,9 +385,7 @@ export async function deleteBlogPost(id: string) {
   }
 
   revalidatePath("/admin/blog");
-  revalidatePath("/");
-  revalidatePath("/blog");
-  if (post?.slug) revalidatePath(`/blog/${post.slug}`);
+  revalidateBlogPublicPages(post?.slug);
 }
 
 async function uploadImageToFolder(formData: FormData, folder = "") {
@@ -447,6 +453,8 @@ function revalidateCategoryAdminPages() {
   revalidatePath("/admin/categories");
   revalidatePath("/admin/blog");
   revalidatePath("/admin/blog/new");
+  revalidatePath("/blog");
+  revalidatePath("/sitemap.xml");
 }
 
 export async function getCategories() {
