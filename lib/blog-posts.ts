@@ -554,6 +554,23 @@ export async function getHomepageHeroPosts(limit = 9): Promise<HomepageHeroPost[
 
 export async function getAffiliateTargetUrl(platform: string, productSlug: string) {
   try {
+    // 1. Try to find in Master catalog first
+    const masterProduct = await prisma.masterAffiliateProduct.findFirst({
+      where: {
+        platform,
+        productSlug,
+        isActive: true,
+      },
+      select: {
+        url: true,
+      },
+    });
+
+    if (masterProduct?.url) {
+      return masterProduct.url;
+    }
+
+    // 2. Fallback to BlogAffiliateProduct
     const products = await prisma.$queryRaw<AffiliateTargetRow[]>`
       SELECT COALESCE(m.url, b.targetUrl) AS targetUrl
       FROM BlogAffiliateProduct b
