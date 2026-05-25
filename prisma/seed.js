@@ -4,15 +4,25 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
-  const post = await prisma.blogPost.upsert({
+  const category = await prisma.blogcategory.upsert({
+    where: { slug: "career-and-wealth" },
+    update: { name: "งาน / การเงิน" },
+    create: {
+      id: "cat_career_wealth",
+      name: "งาน / การเงิน",
+      slug: "career-and-wealth",
+      updatedAt: new Date()
+    }
+  });
+
+  const post = await prisma.blogpost.upsert({
     where: { slug: "lucky-work-desk-items-2026" },
     update: {
       title: "จัดโต๊ะทำงานเสริมดวงปี 2569: ไอเทมเล็ก ๆ ที่ช่วยให้โฟกัสดีขึ้นและงานไหลลื่น",
       excerpt:
         "เปลี่ยนมุมทำงานให้เป็นพื้นที่ที่ช่วยตั้งหลัก เสริมสมาธิ และเปิดรับโอกาสดี ๆ ด้วยการจัดแสง สี และของใช้บนโต๊ะอย่างมีจังหวะ",
-      category: "งาน / การเงิน",
+      categoryId: category.id,
       publishedAt: new Date("2026-05-15T02:00:00.000Z"),
-      readMinutes: 6,
       authorName: "MULAMOON Editorial",
       authorRole: "ทีมบรรณาธิการไลฟ์สไตล์และมูเตลู",
       heroImage: "/images/hero-bg.png",
@@ -21,15 +31,16 @@ async function main() {
       seoDescription:
         "ไอเดียจัดโต๊ะทำงานให้ใช้งานง่าย สบายตา และช่วยเสริมบรรยากาศที่ดีสำหรับการงานและการเงิน",
       status: "PUBLISHED",
+      updatedAt: new Date(),
     },
     create: {
+      id: "36e7e129",
       slug: "lucky-work-desk-items-2026",
       title: "จัดโต๊ะทำงานเสริมดวงปี 2569: ไอเทมเล็ก ๆ ที่ช่วยให้โฟกัสดีขึ้นและงานไหลลื่น",
       excerpt:
         "เปลี่ยนมุมทำงานให้เป็นพื้นที่ที่ช่วยตั้งหลัก เสริมสมาธิ และเปิดรับโอกาสดี ๆ ด้วยการจัดแสง สี และของใช้บนโต๊ะอย่างมีจังหวะ",
-      category: "งาน / การเงิน",
+      categoryId: category.id,
       publishedAt: new Date("2026-05-15T02:00:00.000Z"),
-      readMinutes: 6,
       authorName: "MULAMOON Editorial",
       authorRole: "ทีมบรรณาธิการไลฟ์สไตล์และมูเตลู",
       heroImage: "/images/hero-bg.png",
@@ -38,15 +49,17 @@ async function main() {
       seoDescription:
         "ไอเดียจัดโต๊ะทำงานให้ใช้งานง่าย สบายตา และช่วยเสริมบรรยากาศที่ดีสำหรับการงานและการเงิน",
       status: "PUBLISHED",
+      updatedAt: new Date(),
     },
   });
 
-  await prisma.blogPostSection.deleteMany({ where: { postId: post.id } });
-  await prisma.blogAffiliateProduct.deleteMany({ where: { postId: post.id } });
+  await prisma.blogpostsection.deleteMany({ where: { postId: post.id } });
+  await prisma.blogaffiliateproduct.deleteMany({ where: { postId: post.id } });
 
-  await prisma.blogPostSection.createMany({
+  await prisma.blogpostsection.createMany({
     data: [
       {
+        id: "section1",
         postId: post.id,
         heading: "เริ่มจากโต๊ะที่ใช้งานได้จริง",
         paragraphs: [
@@ -54,8 +67,10 @@ async function main() {
           "หลักง่าย ๆ คือเก็บของที่ไม่ได้ใช้ประจำออกจากระยะสายตา เหลือเฉพาะสิ่งที่หยิบใช้จริง เช่น คอมพิวเตอร์ สมุด ปากกา โคมไฟ และของชิ้นเล็กที่ทำให้รู้สึกมั่นใจ การเว้นพื้นที่ว่างด้านหน้าโต๊ะเล็กน้อยช่วยให้วันทำงานไม่แน่นจนเกินไป",
         ],
         sortOrder: 10,
+        updatedAt: new Date(),
       },
       {
+        id: "section2",
         postId: post.id,
         heading: "เลือกสีและแสงให้เข้ากับงาน",
         paragraphs: [
@@ -63,8 +78,10 @@ async function main() {
           "สายการเงิน งานขาย หรือผู้ที่ต้องเจรจาบ่อย อาจเติมสีเขียว น้ำเงิน หรือทองในจุดเล็ก ๆ เช่น ถาดวางของ แก้วน้ำ หรือกรอบรูป สีเหล่านี้ช่วยสร้างความรู้สึกมั่นคง มีระเบียบ และพร้อมรับโอกาสใหม่ ๆ",
         ],
         sortOrder: 20,
+        updatedAt: new Date(),
       },
       {
+        id: "section3",
         postId: post.id,
         heading: "ไอเทมที่ช่วยจัดระเบียบพลังงาน",
         paragraphs: [
@@ -72,8 +89,10 @@ async function main() {
           "ไอเทมที่เหมาะกับโต๊ะทำงานขนาดเล็กคือโคมไฟปรับแสง ถาดวางของจุกจิก หินหรือเครื่องประดับโทนสีที่ชอบ และต้นไม้ดูแลง่ายหนึ่งกระถาง สิ่งสำคัญคือเลือกให้เข้ากับกิจวัตรของตัวเองมากกว่าตามกระแสเพียงอย่างเดียว",
         ],
         sortOrder: 30,
+        updatedAt: new Date(),
       },
       {
+        id: "section4",
         postId: post.id,
         heading: "ดูแลมุมทำงานให้พร้อมรับโอกาส",
         paragraphs: [
@@ -81,13 +100,15 @@ async function main() {
           "เมื่อพื้นที่ทำงานพร้อม ใจเราก็มักพร้อมตามไปด้วย การเสริมดวงที่ดีจึงเริ่มจากสิ่งใกล้ตัวที่สุด: โต๊ะที่ใช้ได้จริง แสงที่ทำให้มองชัด และของไม่กี่ชิ้นที่เตือนให้เรากลับมาโฟกัสกับเป้าหมายของวัน",
         ],
         sortOrder: 40,
+        updatedAt: new Date(),
       },
     ],
   });
 
-  await prisma.blogAffiliateProduct.createMany({
+  await prisma.blogaffiliateproduct.createMany({
     data: [
       {
+        id: "aff1",
         postId: post.id,
         title: "โคมไฟตั้งโต๊ะปรับแสง โทนอบอุ่น",
         platform: "shopee",
@@ -99,8 +120,10 @@ async function main() {
         accent: "#2563eb",
         targetUrl: "https://shopee.co.th/search?keyword=desk%20lamp",
         sortOrder: 10,
+        updatedAt: new Date(),
       },
       {
+        id: "aff2",
         postId: post.id,
         title: "ถาดหินมงคลวางโต๊ะ สีเขียวหยก",
         platform: "lazada",
@@ -112,6 +135,7 @@ async function main() {
         accent: "#10b981",
         targetUrl: "https://www.lazada.co.th/catalog/?q=stone%20tray",
         sortOrder: 20,
+        updatedAt: new Date(),
       },
     ],
   });

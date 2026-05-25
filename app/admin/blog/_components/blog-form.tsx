@@ -112,19 +112,33 @@ export default function BlogForm({ initialData, categories, heroSlotAssignments 
   const [affiliateProducts, setAffiliateProducts] = useState<MasterAffiliateProduct[]>([]);
 
   // Form State
-  const [formData, setFormData] = useState({
-    title: initialData?.title || "",
-    slug: initialData?.slug || "",
-    excerpt: initialData?.excerpt || "",
-    categoryId: initialData?.categoryId || "",
-    heroImage: initialData?.heroImage || "",
-    featuredOnHome: initialData?.featuredOnHome || false,
-    homeHeroSlot: initialData?.homeHeroSlot || 1,
-    tags: initialData?.tags || [],
-    seoTitle: initialData?.seoTitle || "",
-    seoDescription: initialData?.seoDescription || "",
-    status: initialData?.status || "DRAFT",
-    publishedAt: (initialData?.publishedAt ? dayjs(initialData.publishedAt) : dayjs()) as Dayjs | null,
+  const [formData, setFormData] = useState(() => {
+    let initialTags = initialData?.tags || [];
+    if (typeof initialTags === "string") {
+      try {
+        initialTags = JSON.parse(initialTags);
+      } catch {
+        initialTags = [initialTags];
+      }
+    }
+    if (!Array.isArray(initialTags)) {
+      initialTags = [];
+    }
+
+    return {
+      title: initialData?.title || "",
+      slug: initialData?.slug || "",
+      excerpt: initialData?.excerpt || "",
+      categoryId: initialData?.categoryId || "",
+      heroImage: initialData?.heroImage || "",
+      featuredOnHome: initialData?.featuredOnHome || false,
+      homeHeroSlot: initialData?.homeHeroSlot || 1,
+      tags: initialTags,
+      seoTitle: initialData?.seoTitle || "",
+      seoDescription: initialData?.seoDescription || "",
+      status: initialData?.status || "DRAFT",
+      publishedAt: (initialData?.publishedAt ? dayjs(initialData.publishedAt) : dayjs()) as Dayjs | null,
+    };
   });
   const selectedHeroSlot = Number(formData.homeHeroSlot) || 1;
   const heroSlotConflict = formData.featuredOnHome
@@ -135,8 +149,40 @@ export default function BlogForm({ initialData, categories, heroSlotAssignments 
   const [blocks, setBlocks] = useState<BlogBlockInput[]>(() => {
     if (!initialData) return [];
 
-    const sections = (initialData.blogpostsection || []).map((s: any) => ({ ...s, type: "section" }));
-    const products = (initialData.blogaffiliateproduct || []).map((p: any) => ({ ...p, masterProductId: p.masterProductId || "", type: "product" }));
+    const sections = (initialData.blogpostsection || []).map((s: any) => {
+      let paragraphs = s.paragraphs;
+      if (typeof paragraphs === "string") {
+        try {
+          paragraphs = JSON.parse(paragraphs);
+        } catch {
+          paragraphs = [paragraphs];
+        }
+      }
+      if (!Array.isArray(paragraphs)) {
+        paragraphs = [];
+      }
+      return { ...s, paragraphs, type: "section" };
+    });
+
+    const products = (initialData.blogaffiliateproduct || []).map((p: any) => {
+      let highlights = p.highlights;
+      if (typeof highlights === "string") {
+        try {
+          highlights = JSON.parse(highlights);
+        } catch {
+          highlights = [highlights];
+        }
+      }
+      if (!Array.isArray(highlights)) {
+        highlights = [];
+      }
+      return {
+        ...p,
+        highlights,
+        masterProductId: p.masterProductId || "",
+        type: "product",
+      };
+    });
 
     return [...sections, ...products].sort((a, b) => a.sortOrder - b.sortOrder);
   });
