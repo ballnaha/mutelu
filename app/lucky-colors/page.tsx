@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { ArrowLeft, Briefcase, Calendar, MagicStar, MoneyRecive, Heart, CloseCircle } from "iconsax-react";
 
@@ -17,8 +18,6 @@ export const metadata: Metadata = {
     canonical: "/lucky-colors",
   },
 };
-
-export const revalidate = 3600;
 
 const colorLabels = [
   { key: "work", label: "งาน", icon: Briefcase },
@@ -278,6 +277,8 @@ function MobileColorList({
 }
 
 export default async function LuckyColorsPage() {
+  await connection();
+
   const data = getMonthlyLuckyColors();
 
   if (!data) {
