@@ -13,94 +13,94 @@ const thaiMonths = [
   "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
 ];
 
-// Helper to get standard recent draw dates in Thailand dynamically based on official GLO rules
-function getRecentDraws() {
-  // Official, verified draw dates for 2024, 2025, and 2026 (CE year, month 0-indexed, day)
-  // These are the exact dates the Thai Government Lottery was drawn.
-  const officialDraws = [
-    // --- 2026 ---
-    { y: 2026, m: 4, d: 16 },  // 16 พฤษภาคม 2569
-    { y: 2026, m: 4, d: 2 },   // 2 พฤษภาคม 2569 (วันแรงงาน)
-    { y: 2026, m: 3, d: 16 },  // 16 เมษายน 2569
-    { y: 2026, m: 3, d: 1 },   // 1 เมษายน 2569
-    { y: 2026, m: 2, d: 16 },  // 16 มีนาคม 2569
-    { y: 2026, m: 2, d: 1 },   // 1 มีนาคม 2569
-    { y: 2026, m: 1, d: 16 },  // 16 กุมภาพันธ์ 2569
-    { y: 2026, m: 1, d: 1 },   // 1 กุมภาพันธ์ 2569
-    { y: 2026, m: 0, d: 17 },  // 17 มกราคม 2569 (วันครู)
-    { y: 2026, m: 0, d: 2 },   // 2 มกราคม 2569 (เลื่อนมาจาก 30 ธันวาคม 2568)
+const bangkokOffsetMs = 7 * 60 * 60 * 1000;
 
-    // --- 2025 ---
-    { y: 2025, m: 11, d: 16 }, // 16 ธันวาคม 2568
-    { y: 2025, m: 11, d: 1 },  // 1 ธันวาคม 2568
-    { y: 2025, m: 10, d: 16 }, // 16 พฤศจิกายน 2568
-    { y: 2025, m: 10, d: 1 },  // 1 พฤศจิกายน 2568
-    { y: 2025, m: 9, d: 16 },  // 16 ตุลาคม 2568
-    { y: 2025, m: 9, d: 1 },   // 1 ตุลาคม 2568
-    { y: 2025, m: 8, d: 16 },  // 16 กันยายน 2568
-    { y: 2025, m: 8, d: 1 },   // 1 กันยายน 2568
-    { y: 2025, m: 7, d: 16 },  // 16 สิงหาคม 2568
-    { y: 2025, m: 7, d: 1 },   // 1 สิงหาคม 2568
-    { y: 2025, m: 6, d: 16 },  // 16 กรกฎาคม 2568
-    { y: 2025, m: 6, d: 1 },   // 1 กรกฎาคม 2568
-    { y: 2025, m: 5, d: 17 },  // 17 มิถุนายน 2568 (วันหยุดชดเชยวันวิสาขบูชา เลื่อนจาก 16 มิ.ย.)
-    { y: 2025, m: 5, d: 1 },   // 1 มิถุนายน 2568
-    { y: 2025, m: 4, d: 16 },  // 16 พฤษภาคม 2568
-    { y: 2025, m: 4, d: 2 },   // 2 พฤษภาคม 2568 (วันแรงงาน)
-    { y: 2025, m: 3, d: 16 },  // 16 เมษายน 2568
-    { y: 2025, m: 3, d: 1 },   // 1 เมษายน 2568
-    { y: 2025, m: 2, d: 16 },  // 16 มีนาคม 2568
-    { y: 2025, m: 2, d: 1 },   // 1 มีนาคม 2568
-    { y: 2025, m: 1, d: 16 },  // 16 กุมภาพันธ์ 2568
-    { y: 2025, m: 1, d: 1 },   // 1 กุมภาพันธ์ 2568
-    { y: 2025, m: 0, d: 17 },  // 17 มกราคม 2568 (วันครู)
-    { y: 2025, m: 0, d: 2 },   // 2 มกราคม 2568 (วันขึ้นปีใหม่)
+const drawDateOverrides: Record<string, number> = {
+  "01-01": 2,
+  "01-16": 17,
+  "05-01": 2,
+};
 
-    // --- 2024 ---
-    { y: 2024, m: 11, d: 30 }, // 30 ธันวาคม 2567
-    { y: 2024, m: 11, d: 16 }, // 16 ธันวาคม 2567
-    { y: 2024, m: 11, d: 1 },  // 1 ธันวาคม 2567
-    { y: 2024, m: 10, d: 16 }, // 16 พฤศจิกายน 2567
-    { y: 2024, m: 10, d: 1 },  // 1 พฤศจิกายน 2567
-    { y: 2024, m: 9, d: 16 },  // 16 ตุลาคม 2567
-    { y: 2024, m: 9, d: 1 },   // 1 ตุลาคม 2567
-    { y: 2024, m: 8, d: 16 },  // 16 กันยายน 2567
-    { y: 2024, m: 8, d: 1 },   // 1 กันยายน 2567
-    { y: 2024, m: 7, d: 16 },  // 16 สิงหาคม 2567
-    { y: 2024, m: 7, d: 1 },   // 1 สิงหาคม 2567
-    { y: 2024, m: 6, d: 16 },  // 16 กรกฎาคม 2567
-    { y: 2024, m: 6, d: 1 },   // 1 กรกฎาคม 2567
-    { y: 2024, m: 5, d: 16 },  // 16 มิถุนายน 2567
-    { y: 2024, m: 5, d: 1 },   // 1 มิถุนายน 2567
-    { y: 2024, m: 4, d: 16 },  // 16 พฤษภาคม 2567
-    { y: 2024, m: 4, d: 2 },   // 2 พฤษภาคม 2567 (วันแรงงาน)
-    { y: 2024, m: 3, d: 16 },  // 16 เมษายน 2567
-    { y: 2024, m: 3, d: 1 },   // 1 เมษายน 2567
-    { y: 2024, m: 2, d: 16 },  // 16 มีนาคม 2567
-    { y: 2024, m: 2, d: 1 },   // 1 มีนาคม 2567
-    { y: 2024, m: 1, d: 16 },  // 16 กุมภาพันธ์ 2567
-    { y: 2024, m: 1, d: 1 },   // 1 กุมภาพันธ์ 2567
-    { y: 2024, m: 0, d: 17 },  // 17 มกราคม 2567 (วันครู)
-    { y: 2024, m: 0, d: 2 }    // 2 มกราคม 2567 (วันขึ้นปีใหม่)
-  ];
+type RecentDraw = LotteryDraw & {
+  gDate: string;
+  gMonth: string;
+  gYear: string;
+};
 
-  const now = new Date();
-  const draws = [];
+function getBangkokDateParts(date: Date) {
+  const bangkokDate = new Date(date.getTime() + bangkokOffsetMs);
 
-  for (const item of officialDraws) {
-    if (draws.length >= 30) break;
-    const drawDate = new Date(item.y, item.m, item.d, 16, 0, 0); // 4 PM of draw day
-    if (drawDate <= now) {
-      const dayStr = String(item.d).padStart(2, "0");
-      const monthStr = String(item.m + 1).padStart(2, "0");
-      const yearBE = item.y + 543;
-      draws.push({
-        id: `${dayStr}${monthStr}${yearBE}`,
-        date: `${item.d} ${thaiMonths[item.m]} ${yearBE}`,
-        gDate: dayStr,
-        gMonth: monthStr,
-        gYear: String(item.y),
-      });
+  return {
+    year: bangkokDate.getUTCFullYear(),
+    month: bangkokDate.getUTCMonth(),
+    day: bangkokDate.getUTCDate(),
+    hour: bangkokDate.getUTCHours(),
+    minute: bangkokDate.getUTCMinutes(),
+  };
+}
+
+function getDrawDay(month: number, scheduledDay: 1 | 16) {
+  const overrideKey = `${String(month + 1).padStart(2, "0")}-${String(scheduledDay).padStart(2, "0")}`;
+  const knownOverride = drawDateOverrides[overrideKey];
+
+  if (knownOverride) {
+    return knownOverride;
+  }
+
+  return scheduledDay;
+}
+
+function hasDrawTimePassed(draw: { y: number; m: number; d: number }, nowParts = getBangkokDateParts(new Date())) {
+  if (draw.y !== nowParts.year) return draw.y < nowParts.year;
+  if (draw.m !== nowParts.month) return draw.m < nowParts.month;
+  if (draw.d !== nowParts.day) return draw.d < nowParts.day;
+
+  return nowParts.hour > 16 || (nowParts.hour === 16 && nowParts.minute >= 0);
+}
+
+function formatRecentDraw(item: { y: number; m: number; d: number }): RecentDraw {
+  const dayStr = String(item.d).padStart(2, "0");
+  const monthStr = String(item.m + 1).padStart(2, "0");
+  const yearBE = item.y + 543;
+
+  return {
+    id: `${dayStr}${monthStr}${yearBE}`,
+    date: `${item.d} ${thaiMonths[item.m]} ${yearBE}`,
+    gDate: dayStr,
+    gMonth: monthStr,
+    gYear: String(item.y),
+  };
+}
+
+// Generate recent draw dates from the Thai Government Lottery schedule so the
+// latest draw does not depend on a manually updated hardcoded list.
+function getRecentDraws(limit = 30): RecentDraw[] {
+  const nowParts = getBangkokDateParts(new Date());
+  const draws: RecentDraw[] = [];
+  let year = nowParts.year;
+  let month = nowParts.month;
+
+  while (draws.length < limit) {
+    const monthDraws = [
+      { y: year, m: month, d: getDrawDay(month, 16) },
+      { y: year, m: month, d: getDrawDay(month, 1) },
+    ];
+
+    if (month === 11) {
+      monthDraws.unshift({ y: year, m: month, d: 30 });
+    }
+
+    for (const item of monthDraws) {
+      if (draws.length >= limit) break;
+      if (hasDrawTimePassed(item, nowParts)) {
+        draws.push(formatRecentDraw(item));
+      }
+    }
+
+    month -= 1;
+    if (month < 0) {
+      month = 11;
+      year -= 1;
     }
   }
 
